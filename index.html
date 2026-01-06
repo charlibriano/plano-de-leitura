@@ -4,163 +4,365 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Plano de Leitura 2026</title>
+  <meta name="theme-color" content="#0b0f14" />
   <style>
     :root{
-      --bg:#0b0f14;
-      --card:#121926;
-      --card2:#0f1623;
-      --text:#e8eef6;
-      --muted:#a9b6c6;
+      --bg:#070a10;
+      --bg2:#0b0f14;
+      --card:#0f1726;
+      --card2:#0b1220;
+      --text:#eaf0f7;
+      --muted:#aab6c7;
       --ok:#2ee59d;
       --warn:#ffcc66;
       --accent:#7aa7ff;
+      --accent2:#b27aff;
       --danger:#ff6b6b;
-      --shadow: 0 10px 30px rgba(0,0,0,0.25);
+      --border: rgba(255,255,255,0.10);
+      --shadow: 0 14px 40px rgba(0,0,0,0.45);
+      --shadow2: 0 10px 30px rgba(0,0,0,0.32);
+      --radius: 18px;
+      --radius2: 14px;
     }
+
     *{box-sizing:border-box}
+    html, body{height:100%}
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-      background: radial-gradient(1200px 800px at 20% 0%, #101a2a 0%, var(--bg) 60%);
       color:var(--text);
-    }
-    header{padding:20px 16px 12px 16px;max-width:1100px;margin:0 auto;}
-    .title{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
-    h1{margin:0 0 6px 0;font-size:22px;letter-spacing:0.2px}
-    .subtitle{margin:0;color:var(--muted);font-size:14px;line-height:1.4}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;padding:10px 12px;
-      background:rgba(122,167,255,0.12);
-      border:1px solid rgba(122,167,255,0.25);
-      border-radius:12px;font-size:13px;white-space:nowrap;
+      background:
+        radial-gradient(900px 600px at 15% -10%, rgba(122,167,255,0.20), transparent 60%),
+        radial-gradient(900px 600px at 95% 10%, rgba(178,122,255,0.18), transparent 55%),
+        radial-gradient(800px 600px at 60% 110%, rgba(46,229,157,0.10), transparent 55%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 60%, #06070b 100%);
+      overflow-x:hidden;
     }
 
-    main{max-width:1100px;margin:0 auto;padding:0 16px 170px 16px;}
+    /* Top bar */
+    header{
+      max-width:1100px;
+      margin:0 auto;
+      padding:18px 16px 8px 16px;
+    }
+    .hero{
+      border-radius: 22px;
+      padding:16px 16px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
+        radial-gradient(1000px 260px at 10% 0%, rgba(122,167,255,0.25), transparent 60%),
+        radial-gradient(800px 240px at 95% 0%, rgba(178,122,255,0.22), transparent 60%);
+      box-shadow: var(--shadow2);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:after{
+      content:"";
+      position:absolute;
+      inset:-2px -2px auto auto;
+      width:240px;height:240px;
+      background: radial-gradient(circle at 25% 25%, rgba(46,229,157,0.20), transparent 60%);
+      transform: rotate(15deg);
+      pointer-events:none;
+    }
+    .heroTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    h1{
+      margin:0 0 6px 0;
+      font-size:22px;
+      letter-spacing:0.25px;
+      font-weight: 950;
+    }
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      max-width: 740px;
+    }
+    .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      font-size:12px;
+      color: var(--text);
+      font-weight:900;
+      white-space:nowrap;
+      backdrop-filter: blur(8px);
+    }
+    .chip.ok{border-color: rgba(46,229,157,0.28); background: rgba(46,229,157,0.10);}
+    .chip.warn{border-color: rgba(255,204,102,0.28); background: rgba(255,204,102,0.10);}
+    .chip.danger{border-color: rgba(255,107,107,0.30); background: rgba(255,107,107,0.10);}
+
+    main{max-width:1100px;margin:0 auto;padding:10px 16px 170px 16px;}
+
     .grid{display:grid;grid-template-columns: 1.2fr 1fr;gap:14px;}
     @media (max-width: 980px){ .grid{grid-template-columns:1fr;} }
 
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:16px;
+      border-radius: var(--radius);
       padding:14px;
-      box-shadow: var(--shadow);
+      border:1px solid rgba(255,255,255,0.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+      box-shadow: var(--shadow2);
+      position:relative;
+      overflow:hidden;
     }
-    .card h2{margin:0 0 10px 0;font-size:16px}
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    label.small{font-size:12px;color:var(--muted);font-weight:700}
+    .card:before{
+      content:"";
+      position:absolute;inset:auto -100px -120px auto;
+      width:280px;height:280px;
+      background: radial-gradient(circle at 30% 30%, rgba(122,167,255,0.18), transparent 60%);
+      transform: rotate(-10deg);
+      pointer-events:none;
+    }
+    .card h2{
+      margin:0 0 10px 0;
+      font-size:15px;
+      font-weight:950;
+      letter-spacing:0.2px;
+      display:flex;align-items:center;gap:10px;
+    }
+
+    .row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+    label.small{font-size:12px;color:var(--muted);font-weight:800}
 
     select{
-      background: var(--card2);color:var(--text);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius:10px;padding:10px 10px;outline:none;min-width: 220px;
+      background: rgba(0,0,0,0.25);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,0.14);
+      border-radius: 14px;
+      padding:12px 12px;
+      outline:none;
+      min-width: 240px;
+      font-weight:850;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25) inset;
     }
 
     button{
       cursor:pointer;
-      background: rgba(122,167,255,0.14);
+      background: linear-gradient(180deg, rgba(122,167,255,0.20), rgba(122,167,255,0.08));
       color: var(--text);
-      border: 1px solid rgba(122,167,255,0.26);
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-weight:900;
+      border: 1px solid rgba(122,167,255,0.28);
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-weight:950;
       letter-spacing:0.2px;
-      transition: transform .05s ease, filter .15s ease, opacity .15s ease;
+      transition: transform .06s ease, filter .15s ease, opacity .15s ease;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 14px 26px rgba(0,0,0,0.25);
     }
     button:hover{filter:brightness(1.08)}
     button:active{transform: translateY(1px)}
-    button.secondary{background: rgba(255,255,255,0.06);border: 1px solid rgba(255,255,255,0.12);font-weight:850;}
-    button.ok{background: rgba(46,229,157,0.14);border:1px solid rgba(46,229,157,0.28);}
-    button.warn{background: rgba(255,204,102,0.12);border:1px solid rgba(255,204,102,0.26);}
-    button.danger{background: rgba(255,107,107,0.14);border:1px solid rgba(255,107,107,0.28);}
-    button:disabled{opacity:0.45;cursor:not-allowed;filter:none;transform:none;}
+    button.secondary{
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: none;
+      font-weight:900;
+    }
+    button.ok{
+      background: linear-gradient(180deg, rgba(46,229,157,0.20), rgba(46,229,157,0.08));
+      border:1px solid rgba(46,229,157,0.28);
+    }
+    button.warn{
+      background: linear-gradient(180deg, rgba(255,204,102,0.20), rgba(255,204,102,0.08));
+      border:1px solid rgba(255,204,102,0.28);
+    }
+    button.danger{
+      background: linear-gradient(180deg, rgba(255,107,107,0.20), rgba(255,107,107,0.08));
+      border:1px solid rgba(255,107,107,0.30);
+    }
+    button:disabled{opacity:0.45;cursor:not-allowed;filter:none;transform:none;box-shadow:none;}
 
-    .stat{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+    .stat{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:12px;
+    }
     @media (max-width: 520px){ .stat{grid-template-columns:1fr;} }
     .kpi{
-      padding:14px;border-radius:16px;
+      padding:14px;border-radius: var(--radius);
       border:1px solid rgba(255,255,255,0.10);
-      background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.12));
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.16));
+      box-shadow: var(--shadow2);
       position:relative;overflow:hidden;
     }
     .kpi:before{
-      content:"";position:absolute;inset:-40px -60px auto auto;width:160px;height:160px;
-      background: radial-gradient(circle at 30% 30%, rgba(122,167,255,0.35), transparent 60%);
-      transform: rotate(12deg);pointer-events:none;
+      content:"";
+      position:absolute;inset:-60px -70px auto auto;
+      width:220px;height:220px;
+      background: radial-gradient(circle at 30% 30%, rgba(122,167,255,0.26), transparent 60%);
+      transform: rotate(12deg);
+      pointer-events:none;
     }
     .kpiHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .kpi .k{font-size:12px;color:var(--muted);font-weight:900;letter-spacing:0.2px}
-    .kpi .v{font-size:22px;font-weight:950;margin-top:4px}
+    .kpi .k{font-size:12px;color:var(--muted);font-weight:950;letter-spacing:0.2px}
+    .kpi .v{font-size:26px;font-weight:980;margin-top:4px}
     .kpi .sub{margin-top:8px;font-size:12px;color:var(--muted);line-height:1.35}
-    .bar{height:10px;background: rgba(255,255,255,0.10);border-radius:999px;overflow:hidden;margin-top:10px;}
-    .bar > div{height:100%;width:0%;background: linear-gradient(90deg, var(--accent), var(--ok));border-radius:999px;transition: width .2s ease;}
-
+    .bar{
+      height:12px;background: rgba(255,255,255,0.10);
+      border-radius:999px;overflow:hidden;margin-top:10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.25) inset;
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(122,167,255,1), rgba(46,229,157,1));
+      border-radius:999px;
+      transition: width .25s ease;
+    }
     .kbd{
       font-size:11px;color:var(--muted);
       border:1px solid rgba(255,255,255,0.14);
-      padding:4px 8px;border-radius:999px;
+      padding:5px 9px;border-radius:999px;
       background: rgba(255,255,255,0.06);
-      white-space:nowrap;font-weight:900;
+      white-space:nowrap;
+      font-weight:950;
     }
 
-    .guidedBox{margin-top:12px;padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,0.10);background: rgba(0,0,0,0.18);}
+    /* Guided */
+    .guidedBox{
+      margin-top:12px;
+      padding:12px;
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,0.10);
+      background:
+        radial-gradient(500px 240px at 10% 0%, rgba(46,229,157,0.10), transparent 60%),
+        rgba(0,0,0,0.18);
+      box-shadow: var(--shadow2);
+    }
     .guidedTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .guidedTitle{font-weight:950;font-size:14px;margin:0}
+    .guidedTitle{font-weight:980;font-size:14px;margin:0}
     .guidedMeta{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}
     .guidedNow{margin-top:10px;font-size:13px;font-weight:900;line-height:1.55}
     .guidedControls{margin-top:12px;display:grid;grid-template-columns: 1fr 1fr;gap:10px;}
     @media (max-width: 520px){ .guidedControls{grid-template-columns: 1fr;} }
-    .guidedControls button{padding:14px 14px;border-radius:14px;font-size:14px}
+    .guidedControls button{padding:15px 14px;border-radius:16px;font-size:14px}
 
     .notice{
-      margin-top:10px;padding:10px 12px;border-radius:14px;
+      margin-top:10px;
+      padding:12px 12px;
+      border-radius: 16px;
       border:1px solid rgba(255,204,102,0.22);
       background: rgba(255,204,102,0.08);
       color: var(--text);
-      font-size:12px;line-height:1.4;
+      font-size:12px;
+      line-height:1.45;
       display:none;
+      box-shadow: 0 12px 25px rgba(0,0,0,0.20);
     }
     .notice.show{display:block;}
     .notice.danger{border-color: rgba(255,107,107,0.30);background: rgba(255,107,107,0.10);}
 
-    details{margin-top:14px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background: rgba(0,0,0,0.18);overflow:hidden;}
-    summary{list-style:none;padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    /* Months + table */
+    details{
+      margin-top:14px;
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.16);
+      overflow:hidden;
+      box-shadow: var(--shadow2);
+    }
+    summary{
+      list-style:none;
+      padding:14px;
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
     summary::-webkit-details-marker{display:none}
-    .monthTitle{display:flex;align-items:center;gap:10px;font-weight:950}
+    .monthTitle{display:flex;align-items:center;gap:10px;font-weight:980}
     .badge{
       font-size:12px;color:var(--muted);
       border:1px solid rgba(255,255,255,0.14);
-      padding:4px 8px;border-radius:999px;background: rgba(255,255,255,0.06);
-      white-space:nowrap;font-weight:900;
+      padding:5px 9px;border-radius:999px;
+      background: rgba(255,255,255,0.06);
+      white-space:nowrap;font-weight:950;
     }
-    .monthBody{padding:0 14px 14px 14px;}
-    table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:14px;border:1px solid rgba(255,255,255,0.08);}
-    th, td{ text-align:left;padding:10px 10px;border-bottom:1px solid rgba(255,255,255,0.07);vertical-align:top;font-size:13px; }
-    th{color:var(--muted);font-weight:900;background: rgba(255,255,255,0.04)}
+    .monthBody{padding:0 12px 12px 12px;}
+
+    .tableWrap{
+      border-radius: var(--radius2);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+    }
+    table{width:100%;border-collapse:collapse;}
+    thead th{
+      position: sticky;
+      top:0;
+      z-index:2;
+      background: rgba(15,23,38,0.95);
+      backdrop-filter: blur(10px);
+      color: var(--muted);
+      font-weight: 980;
+      font-size:12px;
+      text-transform: uppercase;
+      letter-spacing:0.6px;
+      border-bottom:1px solid rgba(255,255,255,0.07);
+    }
+    th, td{
+      text-align:left;
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,0.07);
+      vertical-align:top;
+      font-size:13px;
+    }
+    tbody tr:nth-child(2n){
+      background: rgba(255,255,255,0.02);
+    }
+    tbody tr:hover{
+      background: rgba(122,167,255,0.06);
+    }
     tr:last-child td{border-bottom:none;}
-    .dayCell{white-space:nowrap;color:var(--muted);font-weight:950;}
-    .readCell{font-weight:800}
+    .dayCell{white-space:nowrap;color:var(--muted);font-weight:980;}
+    .readCell{font-weight:850}
     .note{
-      width:100%;min-height:38px;resize:vertical;
-      background: rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.10);
-      border-radius:10px;color: var(--text);
-      padding:8px;outline:none;
+      width:100%;
+      min-height:40px;
+      resize:vertical;
+      background: rgba(0,0,0,0.22);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      color: var(--text);
+      padding:10px;
+      outline:none;
+      font-weight: 700;
+    }
+    .note:focus{
+      border-color: rgba(122,167,255,0.35);
+      box-shadow: 0 0 0 3px rgba(122,167,255,0.12);
     }
     .checkWrap{display:flex;align-items:center;gap:10px}
     input[type="checkbox"]{width:18px;height:18px;accent-color: var(--ok);cursor:pointer}
-    .today{outline:2px solid rgba(255,204,102,0.35);outline-offset:-2px;background: rgba(255,204,102,0.06);}
-    .muted{color:var(--muted)}
-    .tiny{font-size:12px;color:var(--muted)}
+    .today{
+      outline:2px solid rgba(255,204,102,0.32);
+      outline-offset:-2px;
+      background: rgba(255,204,102,0.07) !important;
+    }
+    .tiny{font-size:12px;color:var(--muted);line-height:1.35}
 
+    /* Mobile bottom bar */
     .actionBar{
       position:fixed;left:0; right:0; bottom:0;
       padding:10px 12px 14px 12px;
-      background: rgba(10,15,20,0.94);
+      background: rgba(7,10,16,0.90);
       border-top: 1px solid rgba(255,255,255,0.10);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       z-index:999;
     }
     .actionBar .wrap{
@@ -169,9 +371,16 @@
     }
     .actionBar .btnBig{
       flex:1;min-width: 190px;
-      padding:14px 14px;border-radius:14px;font-size:14px;
+      padding:15px 14px;border-radius:16px;font-size:14px;
     }
-    .actionBar .hint{width:100%;margin-top:6px;font-size:12px;color:var(--muted);line-height:1.35;}
+    .actionBar .hint{
+      width:100%;
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+      opacity:0.95;
+    }
     @media (min-width: 981px){
       main{padding-bottom:140px;}
       .actionBar{padding:8px 12px 10px 12px;}
@@ -180,22 +389,30 @@
   </style>
 </head>
 <body>
+
 <header>
-  <div class="title">
-    <div>
-      <h1>Plano de Leitura 2026</h1>
-      <p class="subtitle">
-        Plano fixo inicia em <b>01/01/2026</b>. Se você começou depois, o site mostra o <b>atraso</b> e te ajuda a recuperar.
-      </p>
+  <div class="hero">
+    <div class="heroTop">
+      <div>
+        <h1>Plano de Leitura 2026</h1>
+        <p class="subtitle">
+          Plano fixo inicia em <b>01/01/2026</b>. Se você começou depois, o site mostra seu <b>atraso</b> e ajuda a recuperar.
+        </p>
+      </div>
+      <div class="chips">
+        <span class="chip ok">✅ Salva automático</span>
+        <span class="chip warn">📅 2026</span>
+        <span class="chip" id="chipPlan">📖 Plano: —</span>
+        <span class="chip danger" id="chipLate" style="display:none;">⚠️ Atraso: —</span>
+      </div>
     </div>
-    <div class="pill">📅 2026 • ✅ Salvo automaticamente</div>
   </div>
 </header>
 
 <main>
   <div class="grid">
     <section class="card">
-      <h2>Configuração</h2>
+      <h2>⚙️ Configuração</h2>
 
       <div class="row">
         <div>
@@ -250,13 +467,14 @@
           <div>
             <p class="guidedTitle">📖 Leitura guiada (1 aba)</p>
             <div class="guidedMeta">
-              “Iniciar” abre 1 aba. “Colocar em dia” abre um pacote maior para recuperar dias atrasados.
+              “Iniciar” abre 1 aba. “Colocar em dia” abre um pacote maior para recuperar atraso.
             </div>
           </div>
           <div class="kbd" id="guidedStep">Capítulo 0/0</div>
         </div>
 
         <div class="guidedNow" id="guidedNow">Hoje: —</div>
+
         <div class="notice danger" id="lateNotice"></div>
         <div class="notice" id="guidedNotice"></div>
 
@@ -269,17 +487,17 @@
         </div>
 
         <div class="tiny" style="margin-top:10px">
-          Obs: “Finalizei” marca apenas o dia atual. Para recuperar, use “Colocar em dia”.
+          Dica: se o navegador bloquear pop-up, clique em “Iniciar” primeiro.
         </div>
       </div>
     </section>
 
     <section class="card">
-      <h2>Como funciona</h2>
+      <h2>✨ Dicas rápidas</h2>
       <div class="tiny" style="line-height:1.85">
         ✅ O plano começa em <b>01/01/2026</b>.<br/>
-        ✅ Se hoje é dia 06/01 e você não marcou 01–05, o site mostra o atraso.<br/>
-        ✅ “Colocar em dia” abre um pacote com os capítulos acumulados (para recuperar).
+        ✅ Se você pulou dias, o site mostra o atraso no topo.<br/>
+        ✅ Use “Colocar em dia” para abrir a leitura acumulada, sem abrir várias abas.
       </div>
     </section>
   </div>
@@ -302,7 +520,6 @@
   const DEFAULT_MODE = "gospel_history_psalms";
   const OT_CHAPTERS_PATTERN = [3,3,2,3,3,2,2];
 
-  // ===== Livros =====
   const OT_ALL = [
     ["Gênesis",50],["Êxodo",40],["Levítico",27],["Números",36],["Deuteronômio",34],
     ["Josué",24],["Juízes",21],["Rute",4],["1 Samuel",31],["2 Samuel",24],
@@ -408,8 +625,9 @@
     return out.join("; ");
   }
 
-  const KEY = "planoLeitura2026_v6";
+  const KEY = "planoLeitura2026_v7_pretty";
   const READING_WINDOW_NAME = "bibliaOnlineReading";
+
   function loadState(){
     try{
       const raw = localStorage.getItem(KEY);
@@ -448,8 +666,14 @@
     ];
   }
 
+  function modeLabel(mode){
+    if (mode === "parallel") return "Paralelo";
+    if (mode === "wisdom_letters_ot") return "Sabedoria + Cartas";
+    return "Evangelho + História + Salmos";
+  }
+
   function buildPlanForYear(state){
-    const startDate = parseYMD(PLAN_START); // FIXO
+    const startDate = parseYMD(PLAN_START);
     const streams = getPlanStreams(state.planMode);
 
     const pos = {};
@@ -532,13 +756,11 @@
 
     const planStart = parseYMD(PLAN_START);
     const todayKey = ymd(today);
-
-    // quantos dias deveriam estar marcados desde 01/01 até ontem
-    // (atraso real = dias anteriores não marcados)
     let late = 0;
+
     for (let d = new Date(planStart); d <= today; d.setDate(d.getDate()+1)){
       const k = ymd(d);
-      if (k === todayKey) break; // não conta hoje no atraso
+      if (k === todayKey) break;
       if (!state.days?.[k]?.done) late++;
     }
     return late;
@@ -554,7 +776,8 @@
     const p = plan[key];
     if (!p?.active) return alert("Hoje está fora do período do plano.");
 
-    const list = p.guidedList || [];
+    const pack = state.guided?.[key]?.catchUpPack;
+    const list = (Array.isArray(pack) && pack.length) ? pack : (p.guidedList || []);
     if (!list.length) return alert("Não há leitura para hoje.");
 
     const total = list.length;
@@ -583,10 +806,8 @@
       return;
     }
 
-    // monta pacote: pega leituras do(s) dia(s) atrasados + hoje
     const start = parseYMD(PLAN_START);
 
-    // acha o primeiro dia não marcado
     let firstMissing = null;
     for (let d = new Date(start); d <= today; d.setDate(d.getDate()+1)){
       const k = ymd(d);
@@ -601,14 +822,10 @@
     for (let d = new Date(firstMissing); d <= today; d.setDate(d.getDate()+1)){
       const k = ymd(d);
       const p = plan[k];
-      if (p?.active){
-        pack.push(...(p.guidedList || []));
-      }
+      if (p?.active) pack.push(...(p.guidedList || []));
     }
-
     if (!pack.length) return alert("Não consegui montar o pacote de recuperação.");
 
-    // salva “pack” como lista guiada temporária do dia (em memória local)
     state.guided = state.guided || {};
     const todayKey = ymd(today);
     state.guided[todayKey] = state.guided[todayKey] || {};
@@ -616,7 +833,6 @@
     state.guided[todayKey].idx = 0;
     saveState(state);
 
-    // abre o primeiro do pacote
     const first = pack[0];
     const url = bibleOnlineUrl(state.version, first.book, first.chapter);
     if (!url) return alert("Não consegui abrir o primeiro capítulo do pacote.");
@@ -634,12 +850,12 @@
     state.days[key] = state.days[key] || {};
     state.days[key].done = true;
 
-    // prepara amanhã
     const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
     if (tomorrow.getFullYear() === YEAR){
       const tKey = ymd(tomorrow);
       state.guided[tKey] = state.guided[tKey] || {};
       state.guided[tKey].idx = 0;
+      // não propaga pack
     }
     saveState(state);
 
@@ -671,11 +887,13 @@
   function updateLateUI(state){
     const lateEl = document.getElementById("lateNotice");
     const catchUpBtn = document.getElementById("catchUpBtn");
+    const chipLate = document.getElementById("chipLate");
     const today = new Date();
 
     if (today.getFullYear() !== YEAR){
       lateEl.classList.remove("show");
       catchUpBtn.disabled = true;
+      chipLate.style.display = "none";
       return;
     }
 
@@ -684,9 +902,13 @@
       lateEl.textContent = `⚠️ Você está ${late} dia(s) atrasado. Use “Colocar em dia” para abrir a leitura acumulada.`;
       lateEl.classList.add("show");
       catchUpBtn.disabled = false;
+
+      chipLate.style.display = "inline-flex";
+      chipLate.textContent = `⚠️ Atraso: ${late} dia(s)`;
     } else {
       lateEl.classList.remove("show");
       catchUpBtn.disabled = true;
+      chipLate.style.display = "none";
     }
   }
 
@@ -721,14 +943,13 @@
     startBtn.disabled = false;
     finishBtn.disabled = false;
 
-    // Se existir pacote de recuperação, usa ele na navegação do dia
     const pack = state.guided?.[key]?.catchUpPack;
     const list = (Array.isArray(pack) && pack.length) ? pack : (p.guidedList || []);
 
     const idx = Math.max(0, Math.min(getGuidedIndex(state, key), Math.max(0, list.length-1)));
     const total = list.length;
 
-    const blocksText = (p.blocks || []).map(b => `<span style="color:var(--muted)">${escapeHtml(b.label)}:</span> <b>${escapeHtml(b.text)}</b>`).join("<br/>");
+    const blocksText = (p.blocks || []).map(b => `<span style="color:var(--muted);font-weight:950">${escapeHtml(b.label)}:</span> <b>${escapeHtml(b.text)}</b>`).join("<br/>");
     const done = !!state.days?.[key]?.done;
 
     if (!total){
@@ -746,7 +967,10 @@
     prevBtn.disabled = (idx === 0);
     nextBtn.disabled = (idx === total - 1);
 
-    const packTag = (Array.isArray(pack) && pack.length) ? `<span class="kbd" style="border-color: rgba(255,107,107,0.28);">PACOTE ATRASO</span>` : "";
+    const packTag = (Array.isArray(pack) && pack.length)
+      ? `<span class="kbd" style="border-color: rgba(255,107,107,0.28); color: var(--text);">PACOTE ATRASO</span>`
+      : "";
+
     nowEl.innerHTML =
       `Hoje:<br/>${blocksText}${done ? " ✅" : ""}<br/>
        ${packTag ? `<br/>${packTag}<br/>` : `<br/>`}
@@ -768,6 +992,8 @@
     const state = ensureStateDefaults(loadState());
     versionSelectEl.value = state.version;
     planModeEl.value = state.planMode;
+
+    document.getElementById("chipPlan").textContent = `📖 Plano: ${modeLabel(state.planMode)}`;
 
     const plan = buildPlanForYear(state);
     const container = document.getElementById("months");
@@ -830,6 +1056,9 @@
       const body = document.createElement("div");
       body.className = "monthBody";
 
+      const wrap = document.createElement("div");
+      wrap.className = "tableWrap";
+
       const table = document.createElement("table");
       table.innerHTML = `
         <thead>
@@ -838,7 +1067,7 @@
             <th>${escapeHtml(h1)}</th>
             <th>${escapeHtml(h2)}</th>
             ${h3 ? `<th>${escapeHtml(h3)}</th>` : ``}
-            <th style="width:120px">Concluído</th>
+            <th style="width:130px">Concluído</th>
             <th>Anotação</th>
           </tr>
         </thead>
@@ -875,8 +1104,8 @@
           ${h3 ? `<td class="readCell">${escapeHtml(b3 || "—")}</td>` : ``}
           <td>
             <div class="checkWrap">
-              <input type="checkbox" id="${doneId}" ${dayState.done ? "checked":""} ${p.active ? "" : "disabled"} />
-              <span class="tiny">${p.active ? "Lido" : "—"}</span>
+              <input type="checkbox" id="${doneId}" ${dayState.done ? "checked":""} />
+              <span class="tiny">${dayState.done ? "Feito" : "Pendente"}</span>
             </div>
           </td>
           <td>
@@ -902,7 +1131,9 @@
         });
       }
 
-      body.appendChild(table);
+      wrap.appendChild(table);
+      body.appendChild(wrap);
+
       details.appendChild(summary);
       details.appendChild(body);
       container.appendChild(details);
@@ -913,7 +1144,7 @@
     }
   }
 
-  // ===== DOM =====
+  // DOM
   const versionSelectEl = document.getElementById("versionSelect");
   const planModeEl = document.getElementById("planMode");
 
@@ -925,7 +1156,7 @@
   const streakText = document.getElementById("streakText");
   const streakSub = document.getElementById("streakSub");
 
-  // ===== Events =====
+  // Events
   document.getElementById("applyBtn").addEventListener("click", ()=>{
     const state = ensureStateDefaults(loadState());
     state.version = versionSelectEl.value || DEFAULT_VERSION;
