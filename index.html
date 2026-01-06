@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Plano de Leitura 2026 (Checklist)</title>
+  <title>Plano de Leitura 2026</title>
   <style>
     :root{
       --bg:#0b0f14;
@@ -60,7 +60,7 @@
       white-space:nowrap;
     }
 
-    main{max-width:1100px;margin:0 auto;padding:0 16px 110px 16px;} /* + espaço para barra mobile */
+    main{max-width:1100px;margin:0 auto;padding:0 16px 150px 16px;}
 
     .grid{
       display:grid;
@@ -105,43 +105,73 @@
       border: 1px solid rgba(122,167,255,0.26);
       padding: 10px 12px;
       border-radius: 12px;
-      font-weight:700;
+      font-weight:800;
       letter-spacing:0.2px;
     }
     button:hover{filter:brightness(1.08)}
     button.secondary{
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.12);
-      font-weight:650;
-    }
-    button.danger{
-      background: rgba(255,107,107,0.16);
-      border:1px solid rgba(255,107,107,0.32);
+      font-weight:750;
     }
     button.ok{
       background: rgba(46,229,157,0.14);
       border:1px solid rgba(46,229,157,0.28);
     }
+    button.warn{
+      background: rgba(255,204,102,0.12);
+      border:1px solid rgba(255,204,102,0.26);
+    }
 
+    /* KPIs (melhor aspecto) */
     .stat{
-      display:flex;
+      display:grid;
+      grid-template-columns:1fr 1fr;
       gap:12px;
-      flex-wrap:wrap;
-      margin-top:10px;
+      margin-top:12px;
+    }
+    @media (max-width: 520px){
+      .stat{grid-template-columns:1fr;}
     }
     .kpi{
-      flex:1;
-      min-width:220px;
-      padding:12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.2);
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.12));
+      position:relative;
+      overflow:hidden;
     }
-    .kpi .k{font-size:12px;color:var(--muted)}
-    .kpi .v{font-size:20px;font-weight:800;margin-top:3px}
+    .kpi:before{
+      content:"";
+      position:absolute;
+      inset:-40px -60px auto auto;
+      width:160px;height:160px;
+      background: radial-gradient(circle at 30% 30%, rgba(122,167,255,0.35), transparent 60%);
+      transform: rotate(12deg);
+      pointer-events:none;
+    }
+    .kpiHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .kpi .k{
+      font-size:12px;color:var(--muted);font-weight:700;
+      letter-spacing:0.2px;
+    }
+    .kpi .v{
+      font-size:22px;font-weight:900;margin-top:4px;
+    }
+    .kpi .sub{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
     .bar{
       height:10px;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.10);
       border-radius:999px;
       overflow:hidden;
       margin-top:10px;
@@ -175,7 +205,7 @@
       display:flex;
       align-items:center;
       gap:10px;
-      font-weight:800;
+      font-weight:900;
     }
     .badge{
       font-size:12px;
@@ -203,12 +233,12 @@
     }
     th{
       color:var(--muted);
-      font-weight:700;
+      font-weight:800;
       background: rgba(255,255,255,0.04);
     }
     tr:last-child td{border-bottom:none;}
-    .dayCell{white-space:nowrap;color:var(--muted);font-weight:800;}
-    .readCell{font-weight:650}
+    .dayCell{white-space:nowrap;color:var(--muted);font-weight:900;}
+    .readCell{font-weight:700}
     .note{
       width:100%;
       min-height:38px;
@@ -237,29 +267,19 @@
     }
     .muted{color:var(--muted)}
     .tiny{font-size:12px;color:var(--muted)}
-    .footer{
-      margin-top:14px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-    }
-    .fileInput{display:none;}
-
     a.link{
       color: var(--accent);
       text-decoration:none;
-      font-weight:700;
+      font-weight:900;
     }
     a.link:hover{ text-decoration:underline; }
 
-    /* ===== Barra de ações mobile (bem visível) ===== */
+    /* Barra de ações mobile */
     .actionBar{
       position:fixed;
       left:0; right:0; bottom:0;
       padding:10px 12px 14px 12px;
-      background: rgba(10,15,20,0.92);
+      background: rgba(10,15,20,0.94);
       border-top: 1px solid rgba(255,255,255,0.10);
       backdrop-filter: blur(10px);
       z-index:999;
@@ -285,18 +305,68 @@
       margin-top:6px;
       font-size:12px;
       color:var(--muted);
-      line-height:1.3;
+      line-height:1.35;
     }
     @media (min-width: 981px){
-      .actionBar{ /* no desktop, mantém mas um pouco menor */
-        padding:8px 12px 10px 12px;
-      }
+      main{padding-bottom:120px;}
+      .actionBar{padding:8px 12px 10px 12px;}
       .actionBar .btnBig{
-        max-width: 340px;
+        max-width: 360px;
         flex:0 1 auto;
         padding:12px 14px;
       }
-      main{padding-bottom:90px;}
+    }
+
+    /* Card Leitura Guiada */
+    .guidedBox{
+      margin-top:12px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.18);
+    }
+    .guidedTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .guidedTitle{
+      font-weight:900;
+      font-size:14px;
+      margin:0;
+    }
+    .guidedMeta{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+      line-height:1.35;
+    }
+    .guidedNow{
+      margin-top:10px;
+      font-size:13px;
+      font-weight:800;
+      line-height:1.45;
+    }
+    .guidedControls{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .guidedControls button{
+      flex:1;
+      min-width:160px;
+    }
+    .kbd{
+      font-size:11px;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,0.14);
+      padding:4px 8px;
+      border-radius:999px;
+      background: rgba(255,255,255,0.06);
+      white-space:nowrap;
     }
   </style>
 </head>
@@ -304,13 +374,12 @@
   <header>
     <div class="title">
       <div>
-        <h1>Plano de Leitura 2026 (Checklist)</h1>
+        <h1>Plano de Leitura 2026</h1>
         <p class="subtitle">
-          Leia e marque ✅. Use <b>📖 Iniciar leitura de hoje</b> para abrir no <b>Bíblia Online</b> e depois
-          <b>✅ Finalizei</b> para marcar o dia.
+          Modo leitura guiada: abre <b>1 aba</b> do Bíblia Online e você controla por aqui com <b>Próximo capítulo</b>.
         </p>
       </div>
-      <div class="pill">📅 2026 • ✅ Progresso salvo automaticamente</div>
+      <div class="pill">📅 2026 • ✅ Salvo automaticamente</div>
     </div>
   </header>
 
@@ -339,57 +408,73 @@
           <div style="flex:1"></div>
 
           <button class="secondary" id="openTodayBtn">Abrir mês de hoje</button>
-          <button id="regenBtn">Recalcular plano</button>
+          <button id="regenBtn">Aplicar</button>
         </div>
-
-        <p class="tiny" style="margin:10px 0 0 0">
-          📝 Dica: se perder um dia, só continue. O checklist não é cobrança — é constância.
-        </p>
 
         <div class="stat">
           <div class="kpi">
-            <div class="k">Progresso do ano</div>
+            <div class="kpiHead">
+              <div class="k">Progresso do ano</div>
+              <div class="kbd" id="yearPct">0%</div>
+            </div>
             <div class="v" id="yearProgressText">0/365</div>
             <div class="bar"><div id="yearBar"></div></div>
+            <div class="sub" id="yearSub">Vamos no ritmo certo.</div>
           </div>
+
           <div class="kpi">
-            <div class="k">Dias consecutivos (streak)</div>
+            <div class="kpiHead">
+              <div class="k">Dias consecutivos</div>
+              <div class="kbd">🔥 streak</div>
+            </div>
             <div class="v" id="streakText">0</div>
-            <div class="tiny muted">Marcações em sequência até hoje</div>
+            <div class="sub" id="streakSub">Marque a leitura de hoje para manter a sequência.</div>
           </div>
         </div>
 
-        <div class="footer">
-          <div class="row">
-            <button class="secondary" id="exportBtn">Exportar backup (JSON)</button>
-            <button class="secondary" id="importBtn">Importar backup (JSON)</button>
-            <input class="fileInput" id="importFile" type="file" accept="application/json" />
+        <div class="guidedBox">
+          <div class="guidedTop">
+            <div>
+              <p class="guidedTitle">📖 Leitura guiada (1 aba)</p>
+              <div class="guidedMeta">
+                Clique em “Iniciar” para abrir o Bíblia Online <b>na mesma aba</b> (reutiliza sempre). Depois use “Próximo capítulo”.
+              </div>
+            </div>
+            <div class="kbd" id="guidedStep">Capítulo 0/0</div>
           </div>
-          <button class="danger" id="resetBtn">Zerar marcações</button>
+
+          <div class="guidedNow" id="guidedNow">Hoje: —</div>
+
+          <div class="guidedControls">
+            <button class="warn" id="guidedStartBtn">📖 Iniciar (abrir 1 aba)</button>
+            <button class="secondary" id="guidedPrevBtn">⬅️ Capítulo anterior</button>
+            <button class="secondary" id="guidedNextBtn">Próximo capítulo ➡️</button>
+            <button class="ok" id="guidedFinishBtn">✅ Finalizei a leitura de hoje</button>
+          </div>
+
+          <div class="tiny" style="margin-top:10px">
+            Dica: no celular, o navegador pode bloquear pop-up se você não clicar no botão. Sempre clique em “Iniciar” primeiro.
+          </div>
         </div>
       </section>
 
       <section class="card">
-        <h2>Como usar (bem simples)</h2>
-        <ul class="tiny" style="margin:8px 0 0 18px; line-height:1.7">
+        <h2>Como funciona</h2>
+        <ul class="tiny" style="margin:8px 0 0 18px; line-height:1.8">
           <li>Todo dia tem leitura do <b>AT</b> e do <b>NT</b>.</li>
           <li>Para fechar o <b>AT em 1 ano</b>, alguns dias têm <b>2 capítulos</b> e outros <b>3</b>.</li>
-          <li>O <b>NT</b> fica em <b>1 capítulo/dia</b>. Ao terminar, ele reinicia (bônus — você lê o NT mais de 1 vez).</li>
-          <li>Use os botões do rodapé no celular: <b>📖 Iniciar</b> → lê → <b>✅ Finalizei</b> para marcar.</li>
+          <li>O <b>NT</b> é <b>1 capítulo/dia</b>. Ao terminar, reinicia (bônus).</li>
+          <li>O “Leitura guiada” abre o Bíblia Online sempre na <b>mesma aba</b> e você navega capítulo por capítulo por aqui.</li>
         </ul>
-        <p class="tiny muted" style="margin-top:10px">
-          Se quiser depois, a gente ajusta para um modelo “Bíblia completa 100% certinho” (sem reiniciar NT).
-        </p>
       </section>
     </div>
 
     <div id="months"></div>
   </main>
 
-  <!-- Barra de ações (mobile first) -->
   <div class="actionBar">
     <div class="wrap">
-      <button class="btnBig" id="startTodayReadingBtn">📖 Iniciar leitura de hoje</button>
+      <button class="btnBig warn" id="startTodayReadingBtn">📖 Iniciar leitura guiada de hoje</button>
       <button class="btnBig ok" id="finishTodayBtn">✅ Finalizei a leitura de hoje</button>
       <div class="hint" id="todayHint">Hoje: —</div>
     </div>
@@ -397,16 +482,16 @@
 
 <script>
   // =========================
-  // CONFIG PADRÃO
+  // CONFIG
   // =========================
   const YEAR = 2026;
-  const DEFAULT_START_DATE = "2026-01-06"; // você disse que o plano começou dia 6
+  const DEFAULT_START_DATE = "2026-01-06";
 
-  // 4 dias com 3 capítulos OT + 3 dias com 2 capítulos OT (média ~2,57/dia => fecha OT em 1 ano)
+  // 4 dias com 3 capítulos OT + 3 dias com 2 capítulos OT
   const OT_CHAPTERS_PATTERN = [3,3,2,3,3,2,2];
 
   // =========================
-  // LIVROS (capítulos)
+  // LIVROS
   // =========================
   const OT = [
     ["Gênesis",50],["Êxodo",40],["Levítico",27],["Números",36],["Deuteronômio",34],
@@ -428,13 +513,8 @@
     ["3 João",1],["Judas",1],["Apocalipse",22]
   ];
 
-  // =========================
-  // BÍBLIA ONLINE (códigos de livros)
-  // URL padrão: https://www.bibliaonline.com.br/{versao}/{codigo}/{capitulo}
-  // Exemplo: https://www.bibliaonline.com.br/acf/gn/1 :contentReference[oaicite:0]{index=0}
-  // =========================
+  // Bíblia Online: https://www.bibliaonline.com.br/{versao}/{codigo}/{capitulo}
   const BO_BOOK_CODE = {
-    // OT
     "Gênesis":"gn","Êxodo":"ex","Levítico":"lv","Números":"nm","Deuteronômio":"dt",
     "Josué":"js","Juízes":"jz","Rute":"rt","1 Samuel":"1sm","2 Samuel":"2sm",
     "1 Reis":"1rs","2 Reis":"2rs","1 Crônicas":"1cr","2 Crônicas":"2cr","Esdras":"ed",
@@ -444,7 +524,6 @@
     "Obadias":"ob","Jonas":"jn","Miquéias":"mq","Naum":"na","Habacuque":"hc",
     "Sofonias":"sf","Ageu":"ag","Zacarias":"zc","Malaquias":"ml",
 
-    // NT
     "Mateus":"mt","Marcos":"mc","Lucas":"lc","João":"jo","Atos":"at",
     "Romanos":"rm","1 Coríntios":"1co","2 Coríntios":"2co","Gálatas":"gl","Efésios":"ef",
     "Filipenses":"fp","Colossenses":"cl","1 Tessalonicenses":"1ts","2 Tessalonicenses":"2ts",
@@ -484,8 +563,8 @@
     return list.reduce((acc,[,c])=>acc+c,0);
   }
 
-  const OT_TOTAL = totalChapters(OT); // 929
-  const NT_TOTAL = totalChapters(NT); // 260
+  const OT_TOTAL = totalChapters(OT);
+  const NT_TOTAL = totalChapters(NT);
 
   function chapterAt(globalIndex, list){
     let idx = globalIndex;
@@ -495,7 +574,6 @@
       }
       idx -= count;
     }
-    // se passar do fim, reinicia (ciclo)
     const total = totalChapters(list);
     idx = ((globalIndex % total)+total)%total;
     return chapterAt(idx, list);
@@ -504,7 +582,6 @@
   function nextNChaptersText(startIndex, n, list){
     const parts = [];
     let i = startIndex;
-
     while (n > 0){
       const start = chapterAt(i, list);
       const bookEntry = list.find(b => b[0] === start.book);
@@ -513,19 +590,14 @@
       const withinBookStart = start.chapter;
       const remainingInBook = bookCount - withinBookStart + 1;
       const take = Math.min(n, remainingInBook);
-
       const endChapter = withinBookStart + take - 1;
 
-      if (take === 1){
-        parts.push(`${start.book} ${withinBookStart}`);
-      } else {
-        parts.push(`${start.book} ${withinBookStart}–${endChapter}`);
-      }
+      if (take === 1) parts.push(`${start.book} ${withinBookStart}`);
+      else parts.push(`${start.book} ${withinBookStart}–${endChapter}`);
 
       i += take;
       n -= take;
     }
-
     return parts.join("; ");
   }
 
@@ -540,14 +612,15 @@
   // =========================
   // STORAGE
   // =========================
-  const KEY = "planoLeitura2026_v2";
+  const KEY = "planoLeitura2026_v3";
+  const READING_WINDOW_NAME = "bibliaOnlineReading"; // sempre reutiliza a mesma aba
 
   function loadState(){
     try{
       const raw = localStorage.getItem(KEY);
-      return raw ? JSON.parse(raw) : { startDate: DEFAULT_START_DATE, version: "acf", days: {} };
+      return raw ? JSON.parse(raw) : { startDate: DEFAULT_START_DATE, version: "acf", days: {}, guided: {} };
     }catch{
-      return { startDate: DEFAULT_START_DATE, version: "acf", days: {} };
+      return { startDate: DEFAULT_START_DATE, version: "acf", days: {}, guided: {} };
     }
   }
 
@@ -559,17 +632,17 @@
     if (!state.startDate) state.startDate = DEFAULT_START_DATE;
     if (!state.version) state.version = "acf";
     if (!state.days) state.days = {};
+    if (!state.guided) state.guided = {};
     return state;
   }
 
   // =========================
-  // PLANO / GERAÇÃO
+  // PLANO
   // =========================
   const monthNames = [
     "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
     "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
   ];
-
   function monthKey(m){ return `m-${YEAR}-${pad2(m+1)}`; }
 
   function buildPlanForYear(startDateStr){
@@ -579,7 +652,6 @@
     let ntPos = 0;
 
     const plan = {};
-
     const yearStart = new Date(YEAR,0,1);
     const yearEnd = new Date(YEAR,11,31);
 
@@ -606,41 +678,19 @@
       otPos += otN;
       ntPos += ntN;
 
-      if (otPos >= OT_TOTAL){
-        // após fechar OT, fica “Revisão”
-        otPos = OT_TOTAL;
-      }
-      if (ntPos >= NT_TOTAL){
-        ntPos = ntPos % NT_TOTAL;
-      }
+      if (otPos >= OT_TOTAL) otPos = OT_TOTAL;
+      if (ntPos >= NT_TOTAL) ntPos = ntPos % NT_TOTAL;
     }
 
     return plan;
   }
 
   // =========================
-  // ESCAPE helpers
-  // =========================
-  function escapeHtml(str){
-    return String(str ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  function cssEscape(id){
-    return id.replaceAll(":", "\\:").replaceAll(".", "\\.").replaceAll("/", "\\/");
-  }
-
-  // =========================
-  // PROGRESS / STREAK
+  // STREAK / KPIs
   // =========================
   function calcStreak(state, today){
     let streak = 0;
     let d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
     while (true){
       if (d.getFullYear() !== YEAR) break;
       const key = ymd(d);
@@ -655,6 +705,18 @@
   // =========================
   // RENDER
   // =========================
+  function escapeHtml(str){
+    return String(str ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+  function cssEscape(id){
+    return id.replaceAll(":", "\\:").replaceAll(".", "\\.").replaceAll("/", "\\/");
+  }
+
   function renderAll(state){
     state = ensureStateDefaults(state);
 
@@ -665,8 +727,8 @@
     const today = new Date();
     const todayKey = ymd(today);
 
-    // Atualiza hint do rodapé (hoje)
     updateTodayHint(plan, state, today);
+    updateGuidedUI(plan, state, today);
 
     // Progresso anual
     const yearDays = [];
@@ -675,13 +737,29 @@
     for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate()+1)){
       yearDays.push(ymd(d));
     }
-
     const doneCount = yearDays.filter(k => state.days?.[k]?.done).length;
+    const pct = Math.round((doneCount/365)*100);
+
     document.getElementById("yearProgressText").textContent = `${doneCount}/365`;
-    document.getElementById("yearBar").style.width = `${Math.round((doneCount/365)*100)}%`;
+    document.getElementById("yearBar").style.width = `${pct}%`;
+    document.getElementById("yearPct").textContent = `${pct}%`;
+
+    // Texto inteligente de progresso
+    const sub = document.getElementById("yearSub");
+    if (doneCount === 0) sub.textContent = "Comece hoje — um dia de cada vez.";
+    else if (pct < 10) sub.textContent = "Ótimo início. Constância vence.";
+    else if (pct < 50) sub.textContent = "Você já está construindo um hábito.";
+    else if (pct < 90) sub.textContent = "Metade do caminho (ou mais). Continue firme.";
+    else sub.textContent = "Reta final. Você vai concluir!";
 
     const streak = calcStreak(state, today);
     document.getElementById("streakText").textContent = String(streak);
+
+    const streakSub = document.getElementById("streakSub");
+    if (streak === 0) streakSub.textContent = "Marque a leitura de hoje para iniciar a sequência.";
+    else if (streak < 7) streakSub.textContent = `Boa! ${streak} dia(s) seguidos.`;
+    else if (streak < 30) streakSub.textContent = `Muito bom! ${streak} dias seguidos.`;
+    else streakSub.textContent = `Excelente! ${streak} dias seguidos. Isso é disciplina.`;
 
     // Render meses
     for (let m = 0; m < 12; m++){
@@ -711,7 +789,6 @@
             <th style="width:70px">Dia</th>
             <th>AT</th>
             <th>NT</th>
-            <th style="width:170px">Abrir</th>
             <th style="width:120px">Concluído</th>
             <th>Anotação</th>
           </tr>
@@ -720,7 +797,6 @@
       `;
 
       const tbody = table.querySelector("tbody");
-
       const lastDay = new Date(YEAR, m+1, 0).getDate();
       let monthDone = 0;
 
@@ -730,7 +806,6 @@
 
         const p = plan[key] || { otText:"—", ntText:"—", otList:[], ntList:[], active:false };
         const dayState = state.days[key] || { done:false, note:"" };
-
         if (dayState.done) monthDone++;
 
         const tr = document.createElement("tr");
@@ -739,27 +814,10 @@
         const doneId = `done-${key}`;
         const noteId = `note-${key}`;
 
-        // Links "Abrir"
-        const otFirst = p.otList?.[0];
-        const ntFirst = p.ntList?.[0];
-
-        const otUrl = (otFirst && p.active) ? bibleOnlineUrl(state.version, otFirst.book, otFirst.chapter) : null;
-        const ntUrl = (ntFirst && p.active) ? bibleOnlineUrl(state.version, ntFirst.book, ntFirst.chapter) : null;
-
-        const openLinks = p.active
-          ? `
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-              ${otUrl ? `<a class="link" href="${otUrl}" target="_blank" rel="noopener noreferrer">AT</a>` : `<span class="muted">AT</span>`}
-              ${ntUrl ? `<a class="link" href="${ntUrl}" target="_blank" rel="noopener noreferrer">NT</a>` : `<span class="muted">NT</span>`}
-            </div>
-          `
-          : `<span class="muted">—</span>`;
-
         tr.innerHTML = `
           <td class="dayCell">${day}</td>
           <td class="readCell">${p.otText}${p.active ? "" : " <span class='muted'>(fora do início)</span>"}</td>
           <td class="readCell">${p.ntText}${p.active ? "" : ""}</td>
-          <td>${openLinks}</td>
           <td>
             <div class="checkWrap">
               <input type="checkbox" id="${doneId}" ${dayState.done ? "checked":""} ${p.active ? "" : "disabled"} />
@@ -773,18 +831,19 @@
 
         tbody.appendChild(tr);
 
-        // listeners
         tr.querySelector(`#${cssEscape(doneId)}`).addEventListener("change", (e)=>{
-          state.days[key] = state.days[key] || {};
-          state.days[key].done = !!e.target.checked;
-          saveState(state);
+          const s = loadState();
+          s.days[key] = s.days[key] || {};
+          s.days[key].done = !!e.target.checked;
+          saveState(s);
           renderAll(loadState());
         });
 
         tr.querySelector(`#${cssEscape(noteId)}`).addEventListener("input", (e)=>{
-          state.days[key] = state.days[key] || {};
-          state.days[key].note = e.target.value;
-          saveState(state);
+          const s = loadState();
+          s.days[key] = s.days[key] || {};
+          s.days[key].note = e.target.value;
+          saveState(s);
         });
       }
 
@@ -794,16 +853,15 @@
       container.appendChild(details);
 
       const monthTotal = lastDay;
-      const pct = Math.round((monthDone/monthTotal)*100);
-      document.getElementById(`badge-${m}`).textContent = `✅ ${monthDone}/${monthTotal} (${pct}%)`;
+      const pctM = Math.round((monthDone/monthTotal)*100);
+      document.getElementById(`badge-${m}`).textContent = `✅ ${monthDone}/${monthTotal} (${pctM}%)`;
     }
   }
 
   function updateTodayHint(plan, state, today){
     const hint = document.getElementById("todayHint");
-
     if (today.getFullYear() !== YEAR){
-      hint.textContent = `Hoje não é ${YEAR}. (O checklist é de ${YEAR})`;
+      hint.textContent = `Hoje não é ${YEAR}. (Checklist de ${YEAR})`;
       return;
     }
 
@@ -820,44 +878,97 @@
   }
 
   // =========================
-  // AÇÕES: Iniciar / Finalizar (HOJE)
+  // LEITURA GUIADA (1 aba do Bíblia Online)
   // =========================
-  function openChaptersInTabs(version, chapterList){
-    // abre cada capítulo em sua própria aba (máximo 3 OT + 1 NT aqui)
-    for (const item of chapterList){
-      const url = bibleOnlineUrl(version, item.book, item.chapter);
-      if (url) window.open(url, "_blank", "noopener,noreferrer");
-    }
+  function getTodayKeyOrNull(today){
+    if (today.getFullYear() !== YEAR) return null;
+    return ymd(today);
   }
 
-  function openTodayReading(){
+  function getTodayReadingList(plan, today){
+    const key = getTodayKeyOrNull(today);
+    if (!key) return null;
+    const p = plan[key];
+    if (!p || !p.active) return null;
+
+    // Ordem: OT (2-3) depois NT (1)
+    const list = [...(p.otList || []), ...(p.ntList || [])];
+    return { key, p, list };
+  }
+
+  function getGuidedIndex(state, dateKey){
+    const idx = state.guided?.[dateKey]?.idx;
+    return Number.isFinite(idx) ? idx : 0;
+  }
+
+  function setGuidedIndex(state, dateKey, idx){
+    state.guided = state.guided || {};
+    state.guided[dateKey] = state.guided[dateKey] || {};
+    state.guided[dateKey].idx = idx;
+  }
+
+  function openInSingleReadingTab(url){
+    // Reutiliza sempre a mesma aba/janela:
+    // - no desktop, abre janela/aba com esse name
+    // - no mobile, vira uma aba reutilizada
+    window.open(url, READING_WINDOW_NAME, "noopener,noreferrer");
+  }
+
+  function openGuidedAtIndex(targetIndex){
     const state = loadState();
     const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
-    const now = new Date();
+    const today = new Date();
 
-    if (now.getFullYear() !== YEAR){
-      alert(`Este checklist é de ${YEAR}.`);
+    const info = getTodayReadingList(plan, today);
+    if (!info){
+      alert("Hoje está fora do período ativo do plano. Verifique a data de início.");
       return;
     }
 
-    const key = ymd(now);
-    const p = plan[key];
+    const { key, list } = info;
+    const total = list.length;
 
-    if (!p || !p.active){
-      alert("Hoje está fora do intervalo ativo do plano. Verifique a data de início.");
+    const idx = Math.max(0, Math.min(targetIndex, total-1));
+    const item = list[idx];
+
+    const url = bibleOnlineUrl(state.version, item.book, item.chapter);
+    if (!url){
+      alert("Não consegui montar o link do capítulo. (Livro não mapeado)");
       return;
     }
 
-    // abre AT (2-3 capítulos) e NT (1 capítulo)
-    openChaptersInTabs(state.version, p.otList || []);
-    openChaptersInTabs(state.version, p.ntList || []);
+    setGuidedIndex(state, key, idx);
+    saveState(state);
 
-    // abre o mês de hoje
-    const el = document.getElementById(monthKey(now.getMonth()));
-    if (el){
-      el.open = true;
-      el.scrollIntoView({behavior:"smooth", block:"start"});
+    openInSingleReadingTab(url);
+
+    // Atualiza UI
+    renderAll(loadState());
+  }
+
+  function updateGuidedUI(plan, state, today){
+    const nowEl = document.getElementById("guidedNow");
+    const stepEl = document.getElementById("guidedStep");
+
+    const info = getTodayReadingList(plan, today);
+    if (!info){
+      nowEl.textContent = "Hoje: —";
+      stepEl.textContent = "Capítulo 0/0";
+      return;
     }
+
+    const { key, p, list } = info;
+    const idx = getGuidedIndex(state, key);
+    const total = list.length;
+    const safeIdx = Math.max(0, Math.min(idx, total-1));
+
+    const cur = list[safeIdx];
+    const done = !!state.days?.[key]?.done;
+
+    nowEl.innerHTML = `Hoje: <span style="color:var(--warn)">${p.otText}</span> | <span style="color:var(--accent)">${p.ntText}</span>${done ? " ✅" : ""}<br/>
+      Agora: <b>${cur.book} ${cur.chapter}</b>`;
+
+    stepEl.textContent = `Capítulo ${safeIdx+1}/${total}`;
   }
 
   function finishTodayReading(){
@@ -865,24 +976,17 @@
     const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
     const now = new Date();
 
-    if (now.getFullYear() !== YEAR){
-      alert(`Este checklist é de ${YEAR}.`);
-      return;
-    }
-
-    const key = ymd(now);
-    const p = plan[key];
-
-    if (!p || !p.active){
+    const info = getTodayReadingList(plan, now);
+    if (!info){
       alert("Hoje está fora do intervalo ativo do plano. Verifique a data de início.");
       return;
     }
 
+    const { key } = info;
     state.days[key] = state.days[key] || {};
     state.days[key].done = true;
     saveState(state);
 
-    // abre o mês de hoje e atualiza a tela
     const el = document.getElementById(monthKey(now.getMonth()));
     if (el){
       el.open = true;
@@ -894,16 +998,17 @@
   // =========================
   // CONTROLES
   // =========================
-  let state = ensureStateDefaults(loadState());
-
   const startDateEl = document.getElementById("startDate");
   const versionSelectEl = document.getElementById("versionSelect");
 
-  startDateEl.value = state.startDate || DEFAULT_START_DATE;
-  versionSelectEl.value = state.version || "acf";
+  function syncControls(){
+    const state = ensureStateDefaults(loadState());
+    startDateEl.value = state.startDate || DEFAULT_START_DATE;
+    versionSelectEl.value = state.version || "acf";
+  }
 
   document.getElementById("regenBtn").addEventListener("click", ()=>{
-    state = loadState();
+    const state = loadState();
     state.startDate = startDateEl.value || DEFAULT_START_DATE;
     state.version = versionSelectEl.value || "acf";
     saveState(state);
@@ -927,67 +1032,42 @@
     }
   });
 
-  document.getElementById("startTodayReadingBtn").addEventListener("click", openTodayReading);
+  // Leitura guiada (topo)
+  document.getElementById("guidedStartBtn").addEventListener("click", ()=> openGuidedAtIndex(0));
+  document.getElementById("guidedPrevBtn").addEventListener("click", ()=>{
+    const state = loadState();
+    const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
+    const today = new Date();
+    const info = getTodayReadingList(plan, today);
+    if (!info) return alert("Hoje está fora do período ativo do plano.");
+    const idx = getGuidedIndex(state, info.key);
+    openGuidedAtIndex(idx - 1);
+  });
+  document.getElementById("guidedNextBtn").addEventListener("click", ()=>{
+    const state = loadState();
+    const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
+    const today = new Date();
+    const info = getTodayReadingList(plan, today);
+    if (!info) return alert("Hoje está fora do período ativo do plano.");
+    const idx = getGuidedIndex(state, info.key);
+    openGuidedAtIndex(idx + 1);
+  });
+  document.getElementById("guidedFinishBtn").addEventListener("click", finishTodayReading);
+
+  // Barra mobile
+  document.getElementById("startTodayReadingBtn").addEventListener("click", ()=> openGuidedAtIndex(0));
   document.getElementById("finishTodayBtn").addEventListener("click", finishTodayReading);
 
-  document.getElementById("resetBtn").addEventListener("click", ()=>{
-    const ok = confirm("Tem certeza que deseja zerar TODAS as marcações e anotações? Isso não tem volta.");
-    if (!ok) return;
-    state = loadState();
-    state.days = {};
-    saveState(state);
-    renderAll(loadState());
-  });
-
-  // Export / Import
-  document.getElementById("exportBtn").addEventListener("click", ()=>{
-    const data = loadState();
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "plano-leitura-2026-backup.json";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
-  });
-
-  document.getElementById("importBtn").addEventListener("click", ()=>{
-    document.getElementById("importFile").click();
-  });
-
-  document.getElementById("importFile").addEventListener("change", async (e)=>{
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try{
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      if (!parsed || typeof parsed !== "object") throw new Error("JSON inválido");
-      parsed.startDate = parsed.startDate || DEFAULT_START_DATE;
-      parsed.version = parsed.version || "acf";
-      parsed.days = parsed.days || {};
-      localStorage.setItem(KEY, JSON.stringify(parsed));
-      state = parsed;
-      startDateEl.value = state.startDate;
-      versionSelectEl.value = state.version;
-      renderAll(loadState());
-      alert("Backup importado com sucesso!");
-    }catch(err){
-      alert("Falha ao importar. Verifique se é um JSON válido do checklist.");
-    }finally{
-      e.target.value = "";
-    }
-  });
-
-  // Atualiza versão na hora
+  // mudança de versão “na hora”
   versionSelectEl.addEventListener("change", ()=>{
-    state = loadState();
+    const state = loadState();
     state.version = versionSelectEl.value || "acf";
     saveState(state);
     renderAll(loadState());
   });
 
   // Render inicial
+  syncControls();
   renderAll(loadState());
 </script>
 </body>
