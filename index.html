@@ -521,6 +521,66 @@
     }
 
 
+
+    /* Day-focus mode (evita sensação de "duplicado") */
+    .dayFocusBar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin: 10px 0 8px 0;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.16);
+      box-shadow: var(--shadow2);
+    }
+    .dayFocusTitle{
+      font-weight: 980;
+      letter-spacing: .2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 980;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .pill.ok{
+      border-color: rgba(46,229,157,0.25);
+      background: rgba(46,229,157,0.10);
+      color: rgba(46,229,157,0.95);
+    }
+    .pill.late{
+      border-color: rgba(255,107,107,0.25);
+      background: rgba(255,107,107,0.10);
+      color: rgba(255,107,107,0.95);
+    }
+    .btnGhost{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-weight: 980;
+      cursor:pointer;
+    }
+    .btnGhost:hover{ filter:brightness(1.06); border-color: rgba(122,167,255,0.18); background: rgba(122,167,255,0.06); }
+    .btnGhost:active{ transform: translateY(1px); }
+
+
     /* row pulse highlight when jumping */
     @keyframes pulseRing{
       0%{ box-shadow: 0 0 0 0 rgba(255,204,102,0.0); }
@@ -954,19 +1014,24 @@
     const t = new Date();
     if (t.getFullYear() !== YEAR){ return alert(`Checklist é de ${YEAR}.`); }
     const key = ymd(t);
+
+    const st = ensureStateDefaults(loadState());
+    st.ui = st.ui || {};
+    st.ui.selectedDay = key;
+    st.ui.showMonth = false;
+    saveState(st);
+    renderAll();
+
     const el = document.getElementById(`m-${YEAR}-${pad2(t.getMonth()+1)}`);
     if (el){ el.open = true; el.scrollIntoView({behavior:"smooth", block:"start"}); }
-    const row = document.querySelector(`[data-datekey="${key}"]`);
-    if (row){
-      setTimeout(()=>{
+    setTimeout(()=>{
+      const row = document.querySelector(`[data-datekey="${key}"]`);
+      if (row){
         row.classList.add("pulse");
         row.scrollIntoView({behavior:"smooth", block:"center"});
         setTimeout(()=>row.classList.remove("pulse"), 950);
-      }, 120);
-      return;
-    }
-    const btn = document.querySelector(`.dayBtn[data-datekey="${key}"]`);
-    if (btn){ btn.scrollIntoView({behavior:"smooth", block:"center"}); }
+      }
+    }, 140);
   }
 
   function getLateDays(state){
@@ -1303,8 +1368,13 @@
 
       const lastDay = new Date(YEAR, m+1, 0).getDate();
       for (let day = 1; day <= lastDay; day++){
+        const ui = state.ui || {};
+        const selectedKey = ui.selectedDay || (todayKey.startsWith(`${YEAR}-${pad2(m+1)}-`) ? todayKey : `${YEAR}-${pad2(m+1)}-01`);
+        const showMonth = !!ui.showMonth;
+        const thisKey = `${YEAR}-${pad2(m+1)}-${pad2(day)}`;
+        if (!showMonth && thisKey !== selectedKey) continue;
         const date = new Date(YEAR, m, day);
-        const key = ymd(date);
+        const key = thisKey;
         const p = plan[key] || { active:false, blocks:[], guidedList:[] };
         const done = !!state.days?.[key]?.done;
         const isLate = (key < todayKey) && !done && !!p.active;
@@ -1316,20 +1386,71 @@
         if (key === todayKey) b.classList.add("today");
         b.innerHTML = `<div class="dNum">${day}</div><div class="dDot" aria-hidden="true"></div>`;
 b.addEventListener("click", ()=>{
-          const el = document.querySelector(`[data-datekey="${key}"]`);
-          if (el){
-            el.classList.add("pulse");
-            el.scrollIntoView({behavior:"smooth", block:"center"});
-            setTimeout(()=>el.classList.remove("pulse"), 950);
-          }
+          const st = ensureStateDefaults(loadState());
+          st.ui = st.ui || {};
+          st.ui.selectedDay = key;
+          st.ui.showMonth = false;
+          saveState(st);
+          renderAll();
+          // rola para a área do plano (logo abaixo do calendário)
+          setTimeout(()=>{
+            const focus = document.querySelector(`.dayFocusBar[data-month="${m}"]`);
+            if (focus) focus.scrollIntoView({behavior:"smooth", block:"start"});
+          }, 60);
         });
-
-        calGrid.appendChild(b);
+calGrid.appendChild(b);
       }
 
       cal.appendChild(calHead);
       cal.appendChild(calGrid);
       body.appendChild(cal);
+
+      // Barra de foco do dia (modo padrão: mostra só o dia selecionado)
+      const stUI = state.ui || {};
+      let selectedKey = stUI.selectedDay;
+      // default: hoje se for no mesmo mês, senão dia 1 do mês
+      if (!selectedKey){
+        const tk = todayKey;
+        if (tk.startsWith(`${YEAR}-${pad2(m+1)}-`)) selectedKey = tk;
+        else selectedKey = `${YEAR}-${pad2(m+1)}-01`;
+      }
+      const selectedDayNum = Number(selectedKey.split("-")[2] || "1");
+
+      const focusBar = document.createElement("div");
+      focusBar.className = "dayFocusBar";
+      focusBar.dataset.month = String(m);
+
+      const focusLeft = document.createElement("div");
+      focusLeft.className = "dayFocusTitle";
+      focusLeft.innerHTML = `📌 <span>Dia <b>${selectedDayNum}</b> — plano do dia</span>`;
+
+      const pSel = plan[selectedKey];
+      const doneSel = !!state.days?.[selectedKey]?.done;
+      const isLateSel = (selectedKey < todayKey) && !doneSel && !!pSel?.active;
+
+      const pill = document.createElement("span");
+      pill.className = "pill " + (doneSel ? "ok" : (isLateSel ? "late" : ""));
+      pill.textContent = doneSel ? "Concluído" : (isLateSel ? "Atrasado" : "Pendente");
+
+      focusLeft.appendChild(pill);
+
+      const focusBtn = document.createElement("button");
+      focusBtn.type = "button";
+      focusBtn.className = "btnGhost";
+      focusBtn.textContent = (state.ui?.showMonth ? "🔽 Mostrar só o dia" : "🗓️ Mostrar mês inteiro");
+      focusBtn.addEventListener("click", ()=>{
+        const st = ensureStateDefaults(loadState());
+        st.ui = st.ui || {};
+        st.ui.selectedDay = selectedKey;
+        st.ui.showMonth = !st.ui.showMonth;
+        saveState(st);
+        renderAll();
+      });
+
+      focusBar.appendChild(focusLeft);
+      focusBar.appendChild(focusBtn);
+      body.appendChild(focusBar);
+
 
       const wrap = document.createElement("div");
       wrap.className = "tableWrap";
