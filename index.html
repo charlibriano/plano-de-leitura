@@ -542,6 +542,10 @@
     .dayPlanHead .title{
       font-weight: 980;
       letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
     }
     .dayPlanGrid{
       display:grid;
@@ -559,7 +563,8 @@
       box-shadow: 0 10px 22px rgba(0,0,0,0.14);
       display:flex;
       flex-direction:column;
-      gap:8px;
+      gap:10px;
+      min-height: 126px;
     }
     .dayBlock .h{
       font-size:11px;
@@ -576,6 +581,7 @@
       font-weight: 980;
       line-height:1.25;
       font-size: 14px;
+      flex:1;
     }
     .btnOpen{
       padding: 10px 12px;
@@ -593,14 +599,13 @@
     .dayMeta{
       margin-top: 12px;
       display:grid;
-      grid-template-columns: 180px 1fr;
+      grid-template-columns: 220px 1fr;
       gap:10px;
       align-items:start;
     }
     @media (max-width: 980px){
       .dayMeta{ grid-template-columns: 1fr; }
     }
-    .dayMeta .checkWrap{ justify-content:flex-start; }
     .dayMeta textarea.note{ min-height: 86px; }
 
     /* Esconde a tabela mensal antiga (para não parecer 2 calendários) */
@@ -1049,17 +1054,11 @@
 
     const el = document.getElementById(`m-${YEAR}-${pad2(t.getMonth()+1)}`);
     if (el){ el.open = true; el.scrollIntoView({behavior:"smooth", block:"start"}); }
-    const row = document.querySelector(`[data-datekey="${key}"]`);
-    if (row){
-      setTimeout(()=>{
-        row.classList.add("pulse");
-        row.scrollIntoView({behavior:"smooth", block:"center"});
-        setTimeout(()=>row.classList.remove("pulse"), 950);
-      }, 120);
-      return;
-    }
-    const btn = document.querySelector(`.dayBtn[data-datekey="${key}"]`);
-    if (btn){ btn.scrollIntoView({behavior:"smooth", block:"center"}); }
+
+    setTimeout(()=>{
+      const panel = document.querySelector(`.dayPlan[data-datekey="${key}"]`);
+      if (panel) panel.scrollIntoView({behavior:"smooth", block:"start"});
+    }, 140);
   }
 
   function getLateDays(state){
@@ -1417,10 +1416,7 @@ b.addEventListener("click", ()=>{
           setTimeout(()=>{
             const panel = document.querySelector(`.dayPlan[data-datekey="${key}"]`);
             if (panel) panel.scrollIntoView({behavior:"smooth", block:"start"});
-          }, 60);
-        });
-setTimeout(()=>el.classList.remove("pulse"), 950);
-          }
+          }, 80);
         });
 
         calGrid.appendChild(b);
@@ -1430,21 +1426,23 @@ setTimeout(()=>el.classList.remove("pulse"), 950);
       cal.appendChild(calGrid);
       body.appendChild(cal);
 
-      // Painel: Plano do dia (renderizado como cards, sem tabela)
+      // Painel: Plano do dia (cards) — aparece ao clicar no dia do calendário
       const ui = state.ui || {};
       let selectedKey = ui.selectedDay;
 
-      // padrão: hoje se for no mesmo mês, senão dia 1 do mês
+      // padrão: hoje se for deste mês, senão dia 1 do mês
       if (!selectedKey){
         if (todayKey.startsWith(`${YEAR}-${pad2(m+1)}-`)) selectedKey = todayKey;
         else selectedKey = `${YEAR}-${pad2(m+1)}-01`;
       }
 
-      // se selectedKey não for deste mês, mantém dia 1 do mês atual (evita confusão ao abrir outro mês)
+      // se selectedKey não for deste mês, mostra dia 1 do mês atual (evita confusão ao abrir outro mês)
       if (!selectedKey.startsWith(`${YEAR}-${pad2(m+1)}-`)) selectedKey = `${YEAR}-${pad2(m+1)}-01`;
 
       const pSel = plan[selectedKey] || { active:false, blocks:[], guidedList:[] };
       const dayNum = Number(selectedKey.split("-")[2] || "1");
+      const doneSel = !!state.days?.[selectedKey]?.done;
+      const isLateSel = (selectedKey < todayKey) && !doneSel && !!pSel?.active;
 
       const dayPlan = document.createElement("div");
       dayPlan.className = "dayPlan";
@@ -1455,24 +1453,24 @@ setTimeout(()=>el.classList.remove("pulse"), 950);
 
       const title = document.createElement("div");
       title.className = "title";
-      title.textContent = `📌 Plano do dia ${dayNum}`;
+      title.innerHTML = `📌 <span>Plano do dia <b>${dayNum}</b></span> ${
+        doneSel ? `<span class="pill ok">Concluído</span>` :
+        (isLateSel ? `<span class="pill late">Atrasado</span>` : `<span class="pill">Pendente</span>`)
+      }`;
 
-      const status = document.createElement("div");
-      const doneSel = !!state.days?.[selectedKey]?.done;
-      const isLateSel = (selectedKey < todayKey) && !doneSel && !!pSel?.active;
-      status.className = "pill " + (doneSel ? "ok" : (isLateSel ? "late" : ""));
-      status.textContent = doneSel ? "Concluído" : (isLateSel ? "Atrasado" : "Pendente");
+      const headRight = document.createElement("div");
+      headRight.className = "tiny";
+      headRight.style.opacity = "0.9";
+      headRight.textContent = "Toque em um dia no calendário para trocar.";
 
       head.appendChild(title);
-      head.appendChild(status);
+      head.appendChild(headRight);
 
       const grid = document.createElement("div");
       grid.className = "dayPlanGrid";
 
-      // monta blocks (até 3 colunas, mas responsivo)
       const blocks = (pSel.blocks || []).slice(0,3);
-      for (let bi=0; bi<blocks.length; bi++){
-        const bb = blocks[bi];
+      for (const bb of blocks){
         const blockEl = document.createElement("div");
         blockEl.className = "dayBlock";
 
@@ -1489,7 +1487,6 @@ setTimeout(()=>el.classList.remove("pulse"), 950);
         btn.className = "btnOpen";
         btn.textContent = "Abrir capítulo";
         btn.addEventListener("click", ()=>{
-          // abre a primeira leitura do bloco (capítulo inicial)
           const list = bb.list || [];
           if (!list.length) return;
           const idx = (pSel.guidedList || []).findIndex(x => x.book === list[0].book && x.chapter === list[0].chapter);
@@ -1502,7 +1499,6 @@ setTimeout(()=>el.classList.remove("pulse"), 950);
         grid.appendChild(blockEl);
       }
 
-      // Concluído + anotação
       const meta = document.createElement("div");
       meta.className = "dayMeta";
 
@@ -1525,10 +1521,9 @@ setTimeout(()=>el.classList.remove("pulse"), 950);
       dayPlan.appendChild(head);
       dayPlan.appendChild(grid);
       dayPlan.appendChild(meta);
-
       body.appendChild(dayPlan);
 
-      // listeners meta
+      // listeners
       dayPlan.querySelector(`#done-${cssEscape(selectedKey)}`).addEventListener("change", (e)=>{
         const st = ensureStateDefaults(loadState());
         st.days[selectedKey] = st.days[selectedKey] || {};
@@ -1536,6 +1531,7 @@ setTimeout(()=>el.classList.remove("pulse"), 950);
         saveState(st);
         renderAll();
       });
+
       dayPlan.querySelector(`#note-${cssEscape(selectedKey)}`).addEventListener("input", (e)=>{
         const st = ensureStateDefaults(loadState());
         st.days[selectedKey] = st.days[selectedKey] || {};
