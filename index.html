@@ -621,6 +621,98 @@
     }
     tr.pulse{ animation: pulseRing 900ms ease-out; }
 
+    /* Reader modal (abre dentro da página quando possível) */
+    .readerModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      z-index: 2000;
+      background: rgba(0,0,0,0.62);
+      backdrop-filter: blur(6px);
+      padding: 12px;
+    }
+    .readerModal.open{ display:flex; align-items:center; justify-content:center; }
+    .readerSheet{
+      width: min(1100px, 100%);
+      height: min(86vh, 860px);
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(12,14,18,0.92);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .readerTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    }
+    .readerTitle{ font-weight: 980; letter-spacing:.2px; }
+    .readerActions{ display:flex; gap:8px; }
+    .readerBtn{
+      padding: 9px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-weight: 980;
+      cursor:pointer;
+    }
+    .readerBtn:hover{ filter:brightness(1.06); border-color: rgba(122,167,255,0.18); background: rgba(122,167,255,0.08); }
+    .readerBtn.danger:hover{ border-color: rgba(255,107,107,0.25); background: rgba(255,107,107,0.10); }
+    .readerHint{
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+    .readerFrame{
+      width:100%;
+      flex:1;
+      border:0;
+      background: rgba(0,0,0,0.1);
+    }
+
+    /* Mobile polish */
+    @media (max-width: 980px){
+      header{
+        padding: 16px 14px;
+      }
+      .topGrid{
+        grid-template-columns: 1fr !important;
+      }
+      .card{
+        padding: 14px 14px;
+      }
+      .monthCalGrid{
+        gap: 6px;
+        padding: 10px;
+      }
+      .dayBtn{ min-height: 50px; border-radius: 12px; }
+      .dayPlan{ padding: 12px; }
+      .dayMeta{ grid-template-columns: 1fr; }
+      .readerModal{ padding: 8px; }
+      .readerSheet{
+        height: 92vh;
+        border-radius: 16px;
+      }
+      .readerActions .readerBtn{
+        padding: 10px 10px;
+      }
+      .fabToday{ bottom: 96px; right: 14px; }
+      .actionBar{
+        gap:10px;
+      }
+      .actionBar button{
+        width: 100%;
+      }
+    }
+
 
     /* Mobile bottom bar */
     .actionBar{
@@ -655,6 +747,24 @@
   </style>
 </head>
 <body>
+
+  <!-- Leitor interno (modal) -->
+  <div class="readerModal" id="readerModal" aria-hidden="true">
+    <div class="readerSheet" role="dialog" aria-modal="true" aria-label="Leitura bíblica">
+      <div class="readerTop">
+        <div class="readerTitle">📖 Leitura</div>
+        <div class="readerActions">
+          <button class="readerBtn" id="readerExternalBtn" type="button" title="Abrir no navegador">Abrir externo</button>
+          <button class="readerBtn danger" id="readerCloseBtn" type="button" title="Fechar">Fechar ✕</button>
+        </div>
+      </div دیده
+      <div class="readerHint" id="readerHint">
+        Dica: se a Bíblia Online bloquear abertura dentro do app, use <b>“Abrir externo”</b>.
+      </div>
+      <iframe class="readerFrame" id="readerFrame" title="Leitura bíblica" loading="lazy"></iframe>
+    </div>
+  </div>
+
 
 <header>
   <div class="hero">
@@ -1020,8 +1130,59 @@
     state.guided[dateKey].idx = idx;
   }
   function openInSingleReadingTab(url){
-    window.open(url, READING_WINDOW_NAME, "noopener,noreferrer");
+    // Tenta abrir dentro da página (modal). Se a Bíblia Online bloquear iframe,
+    // o usuário ainda pode usar "Abrir externo".
+    openReader(url);
   }
+
+  function openReader(url){
+    const modal = document.getElementById("readerModal");
+    const frame = document.getElementById("readerFrame");
+    const hint = document.getElementById("readerHint");
+    const externalBtn = document.getElementById("readerExternalBtn");
+
+    externalBtn.onclick = ()=> window.open(url, READING_WINDOW_NAME, "noopener,noreferrer");
+    hint.style.display = "block";
+
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+
+    // Set src last (helps on some mobile browsers)
+    frame.src = url;
+
+    // Fechamento por ESC e clique fora
+    const onKey = (e)=>{ if (e.key === "Escape") closeReader(); };
+    window.addEventListener("keydown", onKey, { once:true });
+
+    modal.addEventListener("click", (e)=>{
+      if (e.target === modal) closeReader();
+    }, { once:true });
+
+    // Se o iframe não carregar (bloqueio de X-Frame-Options/CSP), o usuário usa "Abrir externo".
+    let loaded = false;
+    const onLoad = ()=>{
+      loaded = true;
+      // Mantém o aviso por segurança (muitos sites carregam parcialmente em mobile).
+      frame.removeEventListener("load", onLoad);
+    };
+    frame.addEventListener("load", onLoad);
+
+    setTimeout(()=>{
+      if (!loaded){
+        hint.innerHTML = '⚠️ Parece que a Bíblia Online pode bloquear abertura dentro do app. Toque em <b>“Abrir externo”</b>.';
+      }
+    }, 1800);
+  }
+
+  function closeReader(){
+    const modal = document.getElementById("readerModal");
+    const frame = document.getElementById("readerFrame");
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    // limpa para parar áudio/video e economizar memória
+    frame.src = "about:blank";
+  }
+
 
   function openDayGuided(dateKey, targetIndex){
     const state = ensureStateDefaults(loadState());
@@ -1701,6 +1862,9 @@ b.addEventListener("click", ()=>{
   });
 
   document.getElementById("fabToday").addEventListener("click", goToToday);
+
+  document.getElementById("readerCloseBtn").addEventListener("click", closeReader);
+
 
   document.getElementById("guidedStartBtn").addEventListener("click", ()=> openGuidedAtIndex(0));
   document.getElementById("catchUpBtn").addEventListener("click", openCatchUpPack);
