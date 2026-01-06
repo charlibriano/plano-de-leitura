@@ -16,6 +16,7 @@
       --warn:#ffcc66;
       --accent:#7aa7ff;
       --danger:#ff6b6b;
+      --shadow: 0 10px 30px rgba(0,0,0,0.25);
     }
     *{box-sizing:border-box}
     body{
@@ -60,7 +61,7 @@
       white-space:nowrap;
     }
 
-    main{max-width:1100px;margin:0 auto;padding:0 16px 150px 16px;}
+    main{max-width:1100px;margin:0 auto;padding:0 16px 170px 16px;}
 
     .grid{
       display:grid;
@@ -76,7 +77,7 @@
       border:1px solid rgba(255,255,255,0.08);
       border-radius:16px;
       padding:14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      box-shadow: var(--shadow);
     }
     .card h2{
       margin:0 0 10px 0;
@@ -105,14 +106,18 @@
       border: 1px solid rgba(122,167,255,0.26);
       padding: 10px 12px;
       border-radius: 12px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:0.2px;
+      transition: transform .05s ease, filter .15s ease, opacity .15s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
     button:hover{filter:brightness(1.08)}
+    button:active{transform: translateY(1px)}
     button.secondary{
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.12);
-      font-weight:750;
+      font-weight:850;
     }
     button.ok{
       background: rgba(46,229,157,0.14);
@@ -122,8 +127,14 @@
       background: rgba(255,204,102,0.12);
       border:1px solid rgba(255,204,102,0.26);
     }
+    button:disabled{
+      opacity:0.45;
+      cursor:not-allowed;
+      filter:none;
+      transform:none;
+    }
 
-    /* KPIs (melhor aspecto) */
+    /* KPIs */
     .stat{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -157,11 +168,11 @@
       gap:10px;
     }
     .kpi .k{
-      font-size:12px;color:var(--muted);font-weight:700;
+      font-size:12px;color:var(--muted);font-weight:800;
       letter-spacing:0.2px;
     }
     .kpi .v{
-      font-size:22px;font-weight:900;margin-top:4px;
+      font-size:22px;font-weight:950;margin-top:4px;
     }
     .kpi .sub{
       margin-top:8px;
@@ -205,7 +216,7 @@
       display:flex;
       align-items:center;
       gap:10px;
-      font-weight:900;
+      font-weight:950;
     }
     .badge{
       font-size:12px;
@@ -215,6 +226,7 @@
       border-radius:999px;
       background: rgba(255,255,255,0.06);
       white-space:nowrap;
+      font-weight:900;
     }
     .monthBody{padding:0 14px 14px 14px;}
     table{
@@ -233,12 +245,12 @@
     }
     th{
       color:var(--muted);
-      font-weight:800;
+      font-weight:900;
       background: rgba(255,255,255,0.04);
     }
     tr:last-child td{border-bottom:none;}
-    .dayCell{white-space:nowrap;color:var(--muted);font-weight:900;}
-    .readCell{font-weight:700}
+    .dayCell{white-space:nowrap;color:var(--muted);font-weight:950;}
+    .readCell{font-weight:800}
     .note{
       width:100%;
       min-height:38px;
@@ -267,14 +279,8 @@
     }
     .muted{color:var(--muted)}
     .tiny{font-size:12px;color:var(--muted)}
-    a.link{
-      color: var(--accent);
-      text-decoration:none;
-      font-weight:900;
-    }
-    a.link:hover{ text-decoration:underline; }
 
-    /* Barra de ações mobile */
+    /* Barra mobile */
     .actionBar{
       position:fixed;
       left:0; right:0; bottom:0;
@@ -307,17 +313,8 @@
       color:var(--muted);
       line-height:1.35;
     }
-    @media (min-width: 981px){
-      main{padding-bottom:120px;}
-      .actionBar{padding:8px 12px 10px 12px;}
-      .actionBar .btnBig{
-        max-width: 360px;
-        flex:0 1 auto;
-        padding:12px 14px;
-      }
-    }
 
-    /* Card Leitura Guiada */
+    /* Controles guiados melhores */
     .guidedBox{
       margin-top:12px;
       padding:12px;
@@ -333,7 +330,7 @@
       flex-wrap:wrap;
     }
     .guidedTitle{
-      font-weight:900;
+      font-weight:950;
       font-size:14px;
       margin:0;
     }
@@ -346,19 +343,26 @@
     .guidedNow{
       margin-top:10px;
       font-size:13px;
-      font-weight:800;
-      line-height:1.45;
+      font-weight:900;
+      line-height:1.55;
     }
     .guidedControls{
-      margin-top:10px;
-      display:flex;
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
       gap:10px;
-      flex-wrap:wrap;
+    }
+    @media (max-width: 520px){
+      .guidedControls{
+        grid-template-columns: 1fr;
+      }
     }
     .guidedControls button{
-      flex:1;
-      min-width:160px;
+      padding:14px 14px;
+      border-radius:14px;
+      font-size:14px;
     }
+
     .kbd{
       font-size:11px;
       color:var(--muted);
@@ -367,6 +371,30 @@
       border-radius:999px;
       background: rgba(255,255,255,0.06);
       white-space:nowrap;
+      font-weight:900;
+    }
+
+    .notice{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,204,102,0.22);
+      background: rgba(255,204,102,0.08);
+      color: var(--text);
+      font-size:12px;
+      line-height:1.4;
+      display:none;
+    }
+    .notice.show{display:block;}
+
+    @media (min-width: 981px){
+      main{padding-bottom:140px;}
+      .actionBar{padding:8px 12px 10px 12px;}
+      .actionBar .btnBig{
+        max-width: 380px;
+        flex:0 1 auto;
+        padding:12px 14px;
+      }
     }
   </style>
 </head>
@@ -376,7 +404,7 @@
       <div>
         <h1>Plano de Leitura 2026</h1>
         <p class="subtitle">
-          Modo leitura guiada: abre <b>1 aba</b> do Bíblia Online e você controla por aqui com <b>Próximo capítulo</b>.
+          Leitura guiada: abre <b>1 aba</b> do Bíblia Online e você navega por aqui com <b>Próximo capítulo</b>.
         </p>
       </div>
       <div class="pill">📅 2026 • ✅ Salvo automaticamente</div>
@@ -419,7 +447,7 @@
             </div>
             <div class="v" id="yearProgressText">0/365</div>
             <div class="bar"><div id="yearBar"></div></div>
-            <div class="sub" id="yearSub">Vamos no ritmo certo.</div>
+            <div class="sub" id="yearSub">Comece hoje — um dia de cada vez.</div>
           </div>
 
           <div class="kpi">
@@ -428,7 +456,7 @@
               <div class="kbd">🔥 streak</div>
             </div>
             <div class="v" id="streakText">0</div>
-            <div class="sub" id="streakSub">Marque a leitura de hoje para manter a sequência.</div>
+            <div class="sub" id="streakSub">Marque a leitura de hoje para iniciar a sequência.</div>
           </div>
         </div>
 
@@ -437,13 +465,15 @@
             <div>
               <p class="guidedTitle">📖 Leitura guiada (1 aba)</p>
               <div class="guidedMeta">
-                Clique em “Iniciar” para abrir o Bíblia Online <b>na mesma aba</b> (reutiliza sempre). Depois use “Próximo capítulo”.
+                Clique em “Iniciar” (abre 1 aba). Depois use Anterior/Próximo. Ao terminar, clique “Finalizei”.
               </div>
             </div>
             <div class="kbd" id="guidedStep">Capítulo 0/0</div>
           </div>
 
           <div class="guidedNow" id="guidedNow">Hoje: —</div>
+
+          <div class="notice" id="guidedNotice"></div>
 
           <div class="guidedControls">
             <button class="warn" id="guidedStartBtn">📖 Iniciar (abrir 1 aba)</button>
@@ -453,18 +483,18 @@
           </div>
 
           <div class="tiny" style="margin-top:10px">
-            Dica: no celular, o navegador pode bloquear pop-up se você não clicar no botão. Sempre clique em “Iniciar” primeiro.
+            Dica: no celular, sempre clique em “Iniciar” primeiro (para o navegador permitir abrir a aba).
           </div>
         </div>
       </section>
 
       <section class="card">
         <h2>Como funciona</h2>
-        <ul class="tiny" style="margin:8px 0 0 18px; line-height:1.8">
+        <ul class="tiny" style="margin:8px 0 0 18px; line-height:1.85">
           <li>Todo dia tem leitura do <b>AT</b> e do <b>NT</b>.</li>
           <li>Para fechar o <b>AT em 1 ano</b>, alguns dias têm <b>2 capítulos</b> e outros <b>3</b>.</li>
           <li>O <b>NT</b> é <b>1 capítulo/dia</b>. Ao terminar, reinicia (bônus).</li>
-          <li>O “Leitura guiada” abre o Bíblia Online sempre na <b>mesma aba</b> e você navega capítulo por capítulo por aqui.</li>
+          <li>O modo guiado abre e reutiliza sempre a <b>mesma aba</b> do Bíblia Online.</li>
         </ul>
       </section>
     </div>
@@ -481,18 +511,10 @@
   </div>
 
 <script>
-  // =========================
-  // CONFIG
-  // =========================
   const YEAR = 2026;
   const DEFAULT_START_DATE = "2026-01-06";
-
-  // 4 dias com 3 capítulos OT + 3 dias com 2 capítulos OT
   const OT_CHAPTERS_PATTERN = [3,3,2,3,3,2,2];
 
-  // =========================
-  // LIVROS
-  // =========================
   const OT = [
     ["Gênesis",50],["Êxodo",40],["Levítico",27],["Números",36],["Deuteronômio",34],
     ["Josué",24],["Juízes",21],["Rute",4],["1 Samuel",31],["2 Samuel",24],
@@ -513,7 +535,6 @@
     ["3 João",1],["Judas",1],["Apocalipse",22]
   ];
 
-  // Bíblia Online: https://www.bibliaonline.com.br/{versao}/{codigo}/{capitulo}
   const BO_BOOK_CODE = {
     "Gênesis":"gn","Êxodo":"ex","Levítico":"lv","Números":"nm","Deuteronômio":"dt",
     "Josué":"js","Juízes":"jz","Rute":"rt","1 Samuel":"1sm","2 Samuel":"2sm",
@@ -538,40 +559,30 @@
     return `https://www.bibliaonline.com.br/${version}/${code}/${chapterNumber}`;
   }
 
-  // =========================
-  // UTIL
-  // =========================
   const pad2 = (n)=> String(n).padStart(2,"0");
-
   function ymd(date){
     return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}`;
   }
-
   function parseYMD(s){
     const [Y,M,D] = s.split("-").map(Number);
     return new Date(Y, M-1, D);
   }
-
   function daysBetween(a,b){
     const ms = 24*60*60*1000;
     const aa = new Date(a.getFullYear(),a.getMonth(),a.getDate()).getTime();
     const bb = new Date(b.getFullYear(),b.getMonth(),b.getDate()).getTime();
     return Math.floor((bb-aa)/ms);
   }
-
   function totalChapters(list){
     return list.reduce((acc,[,c])=>acc+c,0);
   }
-
   const OT_TOTAL = totalChapters(OT);
   const NT_TOTAL = totalChapters(NT);
 
   function chapterAt(globalIndex, list){
     let idx = globalIndex;
     for (const [book, count] of list){
-      if (idx < count){
-        return { book, chapter: idx+1 };
-      }
+      if (idx < count) return { book, chapter: idx+1 };
       idx -= count;
     }
     const total = totalChapters(list);
@@ -609,11 +620,8 @@
     return chapters;
   }
 
-  // =========================
-  // STORAGE
-  // =========================
-  const KEY = "planoLeitura2026_v3";
-  const READING_WINDOW_NAME = "bibliaOnlineReading"; // sempre reutiliza a mesma aba
+  const KEY = "planoLeitura2026_v4";
+  const READING_WINDOW_NAME = "bibliaOnlineReading";
 
   function loadState(){
     try{
@@ -623,11 +631,7 @@
       return { startDate: DEFAULT_START_DATE, version: "acf", days: {}, guided: {} };
     }
   }
-
-  function saveState(state){
-    localStorage.setItem(KEY, JSON.stringify(state));
-  }
-
+  function saveState(state){ localStorage.setItem(KEY, JSON.stringify(state)); }
   function ensureStateDefaults(state){
     if (!state.startDate) state.startDate = DEFAULT_START_DATE;
     if (!state.version) state.version = "acf";
@@ -636,9 +640,6 @@
     return state;
   }
 
-  // =========================
-  // PLANO
-  // =========================
   const monthNames = [
     "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
     "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
@@ -647,10 +648,8 @@
 
   function buildPlanForYear(startDateStr){
     const startDate = parseYMD(startDateStr);
-
     let otPos = 0;
     let ntPos = 0;
-
     const plan = {};
     const yearStart = new Date(YEAR,0,1);
     const yearEnd = new Date(YEAR,11,31);
@@ -681,13 +680,9 @@
       if (otPos >= OT_TOTAL) otPos = OT_TOTAL;
       if (ntPos >= NT_TOTAL) ntPos = ntPos % NT_TOTAL;
     }
-
     return plan;
   }
 
-  // =========================
-  // STREAK / KPIs
-  // =========================
   function calcStreak(state, today){
     let streak = 0;
     let d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -702,9 +697,6 @@
     return streak;
   }
 
-  // =========================
-  // RENDER
-  // =========================
   function escapeHtml(str){
     return String(str ?? "")
       .replaceAll("&","&amp;")
@@ -717,9 +709,165 @@
     return id.replaceAll(":", "\\:").replaceAll(".", "\\.").replaceAll("/", "\\/");
   }
 
+  function updateTodayHint(plan, state, today){
+    const hint = document.getElementById("todayHint");
+    if (today.getFullYear() !== YEAR){
+      hint.textContent = `Hoje não é ${YEAR}. (Checklist de ${YEAR})`;
+      return;
+    }
+    const key = ymd(today);
+    const p = plan[key];
+    if (!p || !p.active){
+      hint.textContent = "Hoje está fora do período ativo do plano (verifique a data de início).";
+      return;
+    }
+    const done = !!state.days?.[key]?.done;
+    hint.textContent = `Hoje: ${p.otText} | ${p.ntText}${done ? " ✅" : ""}`;
+  }
+
+  function getTodayReadingList(plan, today){
+    if (today.getFullYear() !== YEAR) return null;
+    const key = ymd(today);
+    const p = plan[key];
+    if (!p || !p.active) return null;
+    const list = [...(p.otList || []), ...(p.ntList || [])]; // OT (2-3) + NT (1)
+    return { key, p, list };
+  }
+
+  function getGuidedIndex(state, dateKey){
+    const idx = state.guided?.[dateKey]?.idx;
+    return Number.isFinite(idx) ? idx : 0;
+  }
+  function setGuidedIndex(state, dateKey, idx){
+    state.guided = state.guided || {};
+    state.guided[dateKey] = state.guided[dateKey] || {};
+    state.guided[dateKey].idx = idx;
+  }
+
+  function openInSingleReadingTab(url){
+    window.open(url, READING_WINDOW_NAME, "noopener,noreferrer");
+  }
+
+  function openGuidedAtIndex(targetIndex){
+    const state = loadState();
+    const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
+    const today = new Date();
+
+    const info = getTodayReadingList(plan, today);
+    if (!info){
+      alert("Hoje está fora do período ativo do plano. Verifique a data de início.");
+      return;
+    }
+
+    const { key, list } = info;
+    const total = list.length;
+
+    const idx = Math.max(0, Math.min(targetIndex, total-1));
+    const item = list[idx];
+
+    const url = bibleOnlineUrl(state.version, item.book, item.chapter);
+    if (!url){
+      alert("Não consegui montar o link do capítulo. (Livro não mapeado)");
+      return;
+    }
+
+    setGuidedIndex(state, key, idx);
+    saveState(state);
+
+    openInSingleReadingTab(url);
+    renderAll(loadState());
+  }
+
+  function updateGuidedUI(plan, state, today){
+    const nowEl = document.getElementById("guidedNow");
+    const stepEl = document.getElementById("guidedStep");
+    const noticeEl = document.getElementById("guidedNotice");
+
+    const startBtn = document.getElementById("guidedStartBtn");
+    const prevBtn  = document.getElementById("guidedPrevBtn");
+    const nextBtn  = document.getElementById("guidedNextBtn");
+    const finishBtn= document.getElementById("guidedFinishBtn");
+
+    const info = getTodayReadingList(plan, today);
+    if (!info){
+      nowEl.textContent = "Hoje: —";
+      stepEl.textContent = "Capítulo 0/0";
+      noticeEl.classList.remove("show");
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      finishBtn.disabled = true;
+      startBtn.disabled = true;
+      return;
+    }
+
+    startBtn.disabled = false;
+    finishBtn.disabled = false;
+
+    const { key, p, list } = info;
+    const idx = getGuidedIndex(state, key);
+    const total = list.length;
+    const safeIdx = Math.max(0, Math.min(idx, total-1));
+    const cur = list[safeIdx];
+
+    // Botões travados
+    prevBtn.disabled = (safeIdx === 0);
+    nextBtn.disabled = (safeIdx === total - 1);
+
+    // Texto
+    const done = !!state.days?.[key]?.done;
+    const remaining = (total - 1) - safeIdx;
+
+    nowEl.innerHTML =
+      `Hoje: <span style="color:var(--warn)">${p.otText}</span> | <span style="color:var(--accent)">${p.ntText}</span>${done ? " ✅" : ""}<br/>
+       Agora: <b>${cur.book} ${cur.chapter}</b> • Faltam: <b>${remaining}</b>`;
+
+    stepEl.textContent = `Capítulo ${safeIdx+1}/${total}`;
+
+    if (safeIdx === total - 1){
+      noticeEl.textContent = "Você está no ÚLTIMO capítulo de hoje. Depois de ler, clique em “✅ Finalizei a leitura de hoje”.";
+      noticeEl.classList.add("show");
+    } else {
+      noticeEl.classList.remove("show");
+    }
+  }
+
+  function finishTodayReading(){
+    const state = loadState();
+    const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
+    const now = new Date();
+
+    const info = getTodayReadingList(plan, now);
+    if (!info){
+      alert("Hoje está fora do intervalo ativo do plano. Verifique a data de início.");
+      return;
+    }
+
+    // Marca hoje como feito
+    const { key } = info;
+    state.days[key] = state.days[key] || {};
+    state.days[key].done = true;
+
+    // Prepara amanhã (zera índice)
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
+    if (tomorrow.getFullYear() === YEAR){
+      const tKey = ymd(tomorrow);
+      if (!state.guided) state.guided = {};
+      state.guided[tKey] = state.guided[tKey] || {};
+      state.guided[tKey].idx = 0;
+    }
+
+    saveState(state);
+
+    const el = document.getElementById(monthKey(now.getMonth()));
+    if (el){
+      el.open = true;
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+    renderAll(loadState());
+  }
+
   function renderAll(state){
     state = ensureStateDefaults(state);
-
     const plan = buildPlanForYear(state.startDate);
     const container = document.getElementById("months");
     container.innerHTML = "";
@@ -730,7 +878,7 @@
     updateTodayHint(plan, state, today);
     updateGuidedUI(plan, state, today);
 
-    // Progresso anual
+    // progresso anual
     const yearDays = [];
     const yearStart = new Date(YEAR,0,1);
     const yearEnd = new Date(YEAR,11,31);
@@ -744,7 +892,6 @@
     document.getElementById("yearBar").style.width = `${pct}%`;
     document.getElementById("yearPct").textContent = `${pct}%`;
 
-    // Texto inteligente de progresso
     const sub = document.getElementById("yearSub");
     if (doneCount === 0) sub.textContent = "Comece hoje — um dia de cada vez.";
     else if (pct < 10) sub.textContent = "Ótimo início. Constância vence.";
@@ -754,17 +901,16 @@
 
     const streak = calcStreak(state, today);
     document.getElementById("streakText").textContent = String(streak);
-
     const streakSub = document.getElementById("streakSub");
     if (streak === 0) streakSub.textContent = "Marque a leitura de hoje para iniciar a sequência.";
     else if (streak < 7) streakSub.textContent = `Boa! ${streak} dia(s) seguidos.`;
     else if (streak < 30) streakSub.textContent = `Muito bom! ${streak} dias seguidos.`;
     else streakSub.textContent = `Excelente! ${streak} dias seguidos. Isso é disciplina.`;
 
-    // Render meses
+    // meses
     for (let m = 0; m < 12; m++){
       const details = document.createElement("details");
-      details.id = monthKey(m);
+      details.id = `m-${YEAR}-${pad2(m+1)}`;
       if (today.getFullYear() === YEAR && today.getMonth() === m) details.open = true;
 
       const summary = document.createElement("summary");
@@ -858,146 +1004,7 @@
     }
   }
 
-  function updateTodayHint(plan, state, today){
-    const hint = document.getElementById("todayHint");
-    if (today.getFullYear() !== YEAR){
-      hint.textContent = `Hoje não é ${YEAR}. (Checklist de ${YEAR})`;
-      return;
-    }
-
-    const key = ymd(today);
-    const p = plan[key];
-
-    if (!p || !p.active){
-      hint.textContent = "Hoje está fora do período ativo do plano (verifique a data de início).";
-      return;
-    }
-
-    const done = !!state.days?.[key]?.done;
-    hint.textContent = `Hoje: ${p.otText} | ${p.ntText}${done ? " ✅" : ""}`;
-  }
-
-  // =========================
-  // LEITURA GUIADA (1 aba do Bíblia Online)
-  // =========================
-  function getTodayKeyOrNull(today){
-    if (today.getFullYear() !== YEAR) return null;
-    return ymd(today);
-  }
-
-  function getTodayReadingList(plan, today){
-    const key = getTodayKeyOrNull(today);
-    if (!key) return null;
-    const p = plan[key];
-    if (!p || !p.active) return null;
-
-    // Ordem: OT (2-3) depois NT (1)
-    const list = [...(p.otList || []), ...(p.ntList || [])];
-    return { key, p, list };
-  }
-
-  function getGuidedIndex(state, dateKey){
-    const idx = state.guided?.[dateKey]?.idx;
-    return Number.isFinite(idx) ? idx : 0;
-  }
-
-  function setGuidedIndex(state, dateKey, idx){
-    state.guided = state.guided || {};
-    state.guided[dateKey] = state.guided[dateKey] || {};
-    state.guided[dateKey].idx = idx;
-  }
-
-  function openInSingleReadingTab(url){
-    // Reutiliza sempre a mesma aba/janela:
-    // - no desktop, abre janela/aba com esse name
-    // - no mobile, vira uma aba reutilizada
-    window.open(url, READING_WINDOW_NAME, "noopener,noreferrer");
-  }
-
-  function openGuidedAtIndex(targetIndex){
-    const state = loadState();
-    const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
-    const today = new Date();
-
-    const info = getTodayReadingList(plan, today);
-    if (!info){
-      alert("Hoje está fora do período ativo do plano. Verifique a data de início.");
-      return;
-    }
-
-    const { key, list } = info;
-    const total = list.length;
-
-    const idx = Math.max(0, Math.min(targetIndex, total-1));
-    const item = list[idx];
-
-    const url = bibleOnlineUrl(state.version, item.book, item.chapter);
-    if (!url){
-      alert("Não consegui montar o link do capítulo. (Livro não mapeado)");
-      return;
-    }
-
-    setGuidedIndex(state, key, idx);
-    saveState(state);
-
-    openInSingleReadingTab(url);
-
-    // Atualiza UI
-    renderAll(loadState());
-  }
-
-  function updateGuidedUI(plan, state, today){
-    const nowEl = document.getElementById("guidedNow");
-    const stepEl = document.getElementById("guidedStep");
-
-    const info = getTodayReadingList(plan, today);
-    if (!info){
-      nowEl.textContent = "Hoje: —";
-      stepEl.textContent = "Capítulo 0/0";
-      return;
-    }
-
-    const { key, p, list } = info;
-    const idx = getGuidedIndex(state, key);
-    const total = list.length;
-    const safeIdx = Math.max(0, Math.min(idx, total-1));
-
-    const cur = list[safeIdx];
-    const done = !!state.days?.[key]?.done;
-
-    nowEl.innerHTML = `Hoje: <span style="color:var(--warn)">${p.otText}</span> | <span style="color:var(--accent)">${p.ntText}</span>${done ? " ✅" : ""}<br/>
-      Agora: <b>${cur.book} ${cur.chapter}</b>`;
-
-    stepEl.textContent = `Capítulo ${safeIdx+1}/${total}`;
-  }
-
-  function finishTodayReading(){
-    const state = loadState();
-    const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
-    const now = new Date();
-
-    const info = getTodayReadingList(plan, now);
-    if (!info){
-      alert("Hoje está fora do intervalo ativo do plano. Verifique a data de início.");
-      return;
-    }
-
-    const { key } = info;
-    state.days[key] = state.days[key] || {};
-    state.days[key].done = true;
-    saveState(state);
-
-    const el = document.getElementById(monthKey(now.getMonth()));
-    if (el){
-      el.open = true;
-      el.scrollIntoView({behavior:"smooth", block:"start"});
-    }
-    renderAll(loadState());
-  }
-
-  // =========================
-  // CONTROLES
-  // =========================
+  // Controles
   const startDateEl = document.getElementById("startDate");
   const versionSelectEl = document.getElementById("versionSelect");
 
@@ -1019,13 +1026,12 @@
     const t = new Date();
     if (t.getFullYear() !== YEAR){
       alert(`Hoje não é ${YEAR}. Vou abrir Janeiro/${YEAR}.`);
-      const jan = document.getElementById(monthKey(0));
+      const jan = document.getElementById(`m-${YEAR}-01`);
       if (jan) jan.open = true;
       jan?.scrollIntoView({behavior:"smooth", block:"start"});
       return;
     }
-    const m = t.getMonth();
-    const el = document.getElementById(monthKey(m));
+    const el = document.getElementById(`m-${YEAR}-${pad2(t.getMonth()+1)}`);
     if (el){
       el.open = true;
       el.scrollIntoView({behavior:"smooth", block:"start"});
@@ -1035,30 +1041,29 @@
   // Leitura guiada (topo)
   document.getElementById("guidedStartBtn").addEventListener("click", ()=> openGuidedAtIndex(0));
   document.getElementById("guidedPrevBtn").addEventListener("click", ()=>{
-    const state = loadState();
-    const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
+    const s = loadState();
+    const plan = buildPlanForYear(s.startDate || DEFAULT_START_DATE);
     const today = new Date();
     const info = getTodayReadingList(plan, today);
     if (!info) return alert("Hoje está fora do período ativo do plano.");
-    const idx = getGuidedIndex(state, info.key);
+    const idx = getGuidedIndex(s, info.key);
     openGuidedAtIndex(idx - 1);
   });
   document.getElementById("guidedNextBtn").addEventListener("click", ()=>{
-    const state = loadState();
-    const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
+    const s = loadState();
+    const plan = buildPlanForYear(s.startDate || DEFAULT_START_DATE);
     const today = new Date();
     const info = getTodayReadingList(plan, today);
     if (!info) return alert("Hoje está fora do período ativo do plano.");
-    const idx = getGuidedIndex(state, info.key);
+    const idx = getGuidedIndex(s, info.key);
     openGuidedAtIndex(idx + 1);
   });
   document.getElementById("guidedFinishBtn").addEventListener("click", finishTodayReading);
 
-  // Barra mobile
+  // Barra mobile (atalhos)
   document.getElementById("startTodayReadingBtn").addEventListener("click", ()=> openGuidedAtIndex(0));
   document.getElementById("finishTodayBtn").addEventListener("click", finishTodayReading);
 
-  // mudança de versão “na hora”
   versionSelectEl.addEventListener("change", ()=>{
     const state = loadState();
     state.version = versionSelectEl.value || "acf";
@@ -1066,7 +1071,7 @@
     renderAll(loadState());
   });
 
-  // Render inicial
+  // Inicial
   syncControls();
   renderAll(loadState());
 </script>
