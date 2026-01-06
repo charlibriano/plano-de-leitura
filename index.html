@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Plano de Leitura da Bíblia 2026 (Checklist)</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --card:#121926;
+      --card2:#0f1623;
+      --text:#e8eef6;
+      --muted:#a9b6c6;
+      --line:#223047;
+      --ok:#2ee59d;
+      --warn:#ffcc66;
+      --accent:#7aa7ff;
+      --danger:#ff6b6b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background: radial-gradient(1200px 800px at 20% 0%, #101a2a 0%, var(--bg) 60%);
+      color:var(--text);
+    }
+    header{
+      padding:24px 16px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    .title{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    h1{
+      margin:0 0 6px 0;
+      font-size:22px;
+      letter-spacing:0.2px;
+    }
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.4;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      background:rgba(122,167,255,0.12);
+      border:1px solid rgba(122,167,255,0.25);
+      border-radius:12px;
+      color:var(--text);
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    main{max-width:1100px;margin:0 auto;padding:0 16px 40px 16px;}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr;}
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:16px;
+      padding:14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .card h2{
+      margin:0 0 8px 0;
+      font-size:16px;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    label.small{font-size:12px;color:var(--muted)}
+    input[type="date"]{
+      background: var(--card2);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:10px;
+      padding:10px 10px;
+      outline:none;
+    }
+    button{
+      cursor:pointer;
+      background: rgba(122,167,255,0.14);
+      color: var(--text);
+      border: 1px solid rgba(122,167,255,0.26);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight:600;
+      letter-spacing:0.2px;
+    }
+    button:hover{filter:brightness(1.08)}
+    button.secondary{
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    button.danger{
+      background: rgba(255,107,107,0.16);
+      border:1px solid rgba(255,107,107,0.32);
+    }
+    .stat{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .kpi{
+      flex:1;
+      min-width:220px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.2);
+    }
+    .kpi .k{font-size:12px;color:var(--muted)}
+    .kpi .v{font-size:20px;font-weight:800;margin-top:3px}
+    .bar{
+      height:10px;
+      background: rgba(255,255,255,0.08);
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:10px;
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--accent), var(--ok));
+      border-radius:999px;
+      transition: width .2s ease;
+    }
+
+    details{
+      margin-top:14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.18);
+      overflow:hidden;
+    }
+    summary{
+      list-style:none;
+      padding:14px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    summary::-webkit-details-marker{display:none}
+    .monthTitle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+    }
+    .badge{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,0.14);
+      padding:4px 8px;
+      border-radius:999px;
+      background: rgba(255,255,255,0.06);
+      white-space:nowrap;
+    }
+    .monthBody{padding:0 14px 14px 14px;}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    th, td{
+      text-align:left;
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,0.07);
+      vertical-align:top;
+      font-size:13px;
+    }
+    th{
+      color:var(--muted);
+      font-weight:700;
+      background: rgba(255,255,255,0.04);
+    }
+    tr:last-child td{border-bottom:none;}
+    .dayCell{white-space:nowrap;color:var(--muted);font-weight:700;}
+    .readCell{font-weight:650}
+    .note{
+      width:100%;
+      min-height:38px;
+      resize:vertical;
+      background: rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius:10px;
+      color: var(--text);
+      padding:8px;
+      outline:none;
+    }
+    .checkWrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    input[type="checkbox"]{
+      width:18px;height:18px;
+      accent-color: var(--ok);
+      cursor:pointer;
+    }
+    .today{
+      outline:2px solid rgba(255,204,102,0.35);
+      outline-offset:-2px;
+      background: rgba(255,204,102,0.06);
+    }
+    .muted{color:var(--muted)}
+    .tiny{font-size:12px;color:var(--muted)}
+    .footer{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .fileInput{
+      display:none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">
+      <div>
+        <h1>Plano de Leitura da Bíblia 2026 (Checklist)</h1>
+        <p class="subtitle">
+          Marque sua leitura diária. Salva automaticamente no navegador (LocalStorage).
+          Plano: capítulos sequenciais do AT e NT em paralelo, começando na data configurada.
+        </p>
+      </div>
+      <div class="pill" id="pillInfo">📅 2026 • ✅ Progresso salvo automaticamente</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <section class="card">
+        <h2>Configuração do plano</h2>
+
+        <div class="row">
+          <div>
+            <label class="small">Data de início do plano</label><br/>
+            <input type="date" id="startDate" />
+          </div>
+
+          <div>
+            <label class="small">Ano do checklist</label><br/>
+            <input type="date" id="yearAnchor" />
+          </div>
+
+          <div style="flex:1"></div>
+
+          <button id="regenBtn">Recalcular Plano</button>
+          <button class="secondary" id="openTodayBtn">Abrir mês de hoje</button>
+        </div>
+
+        <p class="tiny" style="margin:10px 0 0 0">
+          📝 *Dica*: se você perder um dia, só continue. O checklist não serve pra te cobrar, e sim pra te manter constante.
+        </p>
+
+        <div class="stat">
+          <div class="kpi">
+            <div class="k">Progresso do ano</div>
+            <div class="v" id="yearProgressText">0/365</div>
+            <div class="bar"><div id="yearBar"></div></div>
+          </div>
+          <div class="kpi">
+            <div class="k">Dias consecutivos (streak)</div>
+            <div class="v" id="streakText">0</div>
+            <div class="tiny muted" id="streakHint">Marcações em sequência até hoje</div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <div class="row">
+            <button class="secondary" id="exportBtn">Exportar backup (JSON)</button>
+            <button class="secondary" id="importBtn">Importar backup (JSON)</button>
+            <input class="fileInput" id="importFile" type="file" accept="application/json" />
+          </div>
+          <button class="danger" id="resetBtn">Zerar marcações</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Como funciona o plano</h2>
+        <ul class="tiny" style="margin:8px 0 0 18px; line-height:1.6">
+          <li>Você terá leituras do <b>AT</b> e do <b>NT</b> por dia (capítulos sequenciais).</li>
+          <li>Para fechar o AT em 1 ano, alguns dias terão <b>2 capítulos do AT</b> e outros terão <b>3 capítulos do AT</b>.</li>
+          <li>O NT fica em <b>1 capítulo por dia</b>. Quando o NT terminar, ele reinicia do começo (você lê o NT mais de 1 vez no ano — bônus).</li>
+          <li>Você pode escrever uma anotação curta por dia (o que Deus falou, um versículo, etc.).</li>
+          <li>Tudo fica salvo no seu navegador automaticamente.</li>
+        </ul>
+        <p class="tiny muted" style="margin-top:10px">
+          Se quiser, depois a gente adapta pra: “Bíblia em 1 ano (3–4 capítulos/dia) com Salmos/Provérbios” ou “Cronograma cronológico”.
+        </p>
+      </section>
+    </div>
+
+    <div id="months"></div>
+  </main>
+
+<script>
+  // =========================
+  // CONFIG PADRÃO (ajuste aqui se quiser)
+  // =========================
+  const DEFAULT_START_DATE = "2026-01-06"; // você disse que hoje é dia 6
+  const YEAR = 2026;
+
+  // Padrão semanal: 4 dias com 3 capítulos do AT e 3 dias com 2 capítulos do AT (média ~2,57/dia)
+  // Isso fecha o AT (929 capítulos) dentro de 365 dias com folga pequena.
+  // Mod 0..6 (0=primeiro dia do plano)
+  const OT_CHAPTERS_PATTERN = [3,3,2,3,3,2,2];
+
+  // =========================
+  // LISTAS DE LIVROS (capítulos)
+  // =========================
+  const OT = [
+    ["Gênesis",50],["Êxodo",40],["Levítico",27],["Números",36],["Deuteronômio",34],
+    ["Josué",24],["Juízes",21],["Rute",4],["1 Samuel",31],["2 Samuel",24],
+    ["1 Reis",22],["2 Reis",25],["1 Crônicas",29],["2 Crônicas",36],["Esdras",10],
+    ["Neemias",13],["Ester",10],["Jó",42],["Salmos",150],["Provérbios",31],
+    ["Eclesiastes",12],["Cantares",8],["Isaías",66],["Jeremias",52],["Lamentações",5],
+    ["Ezequiel",48],["Daniel",12],["Oséias",14],["Joel",3],["Amós",9],
+    ["Obadias",1],["Jonas",4],["Miquéias",7],["Naum",3],["Habacuque",3],
+    ["Sofonias",3],["Ageu",2],["Zacarias",14],["Malaquias",4]
+  ];
+
+  const NT = [
+    ["Mateus",28],["Marcos",16],["Lucas",24],["João",21],["Atos",28],
+    ["Romanos",16],["1 Coríntios",16],["2 Coríntios",13],["Gálatas",6],["Efésios",6],
+    ["Filipenses",4],["Colossenses",4],["1 Tessalonicenses",5],["2 Tessalonicenses",3],
+    ["1 Timóteo",6],["2 Timóteo",4],["Tito",3],["Filemom",1],["Hebreus",13],
+    ["Tiago",5],["1 Pedro",5],["2 Pedro",3],["1 João",5],["2 João",1],
+    ["3 João",1],["Judas",1],["Apocalipse",22]
+  ];
+
+  // =========================
+  // UTIL
+  // =========================
+  const pad2 = (n)=> String(n).padStart(2,"0");
+
+  function formatBR(date){
+    const d = date.getDate();
+    const m = date.getMonth()+1;
+    return `${pad2(d)}/${pad2(m)}/${date.getFullYear()}`;
+  }
+
+  function ymd(date){
+    return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}`;
+  }
+
+  function parseYMD(s){
+    const [Y,M,D] = s.split("-").map(Number);
+    return new Date(Y, M-1, D);
+  }
+
+  function daysBetween(a,b){
+    // diferença em dias inteiros (b - a)
+    const ms = 24*60*60*1000;
+    const aa = new Date(a.getFullYear(),a.getMonth(),a.getDate()).getTime();
+    const bb = new Date(b.getFullYear(),b.getMonth(),b.getDate()).getTime();
+    return Math.floor((bb-aa)/ms);
+  }
+
+  function totalChapters(list){
+    return list.reduce((acc,[,c])=>acc+c,0);
+  }
+
+  const OT_TOTAL = totalChapters(OT); // 929
+  const NT_TOTAL = totalChapters(NT); // 260
+
+  // Dado um índice de capítulo global (0-based), retorna {book, chapter} (1-based)
+  function chapterAt(globalIndex, list){
+    let idx = globalIndex;
+    for (const [book, count] of list){
+      if (idx < count){
+        return { book, chapter: idx+1 };
+      }
+      idx -= count;
+    }
+    // se passar do fim, reinicia (ciclo)
+    const total = totalChapters(list);
+    idx = ((globalIndex % total)+total)%total;
+    return chapterAt(idx, list);
+  }
+
+  // Pega N capítulos consecutivos, pode atravessar livros.
+  // Retorna texto bonito agrupando quando possível: "Gênesis 1–3" ou "Gênesis 50; Êxodo 1–2"
+  function nextNChaptersText(startIndex, n, list){
+    const parts = [];
+    let i = startIndex;
+
+    while (n > 0){
+      const start = chapterAt(i, list);
+      // descobrir até onde dá pra ir no mesmo livro
+      const bookEntry = list.find(b => b[0] === start.book);
+      const bookCount = bookEntry ? bookEntry[1] : 1;
+
+      const withinBookStart = start.chapter;
+      const remainingInBook = bookCount - withinBookStart + 1;
+      const take = Math.min(n, remainingInBook);
+
+      const endChapter = withinBookStart + take - 1;
+
+      if (take === 1){
+        parts.push(`${start.book} ${withinBookStart}`);
+      } else {
+        parts.push(`${start.book} ${withinBookStart}–${endChapter}`);
+      }
+
+      i += take;
+      n -= take;
+    }
+
+    return parts.join("; ");
+  }
+
+  // =========================
+  // STORAGE
+  // =========================
+  const KEY = "bibleChecklist2026_v1";
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : { startDate: DEFAULT_START_DATE, yearAnchor: `${YEAR}-01-01`, days: {} };
+    }catch{
+      return { startDate: DEFAULT_START_DATE, yearAnchor: `${YEAR}-01-01`, days: {} };
+    }
+  }
+
+  function saveState(state){
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+
+  function ensureStateDefaults(state){
+    if (!state.startDate) state.startDate = DEFAULT_START_DATE;
+    if (!state.yearAnchor) state.yearAnchor = `${YEAR}-01-01`;
+    if (!state.days) state.days = {};
+    return state;
+  }
+
+  // =========================
+  // PLANO / GERAÇÃO
+  // =========================
+  const monthNames = [
+    "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+    "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+  ];
+
+  function buildPlanForYear(startDateStr){
+    const startDate = parseYMD(startDateStr);
+
+    // Precompute positions: OT e NT começam do capítulo 0.
+    let otPos = 0;
+    let ntPos = 0;
+
+    const plan = {}; // ymd -> {otText, ntText}
+
+    const yearStart = new Date(YEAR,0,1);
+    const yearEnd = new Date(YEAR,11,31);
+
+    // Vamos iterar cada dia do ano, mas só avançar posições a partir do startDate.
+    // Antes do startDate: coloca "—" para não confundir.
+    for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate()+1)){
+      const key = ymd(d);
+
+      if (d < startDate){
+        plan[key] = { otText: "—", ntText: "—", active:false };
+        continue;
+      }
+
+      const offset = daysBetween(startDate, d); // 0 no dia inicial
+      const otN = OT_CHAPTERS_PATTERN[offset % 7]; // 2 ou 3
+      const ntN = 1;
+
+      const otText = nextNChaptersText(otPos, otN, OT);
+      const ntText = nextNChaptersText(ntPos, ntN, NT);
+
+      plan[key] = { otText, ntText, active:true };
+
+      otPos += otN;
+      ntPos += ntN;
+
+      // AT não reinicia (queremos completar uma vez; se passar do total, mantém "Revisão AT")
+      if (otPos >= OT_TOTAL){
+        // a partir do momento que terminar o AT, vamos manter uma sugestão fixa
+        otPos = OT_TOTAL;
+      }
+      if (ntPos >= NT_TOTAL){
+        // NT reinicia para ler novamente (bônus)
+        ntPos = ntPos % NT_TOTAL;
+      }
+    }
+
+    return plan;
+  }
+
+  function monthKey(m){ return `m-${YEAR}-${pad2(m+1)}`; }
+
+  function renderAll(state){
+    state = ensureStateDefaults(state);
+
+    const startDateStr = state.startDate;
+    const plan = buildPlanForYear(startDateStr);
+
+    const container = document.getElementById("months");
+    container.innerHTML = "";
+
+    const today = new Date();
+    const todayKey = ymd(today);
+
+    // Progresso anual
+    const yearDays = [];
+    const yearStart = new Date(YEAR,0,1);
+    const yearEnd = new Date(YEAR,11,31);
+    for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate()+1)){
+      yearDays.push(ymd(d));
+    }
+
+    const doneCount = yearDays.filter(k => state.days?.[k]?.done).length;
+    document.getElementById("yearProgressText").textContent = `${doneCount}/365`;
+    document.getElementById("yearBar").style.width = `${Math.round((doneCount/365)*100)}%`;
+
+    // Streak até hoje (contando somente dias do ano)
+    const streak = calcStreak(state, today);
+    document.getElementById("streakText").textContent = String(streak);
+
+    // Render meses
+    for (let m = 0; m < 12; m++){
+      const details = document.createElement("details");
+      details.id = monthKey(m);
+      // abre o mês atual automaticamente
+      if (today.getFullYear() === YEAR && today.getMonth() === m) details.open = true;
+
+      const summary = document.createElement("summary");
+      const left = document.createElement("div");
+      left.className = "monthTitle";
+      left.innerHTML = `📌 ${monthNames[m]}`;
+
+      const monthStats = document.createElement("div");
+      monthStats.className = "badge";
+      monthStats.id = `badge-${m}`;
+
+      summary.appendChild(left);
+      summary.appendChild(monthStats);
+
+      const body = document.createElement("div");
+      body.className = "monthBody";
+
+      const table = document.createElement("table");
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th style="width:90px">Dia</th>
+            <th style="width:260px">AT</th>
+            <th style="width:210px">NT</th>
+            <th style="width:140px">Concluído</th>
+            <th>Anotação (opcional)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      `;
+
+      const tbody = table.querySelector("tbody");
+
+      // Dias do mês
+      const lastDay = new Date(YEAR, m+1, 0).getDate();
+      let monthDone = 0;
+
+      for (let day = 1; day <= lastDay; day++){
+        const date = new Date(YEAR, m, day);
+        const key = ymd(date);
+
+        const p = plan[key] || { otText:"—", ntText:"—", active:false };
+        const dayState = state.days[key] || { done:false, note:"" };
+
+        if (dayState.done) monthDone++;
+
+        const tr = document.createElement("tr");
+        if (key === todayKey) tr.classList.add("today");
+
+        const doneId = `done-${key}`;
+        const noteId = `note-${key}`;
+
+        tr.innerHTML = `
+          <td class="dayCell">${day}</td>
+          <td class="readCell">${p.otText}${p.active ? "" : " <span class='muted'>(fora do início)</span>"}</td>
+          <td class="readCell">${p.ntText}${p.active ? "" : ""}</td>
+          <td>
+            <div class="checkWrap">
+              <input type="checkbox" id="${doneId}" ${dayState.done ? "checked":""} />
+              <span class="tiny">${p.active ? "Lido" : "—"}</span>
+            </div>
+          </td>
+          <td>
+            <textarea class="note" id="${noteId}" placeholder="Ex.: um versículo, algo que aprendi...">${escapeHtml(dayState.note || "")}</textarea>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+
+        // listeners
+        tr.querySelector(`#${cssEscape(doneId)}`).addEventListener("change", (e)=>{
+          state.days[key] = state.days[key] || {};
+          state.days[key].done = !!e.target.checked;
+          saveState(state);
+          renderAll(loadState()); // simples e confiável
+        });
+
+        tr.querySelector(`#${cssEscape(noteId)}`).addEventListener("input", (e)=>{
+          state.days[key] = state.days[key] || {};
+          state.days[key].note = e.target.value;
+          saveState(state);
+          // não re-renderiza toda hora, só salva
+        });
+      }
+
+      body.appendChild(table);
+      details.appendChild(summary);
+      details.appendChild(body);
+      container.appendChild(details);
+
+      // Badge do mês
+      const monthTotal = lastDay;
+      const pct = Math.round((monthDone/monthTotal)*100);
+      document.getElementById(`badge-${m}`).textContent = `✅ ${monthDone}/${monthTotal} (${pct}%)`;
+    }
+  }
+
+  function calcStreak(state, today){
+    // streak contando dias marcados até hoje (inclusive hoje)
+    let streak = 0;
+    let d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    // se hoje não é 2026, ainda calculamos olhando para 2026 se existir
+    // (mas o ideal é usar durante 2026)
+    while (true){
+      if (d.getFullYear() !== YEAR) break;
+      const key = ymd(d);
+      if (state.days?.[key]?.done){
+        streak++;
+        d.setDate(d.getDate()-1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  // =========================
+  // ESCAPE helpers
+  // =========================
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function cssEscape(id){
+    // escape mínimo pra querySelector
+    return id.replaceAll(":", "\\:").replaceAll(".", "\\.").replaceAll("/", "\\/");
+  }
+
+  // =========================
+  // CONTROLES
+  // =========================
+  let state = ensureStateDefaults(loadState());
+
+  const startDateEl = document.getElementById("startDate");
+  const yearAnchorEl = document.getElementById("yearAnchor");
+
+  // set defaults
+  startDateEl.value = state.startDate || DEFAULT_START_DATE;
+  yearAnchorEl.value = state.yearAnchor || `${YEAR}-01-01`;
+
+  document.getElementById("regenBtn").addEventListener("click", ()=>{
+    state.startDate = startDateEl.value || DEFAULT_START_DATE;
+    state.yearAnchor = yearAnchorEl.value || `${YEAR}-01-01`;
+    saveState(state);
+    renderAll(loadState());
+  });
+
+  document.getElementById("openTodayBtn").addEventListener("click", ()=>{
+    const t = new Date();
+    if (t.getFullYear() !== YEAR){
+      alert("Hoje não é 2026. Vou abrir Janeiro/2026.");
+      const jan = document.getElementById(monthKey(0));
+      if (jan) jan.open = true;
+      jan?.scrollIntoView({behavior:"smooth", block:"start"});
+      return;
+    }
+    const m = t.getMonth();
+    const el = document.getElementById(monthKey(m));
+    if (el){
+      el.open = true;
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", ()=>{
+    const ok = confirm("Tem certeza que deseja zerar TODAS as marcações e anotações? Isso não tem volta.");
+    if (!ok) return;
+    state.days = {};
+    saveState(state);
+    renderAll(loadState());
+  });
+
+  // Export / Import
+  document.getElementById("exportBtn").addEventListener("click", ()=>{
+    const data = loadState();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "bible-checklist-2026-backup.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  });
+
+  document.getElementById("importBtn").addEventListener("click", ()=>{
+    document.getElementById("importFile").click();
+  });
+
+  document.getElementById("importFile").addEventListener("change", async (e)=>{
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try{
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if (!parsed || typeof parsed !== "object") throw new Error("JSON inválido");
+      // valida minimamente
+      parsed.startDate = parsed.startDate || DEFAULT_START_DATE;
+      parsed.yearAnchor = parsed.yearAnchor || `${YEAR}-01-01`;
+      parsed.days = parsed.days || {};
+      localStorage.setItem(KEY, JSON.stringify(parsed));
+      state = parsed;
+      startDateEl.value = state.startDate;
+      yearAnchorEl.value = state.yearAnchor;
+      renderAll(loadState());
+      alert("Backup importado com sucesso!");
+    }catch(err){
+      alert("Falha ao importar. Verifique se é um JSON válido do checklist.");
+    }finally{
+      e.target.value = "";
+    }
+  });
+
+  // Render inicial
+  renderAll(loadState());
+</script>
+</body>
+</html>
