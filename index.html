@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Plano de Leitura da Bíblia 2026 (Checklist)</title>
+  <title>Plano de Leitura 2026 (Checklist)</title>
   <style>
     :root{
       --bg:#0b0f14;
@@ -25,7 +25,7 @@
       color:var(--text);
     }
     header{
-      padding:24px 16px;
+      padding:20px 16px 12px 16px;
       max-width:1100px;
       margin:0 auto;
     }
@@ -60,7 +60,7 @@
       white-space:nowrap;
     }
 
-    main{max-width:1100px;margin:0 auto;padding:0 16px 40px 16px;}
+    main{max-width:1100px;margin:0 auto;padding:0 16px 110px 16px;} /* + espaço para barra mobile */
 
     .grid{
       display:grid;
@@ -79,7 +79,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     }
     .card h2{
-      margin:0 0 8px 0;
+      margin:0 0 10px 0;
       font-size:16px;
     }
     .row{
@@ -89,7 +89,7 @@
       flex-wrap:wrap;
     }
     label.small{font-size:12px;color:var(--muted)}
-    input[type="date"]{
+    select, input[type="date"]{
       background: var(--card2);
       color:var(--text);
       border:1px solid rgba(255,255,255,0.12);
@@ -97,6 +97,7 @@
       padding:10px 10px;
       outline:none;
     }
+
     button{
       cursor:pointer;
       background: rgba(122,167,255,0.14);
@@ -104,18 +105,24 @@
       border: 1px solid rgba(122,167,255,0.26);
       padding: 10px 12px;
       border-radius: 12px;
-      font-weight:600;
+      font-weight:700;
       letter-spacing:0.2px;
     }
     button:hover{filter:brightness(1.08)}
     button.secondary{
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.12);
+      font-weight:650;
     }
     button.danger{
       background: rgba(255,107,107,0.16);
       border:1px solid rgba(255,107,107,0.32);
     }
+    button.ok{
+      background: rgba(46,229,157,0.14);
+      border:1px solid rgba(46,229,157,0.28);
+    }
+
     .stat{
       display:flex;
       gap:12px;
@@ -200,7 +207,7 @@
       background: rgba(255,255,255,0.04);
     }
     tr:last-child td{border-bottom:none;}
-    .dayCell{white-space:nowrap;color:var(--muted);font-weight:700;}
+    .dayCell{white-space:nowrap;color:var(--muted);font-weight:800;}
     .readCell{font-weight:650}
     .note{
       width:100%;
@@ -238,8 +245,58 @@
       align-items:center;
       justify-content:space-between;
     }
-    .fileInput{
-      display:none;
+    .fileInput{display:none;}
+
+    a.link{
+      color: var(--accent);
+      text-decoration:none;
+      font-weight:700;
+    }
+    a.link:hover{ text-decoration:underline; }
+
+    /* ===== Barra de ações mobile (bem visível) ===== */
+    .actionBar{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      padding:10px 12px 14px 12px;
+      background: rgba(10,15,20,0.92);
+      border-top: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(10px);
+      z-index:999;
+    }
+    .actionBar .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .actionBar .btnBig{
+      flex:1;
+      min-width: 190px;
+      padding:14px 14px;
+      border-radius:14px;
+      font-size:14px;
+    }
+    .actionBar .hint{
+      width:100%;
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.3;
+    }
+    @media (min-width: 981px){
+      .actionBar{ /* no desktop, mantém mas um pouco menor */
+        padding:8px 12px 10px 12px;
+      }
+      .actionBar .btnBig{
+        max-width: 340px;
+        flex:0 1 auto;
+        padding:12px 14px;
+      }
+      main{padding-bottom:90px;}
     }
   </style>
 </head>
@@ -247,20 +304,20 @@
   <header>
     <div class="title">
       <div>
-        <h1>Plano de Leitura da Bíblia 2026 (Checklist)</h1>
+        <h1>Plano de Leitura 2026 (Checklist)</h1>
         <p class="subtitle">
-          Marque sua leitura diária. Salva automaticamente no navegador (LocalStorage).
-          Plano: capítulos sequenciais do AT e NT em paralelo, começando na data configurada.
+          Leia e marque ✅. Use <b>📖 Iniciar leitura de hoje</b> para abrir no <b>Bíblia Online</b> e depois
+          <b>✅ Finalizei</b> para marcar o dia.
         </p>
       </div>
-      <div class="pill" id="pillInfo">📅 2026 • ✅ Progresso salvo automaticamente</div>
+      <div class="pill">📅 2026 • ✅ Progresso salvo automaticamente</div>
     </div>
   </header>
 
   <main>
     <div class="grid">
       <section class="card">
-        <h2>Configuração do plano</h2>
+        <h2>Configuração</h2>
 
         <div class="row">
           <div>
@@ -269,18 +326,24 @@
           </div>
 
           <div>
-            <label class="small">Ano do checklist</label><br/>
-            <input type="date" id="yearAnchor" />
+            <label class="small">Tradução (Bíblia Online)</label><br/>
+            <select id="versionSelect" title="Tradução">
+              <option value="acf">ACF</option>
+              <option value="ara">ARA</option>
+              <option value="arc">ARC</option>
+              <option value="naa">NAA</option>
+              <option value="nvi">NVI</option>
+            </select>
           </div>
 
           <div style="flex:1"></div>
 
-          <button id="regenBtn">Recalcular Plano</button>
           <button class="secondary" id="openTodayBtn">Abrir mês de hoje</button>
+          <button id="regenBtn">Recalcular plano</button>
         </div>
 
         <p class="tiny" style="margin:10px 0 0 0">
-          📝 *Dica*: se você perder um dia, só continue. O checklist não serve pra te cobrar, e sim pra te manter constante.
+          📝 Dica: se perder um dia, só continue. O checklist não é cobrança — é constância.
         </p>
 
         <div class="stat">
@@ -292,7 +355,7 @@
           <div class="kpi">
             <div class="k">Dias consecutivos (streak)</div>
             <div class="v" id="streakText">0</div>
-            <div class="tiny muted" id="streakHint">Marcações em sequência até hoje</div>
+            <div class="tiny muted">Marcações em sequência até hoje</div>
           </div>
         </div>
 
@@ -307,16 +370,15 @@
       </section>
 
       <section class="card">
-        <h2>Como funciona o plano</h2>
-        <ul class="tiny" style="margin:8px 0 0 18px; line-height:1.6">
-          <li>Você terá leituras do <b>AT</b> e do <b>NT</b> por dia (capítulos sequenciais).</li>
-          <li>Para fechar o AT em 1 ano, alguns dias terão <b>2 capítulos do AT</b> e outros terão <b>3 capítulos do AT</b>.</li>
-          <li>O NT fica em <b>1 capítulo por dia</b>. Quando o NT terminar, ele reinicia do começo (você lê o NT mais de 1 vez no ano — bônus).</li>
-          <li>Você pode escrever uma anotação curta por dia (o que Deus falou, um versículo, etc.).</li>
-          <li>Tudo fica salvo no seu navegador automaticamente.</li>
+        <h2>Como usar (bem simples)</h2>
+        <ul class="tiny" style="margin:8px 0 0 18px; line-height:1.7">
+          <li>Todo dia tem leitura do <b>AT</b> e do <b>NT</b>.</li>
+          <li>Para fechar o <b>AT em 1 ano</b>, alguns dias têm <b>2 capítulos</b> e outros <b>3</b>.</li>
+          <li>O <b>NT</b> fica em <b>1 capítulo/dia</b>. Ao terminar, ele reinicia (bônus — você lê o NT mais de 1 vez).</li>
+          <li>Use os botões do rodapé no celular: <b>📖 Iniciar</b> → lê → <b>✅ Finalizei</b> para marcar.</li>
         </ul>
         <p class="tiny muted" style="margin-top:10px">
-          Se quiser, depois a gente adapta pra: “Bíblia em 1 ano (3–4 capítulos/dia) com Salmos/Provérbios” ou “Cronograma cronológico”.
+          Se quiser depois, a gente ajusta para um modelo “Bíblia completa 100% certinho” (sem reiniciar NT).
         </p>
       </section>
     </div>
@@ -324,20 +386,27 @@
     <div id="months"></div>
   </main>
 
+  <!-- Barra de ações (mobile first) -->
+  <div class="actionBar">
+    <div class="wrap">
+      <button class="btnBig" id="startTodayReadingBtn">📖 Iniciar leitura de hoje</button>
+      <button class="btnBig ok" id="finishTodayBtn">✅ Finalizei a leitura de hoje</button>
+      <div class="hint" id="todayHint">Hoje: —</div>
+    </div>
+  </div>
+
 <script>
   // =========================
-  // CONFIG PADRÃO (ajuste aqui se quiser)
+  // CONFIG PADRÃO
   // =========================
-  const DEFAULT_START_DATE = "2026-01-06"; // você disse que hoje é dia 6
   const YEAR = 2026;
+  const DEFAULT_START_DATE = "2026-01-06"; // você disse que o plano começou dia 6
 
-  // Padrão semanal: 4 dias com 3 capítulos do AT e 3 dias com 2 capítulos do AT (média ~2,57/dia)
-  // Isso fecha o AT (929 capítulos) dentro de 365 dias com folga pequena.
-  // Mod 0..6 (0=primeiro dia do plano)
+  // 4 dias com 3 capítulos OT + 3 dias com 2 capítulos OT (média ~2,57/dia => fecha OT em 1 ano)
   const OT_CHAPTERS_PATTERN = [3,3,2,3,3,2,2];
 
   // =========================
-  // LISTAS DE LIVROS (capítulos)
+  // LIVROS (capítulos)
   // =========================
   const OT = [
     ["Gênesis",50],["Êxodo",40],["Levítico",27],["Números",36],["Deuteronômio",34],
@@ -360,15 +429,40 @@
   ];
 
   // =========================
+  // BÍBLIA ONLINE (códigos de livros)
+  // URL padrão: https://www.bibliaonline.com.br/{versao}/{codigo}/{capitulo}
+  // Exemplo: https://www.bibliaonline.com.br/acf/gn/1 :contentReference[oaicite:0]{index=0}
+  // =========================
+  const BO_BOOK_CODE = {
+    // OT
+    "Gênesis":"gn","Êxodo":"ex","Levítico":"lv","Números":"nm","Deuteronômio":"dt",
+    "Josué":"js","Juízes":"jz","Rute":"rt","1 Samuel":"1sm","2 Samuel":"2sm",
+    "1 Reis":"1rs","2 Reis":"2rs","1 Crônicas":"1cr","2 Crônicas":"2cr","Esdras":"ed",
+    "Neemias":"ne","Ester":"et","Jó":"jo","Salmos":"sl","Provérbios":"pv",
+    "Eclesiastes":"ec","Cantares":"ct","Isaías":"is","Jeremias":"jr","Lamentações":"lm",
+    "Ezequiel":"ez","Daniel":"dn","Oséias":"os","Joel":"jl","Amós":"am",
+    "Obadias":"ob","Jonas":"jn","Miquéias":"mq","Naum":"na","Habacuque":"hc",
+    "Sofonias":"sf","Ageu":"ag","Zacarias":"zc","Malaquias":"ml",
+
+    // NT
+    "Mateus":"mt","Marcos":"mc","Lucas":"lc","João":"jo","Atos":"at",
+    "Romanos":"rm","1 Coríntios":"1co","2 Coríntios":"2co","Gálatas":"gl","Efésios":"ef",
+    "Filipenses":"fp","Colossenses":"cl","1 Tessalonicenses":"1ts","2 Tessalonicenses":"2ts",
+    "1 Timóteo":"1tm","2 Timóteo":"2tm","Tito":"tt","Filemom":"fm","Hebreus":"hb",
+    "Tiago":"tg","1 Pedro":"1pe","2 Pedro":"2pe","1 João":"1jo","2 João":"2jo",
+    "3 João":"3jo","Judas":"jd","Apocalipse":"ap"
+  };
+
+  function bibleOnlineUrl(version, bookName, chapterNumber){
+    const code = BO_BOOK_CODE[bookName];
+    if (!code) return null;
+    return `https://www.bibliaonline.com.br/${version}/${code}/${chapterNumber}`;
+  }
+
+  // =========================
   // UTIL
   // =========================
   const pad2 = (n)=> String(n).padStart(2,"0");
-
-  function formatBR(date){
-    const d = date.getDate();
-    const m = date.getMonth()+1;
-    return `${pad2(d)}/${pad2(m)}/${date.getFullYear()}`;
-  }
 
   function ymd(date){
     return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}`;
@@ -380,7 +474,6 @@
   }
 
   function daysBetween(a,b){
-    // diferença em dias inteiros (b - a)
     const ms = 24*60*60*1000;
     const aa = new Date(a.getFullYear(),a.getMonth(),a.getDate()).getTime();
     const bb = new Date(b.getFullYear(),b.getMonth(),b.getDate()).getTime();
@@ -394,7 +487,6 @@
   const OT_TOTAL = totalChapters(OT); // 929
   const NT_TOTAL = totalChapters(NT); // 260
 
-  // Dado um índice de capítulo global (0-based), retorna {book, chapter} (1-based)
   function chapterAt(globalIndex, list){
     let idx = globalIndex;
     for (const [book, count] of list){
@@ -409,15 +501,12 @@
     return chapterAt(idx, list);
   }
 
-  // Pega N capítulos consecutivos, pode atravessar livros.
-  // Retorna texto bonito agrupando quando possível: "Gênesis 1–3" ou "Gênesis 50; Êxodo 1–2"
   function nextNChaptersText(startIndex, n, list){
     const parts = [];
     let i = startIndex;
 
     while (n > 0){
       const start = chapterAt(i, list);
-      // descobrir até onde dá pra ir no mesmo livro
       const bookEntry = list.find(b => b[0] === start.book);
       const bookCount = bookEntry ? bookEntry[1] : 1;
 
@@ -440,17 +529,25 @@
     return parts.join("; ");
   }
 
+  function nextNChaptersList(startIndex, n, list){
+    const chapters = [];
+    for (let i = 0; i < n; i++){
+      chapters.push(chapterAt(startIndex + i, list));
+    }
+    return chapters;
+  }
+
   // =========================
   // STORAGE
   // =========================
-  const KEY = "bibleChecklist2026_v1";
+  const KEY = "planoLeitura2026_v2";
 
   function loadState(){
     try{
       const raw = localStorage.getItem(KEY);
-      return raw ? JSON.parse(raw) : { startDate: DEFAULT_START_DATE, yearAnchor: `${YEAR}-01-01`, days: {} };
+      return raw ? JSON.parse(raw) : { startDate: DEFAULT_START_DATE, version: "acf", days: {} };
     }catch{
-      return { startDate: DEFAULT_START_DATE, yearAnchor: `${YEAR}-01-01`, days: {} };
+      return { startDate: DEFAULT_START_DATE, version: "acf", days: {} };
     }
   }
 
@@ -460,7 +557,7 @@
 
   function ensureStateDefaults(state){
     if (!state.startDate) state.startDate = DEFAULT_START_DATE;
-    if (!state.yearAnchor) state.yearAnchor = `${YEAR}-01-01`;
+    if (!state.version) state.version = "acf";
     if (!state.days) state.days = {};
     return state;
   }
@@ -473,47 +570,47 @@
     "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
   ];
 
+  function monthKey(m){ return `m-${YEAR}-${pad2(m+1)}`; }
+
   function buildPlanForYear(startDateStr){
     const startDate = parseYMD(startDateStr);
 
-    // Precompute positions: OT e NT começam do capítulo 0.
     let otPos = 0;
     let ntPos = 0;
 
-    const plan = {}; // ymd -> {otText, ntText}
+    const plan = {};
 
     const yearStart = new Date(YEAR,0,1);
     const yearEnd = new Date(YEAR,11,31);
 
-    // Vamos iterar cada dia do ano, mas só avançar posições a partir do startDate.
-    // Antes do startDate: coloca "—" para não confundir.
     for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate()+1)){
       const key = ymd(d);
 
       if (d < startDate){
-        plan[key] = { otText: "—", ntText: "—", active:false };
+        plan[key] = { otText: "—", ntText: "—", otList: [], ntList: [], active:false };
         continue;
       }
 
-      const offset = daysBetween(startDate, d); // 0 no dia inicial
-      const otN = OT_CHAPTERS_PATTERN[offset % 7]; // 2 ou 3
+      const offset = daysBetween(startDate, d);
+      const otN = OT_CHAPTERS_PATTERN[offset % 7];
       const ntN = 1;
+
+      const otList = nextNChaptersList(otPos, otN, OT);
+      const ntList = nextNChaptersList(ntPos, ntN, NT);
 
       const otText = nextNChaptersText(otPos, otN, OT);
       const ntText = nextNChaptersText(ntPos, ntN, NT);
 
-      plan[key] = { otText, ntText, active:true };
+      plan[key] = { otText, ntText, otList, ntList, active:true };
 
       otPos += otN;
       ntPos += ntN;
 
-      // AT não reinicia (queremos completar uma vez; se passar do total, mantém "Revisão AT")
       if (otPos >= OT_TOTAL){
-        // a partir do momento que terminar o AT, vamos manter uma sugestão fixa
+        // após fechar OT, fica “Revisão”
         otPos = OT_TOTAL;
       }
       if (ntPos >= NT_TOTAL){
-        // NT reinicia para ler novamente (bônus)
         ntPos = ntPos % NT_TOTAL;
       }
     }
@@ -521,19 +618,55 @@
     return plan;
   }
 
-  function monthKey(m){ return `m-${YEAR}-${pad2(m+1)}`; }
+  // =========================
+  // ESCAPE helpers
+  // =========================
+  function escapeHtml(str){
+    return String(str ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
 
+  function cssEscape(id){
+    return id.replaceAll(":", "\\:").replaceAll(".", "\\.").replaceAll("/", "\\/");
+  }
+
+  // =========================
+  // PROGRESS / STREAK
+  // =========================
+  function calcStreak(state, today){
+    let streak = 0;
+    let d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    while (true){
+      if (d.getFullYear() !== YEAR) break;
+      const key = ymd(d);
+      if (state.days?.[key]?.done){
+        streak++;
+        d.setDate(d.getDate()-1);
+      } else break;
+    }
+    return streak;
+  }
+
+  // =========================
+  // RENDER
+  // =========================
   function renderAll(state){
     state = ensureStateDefaults(state);
 
-    const startDateStr = state.startDate;
-    const plan = buildPlanForYear(startDateStr);
-
+    const plan = buildPlanForYear(state.startDate);
     const container = document.getElementById("months");
     container.innerHTML = "";
 
     const today = new Date();
     const todayKey = ymd(today);
+
+    // Atualiza hint do rodapé (hoje)
+    updateTodayHint(plan, state, today);
 
     // Progresso anual
     const yearDays = [];
@@ -547,7 +680,6 @@
     document.getElementById("yearProgressText").textContent = `${doneCount}/365`;
     document.getElementById("yearBar").style.width = `${Math.round((doneCount/365)*100)}%`;
 
-    // Streak até hoje (contando somente dias do ano)
     const streak = calcStreak(state, today);
     document.getElementById("streakText").textContent = String(streak);
 
@@ -555,7 +687,6 @@
     for (let m = 0; m < 12; m++){
       const details = document.createElement("details");
       details.id = monthKey(m);
-      // abre o mês atual automaticamente
       if (today.getFullYear() === YEAR && today.getMonth() === m) details.open = true;
 
       const summary = document.createElement("summary");
@@ -577,11 +708,12 @@
       table.innerHTML = `
         <thead>
           <tr>
-            <th style="width:90px">Dia</th>
-            <th style="width:260px">AT</th>
-            <th style="width:210px">NT</th>
-            <th style="width:140px">Concluído</th>
-            <th>Anotação (opcional)</th>
+            <th style="width:70px">Dia</th>
+            <th>AT</th>
+            <th>NT</th>
+            <th style="width:170px">Abrir</th>
+            <th style="width:120px">Concluído</th>
+            <th>Anotação</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -589,7 +721,6 @@
 
       const tbody = table.querySelector("tbody");
 
-      // Dias do mês
       const lastDay = new Date(YEAR, m+1, 0).getDate();
       let monthDone = 0;
 
@@ -597,7 +728,7 @@
         const date = new Date(YEAR, m, day);
         const key = ymd(date);
 
-        const p = plan[key] || { otText:"—", ntText:"—", active:false };
+        const p = plan[key] || { otText:"—", ntText:"—", otList:[], ntList:[], active:false };
         const dayState = state.days[key] || { done:false, note:"" };
 
         if (dayState.done) monthDone++;
@@ -608,13 +739,30 @@
         const doneId = `done-${key}`;
         const noteId = `note-${key}`;
 
+        // Links "Abrir"
+        const otFirst = p.otList?.[0];
+        const ntFirst = p.ntList?.[0];
+
+        const otUrl = (otFirst && p.active) ? bibleOnlineUrl(state.version, otFirst.book, otFirst.chapter) : null;
+        const ntUrl = (ntFirst && p.active) ? bibleOnlineUrl(state.version, ntFirst.book, ntFirst.chapter) : null;
+
+        const openLinks = p.active
+          ? `
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              ${otUrl ? `<a class="link" href="${otUrl}" target="_blank" rel="noopener noreferrer">AT</a>` : `<span class="muted">AT</span>`}
+              ${ntUrl ? `<a class="link" href="${ntUrl}" target="_blank" rel="noopener noreferrer">NT</a>` : `<span class="muted">NT</span>`}
+            </div>
+          `
+          : `<span class="muted">—</span>`;
+
         tr.innerHTML = `
           <td class="dayCell">${day}</td>
           <td class="readCell">${p.otText}${p.active ? "" : " <span class='muted'>(fora do início)</span>"}</td>
           <td class="readCell">${p.ntText}${p.active ? "" : ""}</td>
+          <td>${openLinks}</td>
           <td>
             <div class="checkWrap">
-              <input type="checkbox" id="${doneId}" ${dayState.done ? "checked":""} />
+              <input type="checkbox" id="${doneId}" ${dayState.done ? "checked":""} ${p.active ? "" : "disabled"} />
               <span class="tiny">${p.active ? "Lido" : "—"}</span>
             </div>
           </td>
@@ -630,14 +778,13 @@
           state.days[key] = state.days[key] || {};
           state.days[key].done = !!e.target.checked;
           saveState(state);
-          renderAll(loadState()); // simples e confiável
+          renderAll(loadState());
         });
 
         tr.querySelector(`#${cssEscape(noteId)}`).addEventListener("input", (e)=>{
           state.days[key] = state.days[key] || {};
           state.days[key].note = e.target.value;
           saveState(state);
-          // não re-renderiza toda hora, só salva
         });
       }
 
@@ -646,48 +793,102 @@
       details.appendChild(body);
       container.appendChild(details);
 
-      // Badge do mês
       const monthTotal = lastDay;
       const pct = Math.round((monthDone/monthTotal)*100);
       document.getElementById(`badge-${m}`).textContent = `✅ ${monthDone}/${monthTotal} (${pct}%)`;
     }
   }
 
-  function calcStreak(state, today){
-    // streak contando dias marcados até hoje (inclusive hoje)
-    let streak = 0;
-    let d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  function updateTodayHint(plan, state, today){
+    const hint = document.getElementById("todayHint");
 
-    // se hoje não é 2026, ainda calculamos olhando para 2026 se existir
-    // (mas o ideal é usar durante 2026)
-    while (true){
-      if (d.getFullYear() !== YEAR) break;
-      const key = ymd(d);
-      if (state.days?.[key]?.done){
-        streak++;
-        d.setDate(d.getDate()-1);
-      } else {
-        break;
-      }
+    if (today.getFullYear() !== YEAR){
+      hint.textContent = `Hoje não é ${YEAR}. (O checklist é de ${YEAR})`;
+      return;
     }
-    return streak;
+
+    const key = ymd(today);
+    const p = plan[key];
+
+    if (!p || !p.active){
+      hint.textContent = "Hoje está fora do período ativo do plano (verifique a data de início).";
+      return;
+    }
+
+    const done = !!state.days?.[key]?.done;
+    hint.textContent = `Hoje: ${p.otText} | ${p.ntText}${done ? " ✅" : ""}`;
   }
 
   // =========================
-  // ESCAPE helpers
+  // AÇÕES: Iniciar / Finalizar (HOJE)
   // =========================
-  function escapeHtml(str){
-    return String(str)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
+  function openChaptersInTabs(version, chapterList){
+    // abre cada capítulo em sua própria aba (máximo 3 OT + 1 NT aqui)
+    for (const item of chapterList){
+      const url = bibleOnlineUrl(version, item.book, item.chapter);
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
+    }
   }
 
-  function cssEscape(id){
-    // escape mínimo pra querySelector
-    return id.replaceAll(":", "\\:").replaceAll(".", "\\.").replaceAll("/", "\\/");
+  function openTodayReading(){
+    const state = loadState();
+    const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
+    const now = new Date();
+
+    if (now.getFullYear() !== YEAR){
+      alert(`Este checklist é de ${YEAR}.`);
+      return;
+    }
+
+    const key = ymd(now);
+    const p = plan[key];
+
+    if (!p || !p.active){
+      alert("Hoje está fora do intervalo ativo do plano. Verifique a data de início.");
+      return;
+    }
+
+    // abre AT (2-3 capítulos) e NT (1 capítulo)
+    openChaptersInTabs(state.version, p.otList || []);
+    openChaptersInTabs(state.version, p.ntList || []);
+
+    // abre o mês de hoje
+    const el = document.getElementById(monthKey(now.getMonth()));
+    if (el){
+      el.open = true;
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+  }
+
+  function finishTodayReading(){
+    const state = loadState();
+    const plan = buildPlanForYear(state.startDate || DEFAULT_START_DATE);
+    const now = new Date();
+
+    if (now.getFullYear() !== YEAR){
+      alert(`Este checklist é de ${YEAR}.`);
+      return;
+    }
+
+    const key = ymd(now);
+    const p = plan[key];
+
+    if (!p || !p.active){
+      alert("Hoje está fora do intervalo ativo do plano. Verifique a data de início.");
+      return;
+    }
+
+    state.days[key] = state.days[key] || {};
+    state.days[key].done = true;
+    saveState(state);
+
+    // abre o mês de hoje e atualiza a tela
+    const el = document.getElementById(monthKey(now.getMonth()));
+    if (el){
+      el.open = true;
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+    renderAll(loadState());
   }
 
   // =========================
@@ -696,15 +897,15 @@
   let state = ensureStateDefaults(loadState());
 
   const startDateEl = document.getElementById("startDate");
-  const yearAnchorEl = document.getElementById("yearAnchor");
+  const versionSelectEl = document.getElementById("versionSelect");
 
-  // set defaults
   startDateEl.value = state.startDate || DEFAULT_START_DATE;
-  yearAnchorEl.value = state.yearAnchor || `${YEAR}-01-01`;
+  versionSelectEl.value = state.version || "acf";
 
   document.getElementById("regenBtn").addEventListener("click", ()=>{
+    state = loadState();
     state.startDate = startDateEl.value || DEFAULT_START_DATE;
-    state.yearAnchor = yearAnchorEl.value || `${YEAR}-01-01`;
+    state.version = versionSelectEl.value || "acf";
     saveState(state);
     renderAll(loadState());
   });
@@ -712,7 +913,7 @@
   document.getElementById("openTodayBtn").addEventListener("click", ()=>{
     const t = new Date();
     if (t.getFullYear() !== YEAR){
-      alert("Hoje não é 2026. Vou abrir Janeiro/2026.");
+      alert(`Hoje não é ${YEAR}. Vou abrir Janeiro/${YEAR}.`);
       const jan = document.getElementById(monthKey(0));
       if (jan) jan.open = true;
       jan?.scrollIntoView({behavior:"smooth", block:"start"});
@@ -726,9 +927,13 @@
     }
   });
 
+  document.getElementById("startTodayReadingBtn").addEventListener("click", openTodayReading);
+  document.getElementById("finishTodayBtn").addEventListener("click", finishTodayReading);
+
   document.getElementById("resetBtn").addEventListener("click", ()=>{
     const ok = confirm("Tem certeza que deseja zerar TODAS as marcações e anotações? Isso não tem volta.");
     if (!ok) return;
+    state = loadState();
     state.days = {};
     saveState(state);
     renderAll(loadState());
@@ -740,7 +945,7 @@
     const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "bible-checklist-2026-backup.json";
+    a.download = "plano-leitura-2026-backup.json";
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -758,14 +963,13 @@
       const text = await file.text();
       const parsed = JSON.parse(text);
       if (!parsed || typeof parsed !== "object") throw new Error("JSON inválido");
-      // valida minimamente
       parsed.startDate = parsed.startDate || DEFAULT_START_DATE;
-      parsed.yearAnchor = parsed.yearAnchor || `${YEAR}-01-01`;
+      parsed.version = parsed.version || "acf";
       parsed.days = parsed.days || {};
       localStorage.setItem(KEY, JSON.stringify(parsed));
       state = parsed;
       startDateEl.value = state.startDate;
-      yearAnchorEl.value = state.yearAnchor;
+      versionSelectEl.value = state.version;
       renderAll(loadState());
       alert("Backup importado com sucesso!");
     }catch(err){
@@ -773,6 +977,14 @@
     }finally{
       e.target.value = "";
     }
+  });
+
+  // Atualiza versão na hora
+  versionSelectEl.addEventListener("change", ()=>{
+    state = loadState();
+    state.version = versionSelectEl.value || "acf";
+    saveState(state);
+    renderAll(loadState());
   });
 
   // Render inicial
