@@ -626,6 +626,7 @@
     .readerModal.open{display:flex;}
     .readerSheet{width:min(900px,100%);height:90vh;background:rgba(10,12,16,.96);border-radius:18px;border:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,.5);overflow:hidden;}
     .readerTop{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.1);}
+    .readerRef{margin:10px 0 12px 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:rgba(220,235,255,.95);font-size:13px;line-height:1.4;}
     .readerTitle{font-weight:980;}
     .readerActions{display:flex;gap:8px;}
     .readerBtn{border-radius:12px;padding:8px 12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font-weight:980;}
@@ -683,6 +684,7 @@
         </div>
       </div>
       <div class="readerBody">
+        <div class="readerRef" id="readerRef"></div>
         <div class="readerLoading" id="readerLoading">Carregando texto bíblico…</div>
         <div class="readerError" id="readerError" style="display:none"></div>
         <div class="readerText" id="readerText"></div>
@@ -1128,14 +1130,12 @@
     const idx = Math.max(0, Math.min(targetIndex, total-1));
     const item = list[idx];
 
-    const url = bibleOnlineUrl(state.version, item.book, item.chapter);
-    if (!url) return alert("Não consegui montar o link do capítulo.");
-
     setGuidedIndex(state, key, idx);
     saveState(state);
-    openInSingleReadingTab(url);
+    // abre no leitor interno
+    openBibleReader(item.book, item.chapter);
     renderAll();
-  }
+}
 
   function openCatchUpPack(){
     const state = ensureStateDefaults(loadState());
@@ -1178,12 +1178,11 @@
     saveState(state);
 
     const first = pack[0];
-    const url = bibleOnlineUrl(state.version, first.book, first.chapter);
-    if (!url) return alert("Não consegui abrir o primeiro capítulo do pacote.");
 
-    openInSingleReadingTab(url);
+    // abre no leitor interno
+    openBibleReader(first.book, first.chapter);
     renderAll();
-  }
+}
 
   function finishTodayReading(){
     const state = ensureStateDefaults(loadState());
@@ -1807,61 +1806,84 @@ b.addEventListener("click", ()=>{
     return map[k] || ptName;
   }
 
+  
+  // === LEITOR BÍBLICO INTERNO (bible-api.com /data) — Português (almeida) ===
+  function normalizeBookName(str){
+    return (str||"")
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9 ]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  function getBookId(ptName){
+    const k = normalizeBookName(ptName);
+    const map = {"genesis": "GEN", "exodo": "EXO", "levitico": "LEV", "numeros": "NUM", "deuteronomio": "DEU", "josue": "JOS", "juizes": "JDG", "rute": "RUT", "1 samuel": "1SA", "2 samuel": "2SA", "1 reis": "1KI", "2 reis": "2KI", "1 cronicas": "1CH", "2 cronicas": "2CH", "esdras": "EZR", "neemias": "NEH", "ester": "EST", "jo": "JOB", "salmos": "PSA", "proverbios": "PRO", "eclesiastes": "ECC", "canticos": "SNG", "cantares": "SNG", "isaias": "ISA", "jeremias": "JER", "lamentacoes": "LAM", "ezequiel": "EZK", "daniel": "DAN", "oseias": "HOS", "joel": "JOL", "amos": "AMO", "obadias": "OBA", "jonas": "JON", "miqueias": "MIC", "naum": "NAM", "habacuque": "HAB", "sofonias": "ZEP", "ageu": "HAG", "zacarias": "ZEC", "malaquias": "MAL", "mateus": "MAT", "marcos": "MRK", "lucas": "LUK", "joao": "JHN", "atos": "ACT", "romanos": "ROM", "1 corintios": "1CO", "2 corintios": "2CO", "galatas": "GAL", "efesios": "EPH", "filipenses": "PHP", "colossenses": "COL", "1 tessalonicenses": "1TH", "2 tessalonicenses": "2TH", "1 timoteo": "1TI", "2 timoteo": "2TI", "tito": "TIT", "filemom": "PHM", "hebreus": "HEB", "tiago": "JAS", "1 pedro": "1PE", "2 pedro": "2PE", "1 joao": "1JN", "2 joao": "2JN", "3 joao": "3JN", "judas": "JUD", "apocalipse": "REV"};
+    return map[k] || null;
+  }
+
   function openBibleReader(book, chapter){
     const modal = document.getElementById("readerModal");
     const textEl = document.getElementById("readerText");
     const loading = document.getElementById("readerLoading");
     const errEl = document.getElementById("readerError");
+    const refEl = document.getElementById("readerRef");
     const extBtn = document.getElementById("readerExternalBtn");
 
     textEl.innerHTML = "";
     errEl.style.display = "none";
     errEl.textContent = "";
     loading.style.display = "block";
+
+    const st = ensureStateDefaults(loadState());
+    const translationId = "almeida"; // sempre PT no leitor interno
+    refEl.textContent = `${book} ${chapter} — ${translationId.toUpperCase()}`;
+
     modal.classList.add("open");
     modal.setAttribute("aria-hidden","false");
 
+    // Externo: respeita a tradução escolhida no app (ACF/ARA/etc) no BibleOnline
     extBtn.onclick = ()=>{
-      const st = ensureStateDefaults(loadState());
       const url = bibleOnlineUrl(st.translation, book, chapter);
       window.open(url, READING_WINDOW_NAME, "noopener,noreferrer");
     };
 
-    const apiBook = apiBookName(book);
-    const ref = encodeURIComponent(`${apiBook} ${chapter}`);
-    const urls = [
-      `https://bible-api.com/${ref}?translation=almeida`,
-      `https://bible-api.com/${ref}`
-    ];
+    const bookId = getBookId(book);
+    if (!bookId){
+      loading.style.display = "none";
+      errEl.style.display = "block";
+      errEl.textContent = `Livro não reconhecido para leitura interna: "${book}".\n\nUse “Abrir externo”.`;
+      return;
+    }
 
-    const tryFetch = (i)=>{
-      fetch(urls[i])
-        .then(r => r.json())
-        .then(data => {
-          if (data && Array.isArray(data.verses) && data.verses.length){
-            loading.style.display = "none";
-            textEl.innerHTML = data.verses
-              .map(v => `<p><b>${v.verse}</b> ${escapeHtml(v.text || "")}</p>`)
-              .join("");
-            return;
-          }
-          if (i+1 < urls.length) return tryFetch(i+1);
+    const url = `https://bible-api.com/data/${translationId}/${bookId}/${chapter}`;
+
+    fetch(url)
+      .then(r => r.json())
+      .then(data => {
+        // Estrutura do /data geralmente traz "verses" com "verse" e "text"
+        const verses = data && (data.verses || data);
+        if (!Array.isArray(verses) || !verses.length){
           loading.style.display = "none";
           errEl.style.display = "block";
           const msg = data?.error || data?.message || "Resposta sem versos.";
-          errEl.textContent = `Não foi possível carregar o texto.\n\nLivro: ${book}  Capítulo: ${chapter}\nDetalhe: ${msg}\n\nUse “Abrir externo”.`;
-        })
-        .catch((e)=>{
-          if (i+1 < urls.length) return tryFetch(i+1);
-          loading.style.display = "none";
-          errEl.style.display = "block";
-          errEl.textContent = `Erro de rede ao carregar o texto.\n\nLivro: ${book}  Capítulo: ${chapter}\nDetalhe: ${String(e)}\n\nUse “Abrir externo”.`;
-        });
-    };
-    tryFetch(0);
+          errEl.textContent = `Não foi possível carregar o texto.\n\nDetalhe: ${msg}\nURL: ${url}\n\nUse “Abrir externo”.`;
+          return;
+        }
+        loading.style.display = "none";
+        textEl.innerHTML = verses.map(v => {
+          const n = v.verse ?? v.verse_id ?? v.number ?? "";
+          const t = v.text ?? v.t ?? "";
+          return `<p><b>${n}</b> ${escapeHtml(String(t))}</p>`;
+        }).join("");
+      })
+      .catch((e)=>{
+        loading.style.display = "none";
+        errEl.style.display = "block";
+        errEl.textContent = `Erro ao carregar o texto.\n\nDetalhe: ${String(e)}\nURL: ${url}\n\nUse “Abrir externo”.`;
+      });
   }
-
-  function closeReader(){
+function closeReader(){
     const modal = document.getElementById("readerModal");
     modal.classList.remove("open");
     modal.setAttribute("aria-hidden","true");
