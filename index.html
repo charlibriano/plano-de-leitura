@@ -1650,8 +1650,9 @@ b.addEventListener("click", ()=>{
         btn.addEventListener("click", ()=>{
           const list = bb.list || [];
           if (!list.length) return;
-          const idx = (pSel.guidedList || []).findIndex(x => x.book === list[0].book && x.chapter === list[0].chapter);
-          openDayGuided(selectedKey, Math.max(0, idx));
+          const first = list[0];
+          const url = bibleOnlineUrl(state.translation, first.book, first.chapter);
+          openInSingleReadingTab(url);
         });
 
         blockEl.appendChild(h);
