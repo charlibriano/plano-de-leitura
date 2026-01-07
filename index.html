@@ -636,6 +636,20 @@
     .readerLoading{color:#aaa;font-style:italic;}
     .readerError{margin:10px 0 12px 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,107,107,.25);background:rgba(255,107,107,.10);color: rgba(255,220,220,.95);font-size:13px;line-height:1.5;white-space:pre-wrap;}
     .readerText p{margin-bottom:10px;}
+    
+    .readerRef{margin:10px 0 12px 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:rgba(220,235,255,.95);font-size:13px;line-height:1.4;}
+    .readerTools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 12px 0;}
+    .readerSearch{flex:1;min-width:220px;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:rgba(240,248,255,.98);outline:none;font-weight:700;}
+    .readerSearch::placeholder{color:rgba(200,210,225,.55);font-weight:700;}
+    .readerSearch:focus{border-color:rgba(122,167,255,.32);background:rgba(122,167,255,.08);}
+    .verse{padding:8px 10px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);cursor:pointer;transition:transform .05s ease, filter .12s ease, background .12s ease, border-color .12s ease;}
+    .verse:hover{filter:brightness(1.06);border-color:rgba(122,167,255,.20);}
+    .verse:active{transform:translateY(1px);}
+    .verse b{display:inline-block;min-width:22px;text-align:right;margin-right:8px;}
+    .verse.hl{border-color:rgba(255,215,102,0.35);background:rgba(255,215,102,0.12);box-shadow:0 10px 18px rgba(0,0,0,0.18);}
+    .verse.active{border-color:rgba(122,167,255,.35);background:rgba(122,167,255,.10);}
+    mark.readerMark{padding:0 4px;border-radius:8px;background:rgba(122,167,255,.22);color:rgba(255,255,255,.98);}
+
     @media(max-width:980px){.readerSheet{height:95vh;}.readerBody{font-size:17px;}}
 
 
@@ -684,6 +698,11 @@
         </div>
       </div>
       <div class="readerBody">
+        <div class="readerTools">
+          <input id="readerSearch" class="readerSearch" type="search" placeholder="Buscar no capítulo (ex.: fé, Deus, amor)..." autocomplete="off" />
+          <button class="readerBtn" id="readerClearSearchBtn" type="button" title="Limpar busca">Limpar</button>
+          <button class="readerBtn" id="readerClearHighlightsBtn" type="button" title="Remover destaques deste capítulo">Limpar destaques</button>
+        </div>
         <div class="readerRef" id="readerRef"></div>
         <div class="readerLoading" id="readerLoading">Carregando texto bíblico…</div>
         <div class="readerError" id="readerError" style="display:none"></div>
@@ -1871,11 +1890,149 @@ b.addEventListener("click", ()=>{
           return;
         }
         loading.style.display = "none";
-        textEl.innerHTML = verses.map(v => {
-          const n = v.verse ?? v.verse_id ?? v.number ?? "";
-          const t = v.text ?? v.t ?? "";
-          return `<p><b>${n}</b> ${escapeHtml(String(t))}</p>`;
-        }).join("");
+        
+            textEl.innerHTML = verses.map(v => {
+              const n = v.verse ?? v.verse_id ?? v.number ?? "";
+              const t = v.text ?? v.t ?? "";
+              return `<p class="verse" data-verse="${n}"><b>${n}</b> ${escapeHtml(String(t))}</p>`;
+            }).join("");
+const keyRef = `${book}|${chapter}|${translationId}`;
+            const st2 = ensureStateDefaults(loadState());
+            st2.reader = st2.reader || {};
+            st2.reader.highlights = st2.reader.highlights || {};
+            st2.reader.last = st2.reader.last || {};
+            const hlSet = new Set(st2.reader.highlights[keyRef] || []);
+
+            const versesEls = Array.from(textEl.querySelectorAll(".verse"));
+            versesEls.forEach(el=>{
+              const vn = String(el.dataset.verse || "");
+              if (!el.getAttribute("data-original")) el.setAttribute("data-original", el.innerHTML);
+              if (hlSet.has(vn)) el.classList.add("hl");
+
+              el.addEventListener("click", ()=>{
+                const st3 = ensureStateDefaults(loadState());
+                st3.reader = st3.reader || {};
+                st3.reader.highlights = st3.reader.highlights || {};
+                const arr = st3.reader.highlights[keyRef] || [];
+                const set = new Set(arr);
+                if (set.has(vn)){
+                  set.delete(vn);
+                  el.classList.remove("hl");
+                } else {
+                  set.add(vn);
+                  el.classList.add("hl");
+                }
+                st3.reader.highlights[keyRef] = Array.from(set);
+                saveState(st3);
+              });
+            });
+
+            // Busca com realce
+            const searchInput = document.getElementById("readerSearch");
+            const clearSearchBtn = document.getElementById("readerClearSearchBtn");
+            const clearHlBtn = document.getElementById("readerClearHighlightsBtn");
+
+            const clearMarks = ()=>{
+              versesEls.forEach(el=>{
+                const orig = el.getAttribute("data-original");
+                if (orig) el.innerHTML = orig;
+              });
+            };
+
+            const applySearch = (q)=>{
+              clearMarks();
+              const query = (q||"").trim().toLowerCase();
+              if (!query) return;
+
+              let firstHit = null;
+              versesEls.forEach(el=>{
+                const txt = el.textContent.toLowerCase();
+                if (txt.includes(query)){
+                  const orig = el.getAttribute("data-original");
+                  if (!orig) return;
+                  const parts = orig.split("</b>");
+                  if (parts.length >= 2){
+                    const head = parts[0] + "</b>";
+                    const body = parts.slice(1).join("</b>");
+                    const esc = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                    const reQ = new RegExp(esc, "gi");
+                    const bodyMarked = body.replace(reQ, (m)=>`<mark class="readerMark">${m}</mark>`);
+                    el.innerHTML = head + bodyMarked;
+                  }
+                  if (!firstHit) firstHit = el;
+                }
+              });
+              if (firstHit){
+                firstHit.scrollIntoView({behavior:"smooth", block:"center"});
+              }
+            };
+
+            searchInput.oninput = ()=> applySearch(searchInput.value);
+
+            clearSearchBtn.onclick = ()=>{
+              searchInput.value = "";
+              clearMarks();
+              searchInput.focus();
+            };
+
+            clearHlBtn.onclick = ()=>{
+              const st4 = ensureStateDefaults(loadState());
+              st4.reader = st4.reader || {};
+              st4.reader.highlights = st4.reader.highlights || {};
+              st4.reader.highlights[keyRef] = [];
+              saveState(st4);
+              versesEls.forEach(el=> el.classList.remove("hl"));
+            };
+
+            // Último versículo lido (mais próximo do topo do scroll)
+            const bodyEl = modal.querySelector(".readerBody");
+            const setActive = (vn)=>{
+              versesEls.forEach(el=> el.classList.toggle("active", String(el.dataset.verse||"")===String(vn)));
+            };
+            const saveLast = (vn)=>{
+              const st5 = ensureStateDefaults(loadState());
+              st5.reader = st5.reader || {};
+              st5.reader.last = st5.reader.last || {};
+              st5.reader.last[keyRef] = String(vn);
+              saveState(st5);
+            };
+
+            let raf = null;
+            const computeTopVerse = ()=>{
+              raf = null;
+              const topY = bodyEl.getBoundingClientRect().top + 140;
+              let best = null, bestDist = Infinity;
+              for (const el of versesEls){
+                const r = el.getBoundingClientRect();
+                const d = Math.abs(r.top - topY);
+                if (d < bestDist){ bestDist = d; best = el; }
+              }
+              if (best){
+                const vn = best.dataset.verse || "";
+                setActive(vn);
+                saveLast(vn);
+              }
+            };
+
+            bodyEl.addEventListener("scroll", ()=>{
+              if (raf) return;
+              raf = requestAnimationFrame(computeTopVerse);
+            });
+
+            // Restaurar último versículo salvo
+            const lastVN = st2.reader.last[keyRef];
+            if (lastVN){
+              const lastEl = textEl.querySelector(`.verse[data-verse="${CSS.escape(String(lastVN))}"]`);
+              if (lastEl){
+                setTimeout(()=> lastEl.scrollIntoView({behavior:"smooth", block:"center"}), 80);
+                setActive(lastVN);
+              } else {
+                computeTopVerse();
+              }
+            } else {
+              computeTopVerse();
+            }
+
       })
       .catch((e)=>{
         loading.style.display = "none";
@@ -1890,6 +2047,8 @@ function closeReader(){
     document.getElementById("readerText").innerHTML = "";
     document.getElementById("readerError").style.display = "none";
     document.getElementById("readerLoading").style.display = "none";
+  
+    try{ const s = document.getElementById("readerSearch"); if (s) s.value=""; }catch(e){}
   }
 
   document.getElementById("readerCloseBtn").addEventListener("click", closeReader);
