@@ -631,6 +631,8 @@
     .readerActions{display:flex;gap:8px;}
     .readerBtn{border-radius:12px;padding:8px 12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font-weight:980;}
     .readerBtn:hover{filter:brightness(1.06);border-color: rgba(122,167,255,.22);background: rgba(122,167,255,.10);}
+    .readerBtn:disabled{opacity:.45;cursor:not-allowed;filter:none;}
+
     .readerBtn.danger:hover{border-color: rgba(255,107,107,.28);background: rgba(255,107,107,.12);}
     .readerBody{padding:14px;overflow-y:auto;line-height:1.7;font-size:16px;}
     .readerLoading{color:#aaa;font-style:italic;}
@@ -693,6 +695,8 @@
       <div class="readerTop">
         <div class="readerTitle">📖 Leitura bíblica</div>
         <div class="readerActions">
+          <button class="readerBtn" id="readerPlanPrevBtn" type="button" title="Voltar no plano">◀ Plano</button>
+          <button class="readerBtn" id="readerPlanNextBtn" type="button" title="Avançar no plano">Plano ▶</button>
           <button class="readerBtn" id="readerExternalBtn" type="button">Abrir externo</button>
           <button class="readerBtn danger" id="readerCloseBtn" type="button">Fechar ✕</button>
         </div>
@@ -1091,7 +1095,7 @@
     const item = list[idx];
     setGuidedIndex(state, dateKey, idx);
     saveState(state);
-    openBibleReader(item.book, item.chapter);
+    openBibleReader(item.book, item.chapter, { dateKey: dateKey, idx: idx, list: list });
     renderAll();
 }
 
@@ -1152,7 +1156,7 @@
     setGuidedIndex(state, key, idx);
     saveState(state);
     // abre no leitor interno
-    openBibleReader(item.book, item.chapter);
+    openBibleReader(item.book, item.chapter, { dateKey: dateKey, idx: idx, list: list });
     renderAll();
 }
 
@@ -1199,7 +1203,7 @@
     const first = pack[0];
 
     // abre no leitor interno
-    openBibleReader(first.book, first.chapter);
+    openBibleReader(first.book, first.chapter, { dateKey: null, idx: 0, list: pack });
     renderAll();
 }
 
@@ -1841,7 +1845,10 @@ b.addEventListener("click", ()=>{
     return map[k] || null;
   }
 
-  function openBibleReader(book, chapter){
+    // Contexto da leitura atual para navegação no plano
+  let currentReadingCtx = null;
+
+  function openBibleReader(book, chapter, ctx){
     const modal = document.getElementById("readerModal");
     const textEl = document.getElementById("readerText");
     const loading = document.getElementById("readerLoading");
@@ -1859,6 +1866,11 @@ b.addEventListener("click", ()=>{
     refEl.textContent = `${book} ${chapter} — ${translationId.toUpperCase()}`;
 
     modal.classList.add("open");
+
+    // registra contexto para "Próximo/Anterior no plano"
+    if (ctx) currentReadingCtx = ctx;
+    updatePlanNavButtons();
+
     modal.setAttribute("aria-hidden","false");
 
     // Externo: respeita a tradução escolhida no app (ACF/ARA/etc) no BibleOnline
@@ -2040,6 +2052,44 @@ const keyRef = `${book}|${chapter}|${translationId}`;
         errEl.textContent = `Erro ao carregar o texto.\n\nDetalhe: ${String(e)}\nURL: ${url}\n\nUse “Abrir externo”.`;
       });
   }
+
+  function updatePlanNavButtons(){
+    const prevBtn = document.getElementById("readerPlanPrevBtn");
+    const nextBtn = document.getElementById("readerPlanNextBtn");
+    if (!prevBtn || !nextBtn) return;
+
+    if (!currentReadingCtx || !currentReadingCtx.list){
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      return;
+    }
+    const idx = Number(currentReadingCtx.idx || 0);
+    prevBtn.disabled = idx <= 0;
+    nextBtn.disabled = idx >= (currentReadingCtx.list.length - 1);
+  }
+
+  function goPlanDelta(delta){
+    if (!currentReadingCtx || !currentReadingCtx.list) return;
+    const nextIdx = Number(currentReadingCtx.idx || 0) + delta;
+    if (nextIdx < 0 || nextIdx >= currentReadingCtx.list.length) return;
+
+    const item = currentReadingCtx.list[nextIdx];
+    // Atualiza índice e abre a próxima leitura do plano no leitor interno
+    currentReadingCtx.idx = nextIdx;
+
+    // Se existir chave de dia (para manter o progresso guiado do dia), atualiza também
+    if (currentReadingCtx.dateKey){
+      try{
+        const st = ensureStateDefaults(loadState());
+        setGuidedIndex(st, currentReadingCtx.dateKey, nextIdx);
+        saveState(st);
+      }catch(e){}
+    }
+
+    openBibleReader(item.book, item.chapter, currentReadingCtx);
+  }
+
+
 function closeReader(){
     const modal = document.getElementById("readerModal");
     modal.classList.remove("open");
@@ -2049,9 +2099,13 @@ function closeReader(){
     document.getElementById("readerLoading").style.display = "none";
   
     try{ const s = document.getElementById("readerSearch"); if (s) s.value=""; }catch(e){}
+    updatePlanNavButtons();
   }
 
   document.getElementById("readerCloseBtn").addEventListener("click", closeReader);
+  document.getElementById("readerPlanPrevBtn").addEventListener("click", ()=>goPlanDelta(-1));
+  document.getElementById("readerPlanNextBtn").addEventListener("click", ()=>goPlanDelta(1));
+
   document.getElementById("readerModal").addEventListener("click", (e)=>{ if (e.target.id === "readerModal") closeReader(); });
   window.addEventListener("keydown", (e)=>{ if (e.key === "Escape" && document.getElementById("readerModal").classList.contains("open")) closeReader(); });
 
