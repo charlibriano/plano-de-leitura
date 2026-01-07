@@ -654,6 +654,32 @@
 
     @media(max-width:980px){.readerSheet{height:95vh;}.readerBody{font-size:17px;}}
 
+    /* Diário do dia (Resumo + Versículo do dia) */
+    .diaryModal{position:fixed;inset:0;z-index:3200;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:12px;backdrop-filter: blur(6px);}
+    .diaryModal.open{display:flex;}
+    .diarySheet{width:min(900px,100%);height:88vh;background:rgba(10,12,16,.96);border-radius:18px;border:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,.5);overflow:hidden;}
+    .diaryTop{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.1);}
+    .diaryTitle{font-weight:980;}
+    .diaryActions{display:flex;gap:8px;}
+    .diaryBody{padding:14px;overflow-y:auto;line-height:1.6;}
+    .diaryRef{margin: 2px 0 10px 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:rgba(220,235,255,.95);font-size:13px;}
+    .diaryLabel{display:block;margin:8px 0 6px 0;color:rgba(235,245,255,.9);font-weight:900;}
+    .diarySummary{width:100%;resize:vertical;min-height:90px;padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:rgba(240,248,255,.98);outline:none;font-weight:700;}
+    .diarySummary:focus{border-color:rgba(122,167,255,.32);background:rgba(122,167,255,.08);}
+    .diaryDivider{height:1px;background:rgba(255,255,255,.10);margin:14px 0;}
+    .diaryRow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;}
+    .diaryRowTitle{font-weight:980;}
+    .diaryHint{color:rgba(200,210,225,.70);font-size:13px;margin-bottom:10px;}
+    .diaryVerses{display:flex;flex-direction:column;gap:10px;}
+    .diaryVerse{padding:12px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);cursor:pointer;}
+    .diaryVerse:hover{filter:brightness(1.06);border-color:rgba(122,167,255,.20);}
+    .diaryVerse.selected{border-color:rgba(255,215,102,0.40);background:rgba(255,215,102,0.10);}
+    .diaryVerseTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
+    .diaryVerseRef{font-weight:980;}
+    .diaryVerseText{color:rgba(240,248,255,.92);margin-top:6px;white-space:pre-wrap;}
+    @media(max-width:980px){.diarySheet{height:95vh;}}
+
+
 
     /* Mobile bottom bar */
     .actionBar{
@@ -701,6 +727,34 @@
           <button class="readerBtn danger" id="readerCloseBtn" type="button">Fechar ✕</button>
         </div>
       </div>
+
+  <!-- Diário do dia (Resumo + Versículo do dia) -->
+  <div class="diaryModal" id="diaryModal" aria-hidden="true">
+    <div class="diarySheet" role="dialog" aria-modal="true" aria-label="Diário do dia">
+      <div class="diaryTop">
+        <div class="diaryTitle">📌 Diário do dia</div>
+        <div class="diaryActions">
+          <button class="readerBtn" id="diarySaveBtn" type="button">Salvar</button>
+          <button class="readerBtn danger" id="diaryCloseBtn" type="button">Fechar ✕</button>
+        </div>
+      </div>
+      <div class="diaryBody">
+        <div class="diaryRef" id="diaryRef">Dia —</div>
+        <label class="diaryLabel" for="diarySummary">Resumo rápido (2–3 linhas)</label>
+        <textarea id="diarySummary" class="diarySummary" rows="3" placeholder="Ex.: O que Deus falou comigo hoje? O que aprendi? Como aplicar?"></textarea>
+
+        <div class="diaryDivider"></div>
+
+        <div class="diaryRow">
+          <div class="diaryRowTitle">🔖 Versículo do dia (a partir dos seus destaques)</div>
+          <button class="readerBtn" id="diaryRefreshBtn" type="button" title="Atualizar lista de destaques">Atualizar</button>
+        </div>
+        <div class="diaryHint" id="diaryHint">Dica: destaque versículos no leitor (clicando no verso) e depois selecione aqui.</div>
+
+        <div class="diaryVerses" id="diaryVerses"></div>
+      </div>
+    </div>
+  </div>
       <div class="readerBody">
         <div class="readerTools">
           <input id="readerSearch" class="readerSearch" type="search" placeholder="Buscar no capítulo (ex.: fé, Deus, amor)..." autocomplete="off" />
@@ -1156,7 +1210,7 @@
     setGuidedIndex(state, key, idx);
     saveState(state);
     // abre no leitor interno
-    openBibleReader(item.book, item.chapter, { dateKey: dateKey, idx: idx, list: list });
+    openBibleReader(item.book, item.chapter, { dateKey: key, idx: idx, list: list });
     renderAll();
 }
 
@@ -1925,14 +1979,18 @@ const keyRef = `${book}|${chapter}|${translationId}`;
                 const st3 = ensureStateDefaults(loadState());
                 st3.reader = st3.reader || {};
                 st3.reader.highlights = st3.reader.highlights || {};
+                st3.reader.hlText = st3.reader.hlText || {};
+                st3.reader.hlText[keyRef] = st3.reader.hlText[keyRef] || {};
                 const arr = st3.reader.highlights[keyRef] || [];
                 const set = new Set(arr);
                 if (set.has(vn)){
                   set.delete(vn);
                   el.classList.remove("hl");
+                  try{ delete st3.reader.hlText[keyRef][vn]; }catch(e){}
                 } else {
                   set.add(vn);
                   el.classList.add("hl");
+                  try{ st3.reader.hlText[keyRef][vn] = (el.textContent || "").trim(); }catch(e){}
                 }
                 st3.reader.highlights[keyRef] = Array.from(set);
                 saveState(st3);
@@ -1992,6 +2050,8 @@ const keyRef = `${book}|${chapter}|${translationId}`;
               st4.reader = st4.reader || {};
               st4.reader.highlights = st4.reader.highlights || {};
               st4.reader.highlights[keyRef] = [];
+              st4.reader.hlText = st4.reader.hlText || {};
+              st4.reader.hlText[keyRef] = {};
               saveState(st4);
               versesEls.forEach(el=> el.classList.remove("hl"));
             };
@@ -2108,6 +2168,120 @@ function closeReader(){
 
   document.getElementById("readerModal").addEventListener("click", (e)=>{ if (e.target.id === "readerModal") closeReader(); });
   window.addEventListener("keydown", (e)=>{ if (e.key === "Escape" && document.getElementById("readerModal").classList.contains("open")) closeReader(); });
+
+
+  // === DIÁRIO DO DIA (Resumo + Versículo do dia) ===
+  let currentDiaryDayKey = null;
+
+  function openDiaryForDay(dateKey){
+    const modal = document.getElementById("diaryModal");
+    const refEl = document.getElementById("diaryRef");
+    const summaryEl = document.getElementById("diarySummary");
+    const versesWrap = document.getElementById("diaryVerses");
+    const hintEl = document.getElementById("diaryHint");
+
+    currentDiaryDayKey = dateKey;
+
+    const st = ensureStateDefaults(loadState());
+    st.reader = st.reader || {};
+    st.reader.diary = st.reader.diary || {};
+
+    const entry = st.reader.diary[dateKey] || {};
+    summaryEl.value = entry.summary || "";
+
+    const labelDay = (dateKey||"").replace("2026-","") || dateKey;
+    refEl.textContent = `Dia ${labelDay} — Diário`;
+
+    const planBlocks = (getPlanForDate(dateKey) || []);
+    const items = planBlocks.flatMap(p => (p.list || []));
+    const translationId = "almeida";
+    const hl = st.reader.highlights || {};
+    const hlText = st.reader.hlText || {};
+
+    const candidates = [];
+    for (const it of items){
+      const keyRef = `${it.book}|${it.chapter}|${translationId}`;
+      const arr = hl[keyRef] || [];
+      const textMap = hlText[keyRef] || {};
+      for (const vn of arr){
+        const full = textMap[vn] || `${it.book} ${it.chapter}:${vn}`;
+        candidates.push({
+          book: it.book,
+          chapter: it.chapter,
+          verse: String(vn),
+          displayRef: `${it.book} ${it.chapter}:${vn}`,
+          text: full
+        });
+      }
+    }
+
+    versesWrap.innerHTML = "";
+    delete versesWrap.dataset.selectedRef;
+    delete versesWrap.dataset.selectedText;
+
+    if (!candidates.length){
+      hintEl.style.display = "block";
+      versesWrap.innerHTML = `<div class="diaryHint">Nenhum destaque encontrado para este dia. Abra o capítulo e clique no versículo para destacar.</div>`;
+    } else {
+      hintEl.style.display = "block";
+      const selectedRef = entry.verseRef || "";
+      candidates.forEach(c=>{
+        const div = document.createElement("div");
+        div.className = "diaryVerse" + (c.displayRef === selectedRef ? " selected" : "");
+        div.innerHTML = `
+          <div class="diaryVerseTop">
+            <div class="diaryVerseRef">${escapeHtml(c.displayRef)}</div>
+          </div>
+          <div class="diaryVerseText">${escapeHtml(c.text)}</div>
+        `;
+        div.addEventListener("click", ()=>{
+          Array.from(versesWrap.querySelectorAll(".diaryVerse")).forEach(x=>x.classList.remove("selected"));
+          div.classList.add("selected");
+          versesWrap.dataset.selectedRef = c.displayRef;
+          versesWrap.dataset.selectedText = c.text;
+        });
+        versesWrap.appendChild(div);
+      });
+
+      if (selectedRef){
+        versesWrap.dataset.selectedRef = selectedRef;
+        versesWrap.dataset.selectedText = entry.verseText || "";
+      }
+    }
+
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+  }
+
+  function closeDiary(){
+    const modal = document.getElementById("diaryModal");
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+  }
+
+  document.getElementById("diaryCloseBtn").addEventListener("click", closeDiary);
+  document.getElementById("diaryModal").addEventListener("click", (e)=>{ if (e.target.id === "diaryModal") closeDiary(); });
+
+  document.getElementById("diaryRefreshBtn").addEventListener("click", ()=>{
+    if (currentDiaryDayKey) openDiaryForDay(currentDiaryDayKey);
+  });
+
+  document.getElementById("diarySaveBtn").addEventListener("click", ()=>{
+    if (!currentDiaryDayKey) return;
+    const st = ensureStateDefaults(loadState());
+    st.reader = st.reader || {};
+    st.reader.diary = st.reader.diary || {};
+
+    const summary = (document.getElementById("diarySummary").value || "").trim();
+    const versesWrap = document.getElementById("diaryVerses");
+    const verseRef = versesWrap.dataset.selectedRef || (st.reader.diary[currentDiaryDayKey]?.verseRef || "");
+    const verseText = versesWrap.dataset.selectedText || (st.reader.diary[currentDiaryDayKey]?.verseText || "");
+
+    st.reader.diary[currentDiaryDayKey] = { summary, verseRef, verseText, updatedAt: new Date().toISOString() };
+    saveState(st);
+    closeDiary();
+    try{ renderAll(); }catch(e){}
+  });
 
 </script>
 </body>
