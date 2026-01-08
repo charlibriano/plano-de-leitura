@@ -285,6 +285,14 @@
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     summary::-webkit-details-marker{display:none}
+
+    .monthControls{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-top:14px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.14);box-shadow:var(--shadow2);}
+    .monthControls .muted{color:var(--muted);}
+    .monthControlsRight{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+    .miniBtn{padding:9px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:rgba(235,245,255,.95);font-weight:900;cursor:pointer;}
+    .miniBtn:hover{filter:brightness(1.06);border-color:rgba(122,167,255,.22);background:rgba(122,167,255,.10);}
+    .monthUnlock{font-size:12px;color:rgba(200,210,225,.75);padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);}
+
     .monthTitle{display:flex;align-items:center;gap:10px;font-weight:980}
     .badge{
       font-size:12px;color:var(--muted);
@@ -711,7 +719,18 @@
       .actionBar{padding:8px 12px 10px 12px;}
       .actionBar .btnBig{max-width: 380px;flex:0 1 auto;padding:12px 14px;}
     }
-  </style>
+  
+    /* Popup mês liberado */
+    .unlockModal{position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;
+      background:rgba(0,0,0,.65);backdrop-filter:blur(6px)}
+    .unlockModal.open{display:flex}
+    .unlockBox{background:rgba(15,18,24,.98);border-radius:22px;padding:22px 24px;
+      border:1px solid rgba(255,255,255,.15);text-align:center;max-width:420px;width:90%;
+      box-shadow:0 30px 70px rgba(0,0,0,.6)}
+    .unlockTitle{font-size:22px;font-weight:900;margin-bottom:12px}
+    .unlockBody{font-size:15px;line-height:1.6;margin-bottom:18px;color:rgba(235,245,255,.95)}
+</style>
+
 </head>
 <body>
 
@@ -1161,6 +1180,7 @@
     const st = ensureStateDefaults(loadState());
     st.ui = st.ui || {};
     st.ui.selectedDay = key;
+          try{ st.ui.openMonth = (new Date(key)).getMonth(); }catch(e){}
     saveState(st);
     renderAll();
 
@@ -1456,10 +1476,73 @@
     const h2 = headers[1] || "Leitura 2";
     const h3 = headers[2] || null;
 
-    for (let m = 0; m < 12; m++){
+    
+    // === MESES: mostrar mês vigente + permitir abrir meses anteriores clicando no mês ===
+    // Regra:
+    // - "Mês vigente" = primeiro mês ainda NÃO 100% concluído (desbloqueio por progresso)
+    // - Mostra somente meses até o vigente (inclui anteriores), com o vigente aberto por padrão
+    // - Meses futuros ficam ocultos/bloqueados até liberar
+    function monthDaysKeys(mIdx){
+      const keys = [];
+      const first = new Date(YEAR, mIdx, 1);
+      const last = new Date(YEAR, mIdx + 1, 0);
+      for (let d = new Date(first); d <= last; d.setDate(d.getDate()+1)) keys.push(ymd(d));
+      return keys;
+    }
+
+    function isMonthComplete(mIdx){
+      const keys = monthDaysKeys(mIdx);
+      return keys.length > 0 && keys.every(k => state.days?.[k]?.done);
+    }
+
+    // unlockedMaxMonth = índice do mês vigente (primeiro não completo). Ex.: terminou Jan => 1 (Fev)
+    let unlockedMaxMonth = 0;
+    while (unlockedMaxMonth < 11 && isMonthComplete(unlockedMaxMonth)) unlockedMaxMonth++;
+
+    // Controla qual mês está aberto no calendário (por padrão, o vigente)
+    state.ui = state.ui || {};
+    if (state.ui.openMonth === undefined || state.ui.openMonth === null) state.ui.openMonth = unlockedMaxMonth;
+    // Se o usuário estava com mês aberto no futuro (não liberado), volta pro vigente
+    if (state.ui.openMonth > unlockedMaxMonth) state.ui.openMonth = unlockedMaxMonth;
+
+    // Se o usuário selecionou um dia de um mês futuro não liberado, traz para hoje/mes vigente
+    if (state.ui.selectedDay){
+      const sel = state.ui.selectedDay;
+      const selMonth = parseInt(sel.split("-")[1] || "1", 10) - 1;
+      if (selMonth > unlockedMaxMonth) state.ui.selectedDay = todayKey;
+    }
+    saveState(state);
+
+    // Controles
+    const controls = document.createElement("div");
+    controls.className = "monthControls";
+    controls.innerHTML = `
+      <div class="monthControlsLeft"><b>📅 Mês vigente:</b> <span class="muted">${monthNames[unlockedMaxMonth]}</span></div>
+      <div class="monthControlsRight">
+        <button class="miniBtn" id="btnOpenCurrentMonth" type="button">Ir para mês vigente</button>
+        <div class="monthUnlock">${unlockedMaxMonth>=11 && isMonthComplete(11) ? "✅ Ano completo!" : "🔓 Conclua o mês para liberar o próximo"}</div>
+      </div>
+    `;
+    container.appendChild(controls);
+    // Listener do botão (depois que ele existir no DOM)
+    setTimeout(()=>{
+      const btn = document.getElementById("btnOpenCurrentMonth");
+      if (btn) btn.onclick = ()=>{
+        const st = ensureStateDefaults(loadState());
+        st.ui = st.ui || {};
+        st.ui.openMonth = unlockedMaxMonth;
+        saveState(st);
+        renderAll();
+      };
+    }, 0);
+
+for (let m = 0; m < 12; m++){
+      // Oculta meses futuros não liberados
+      if (m > unlockedMaxMonth) continue;
       const details = document.createElement("details");
+      details.className = "month";
       details.id = `m-${YEAR}-${pad2(m+1)}`;
-      if (today.getFullYear() === YEAR && today.getMonth() === m) details.open = true;
+      details.open = (m === state.ui.openMonth);
 
       const summary = document.createElement("summary");
       const left = document.createElement("div");
@@ -1520,6 +1603,7 @@ b.addEventListener("click", ()=>{
           const st = ensureStateDefaults(loadState());
           st.ui = st.ui || {};
           st.ui.selectedDay = key;
+          try{ st.ui.openMonth = (new Date(key)).getMonth(); }catch(e){}
           saveState(st);
           renderAll();
           setTimeout(()=>{
@@ -1544,12 +1628,11 @@ b.addEventListener("click", ()=>{
         if (todayKey.startsWith(`${YEAR}-${pad2(m+1)}-`)) selectedKey = todayKey;
         else selectedKey = `${YEAR}-${pad2(m+1)}-01`;
       }
-
-      // se selectedKey não for deste mês, mostra dia 1 do mês atual (evita confusão ao abrir outro mês)
-      if (!selectedKey.startsWith(`${YEAR}-${pad2(m+1)}-`)) selectedKey = `${YEAR}-${pad2(m+1)}-01`;
+      // (ajuste) mantém o dia selecionado globalmente — o painel de leitura sempre acompanha o dia escolhido
 
       const pSel = plan[selectedKey] || { active:false, blocks:[], guidedList:[] };
       const dayNum = Number(selectedKey.split("-")[2] || "1");
+      const monthName = monthNames[new Date(selectedKey).getMonth()];
       const doneSel = !!state.days?.[selectedKey]?.done;
       const isLateSel = (selectedKey < todayKey) && !doneSel && !!pSel?.active;
 
@@ -1562,7 +1645,7 @@ b.addEventListener("click", ()=>{
 
       const title = document.createElement("div");
       title.className = "title";
-      title.innerHTML = `📌 <span>Plano do dia <b>${dayNum}</b></span> ${
+      title.innerHTML = `📌 <span>Plano do dia <b>${dayNum}</b> · <b>${monthName}</b></span> ${
         doneSel ? `<span class="pill ok">Concluído</span>` :
         (isLateSel ? `<span class="pill late">Atrasado</span>` : `<span class="pill">Pendente</span>`)
       }`;
@@ -1772,6 +1855,20 @@ b.addEventListener("click", ()=>{
       body.appendChild(wrap);
 
       details.appendChild(summary);
+      summary.addEventListener("click", (e)=>{
+        // deixa o comportamento padrão do <details> acontecer, mas persistimos o mês aberto
+        const st = ensureStateDefaults(loadState());
+        st.ui = st.ui || {};
+        st.ui.openMonth = m;
+        saveState(st);
+        // Fecha outros meses abertos (efeito accordion) após o clique
+        setTimeout(()=>{
+          try{
+            document.querySelectorAll("details.month").forEach((d)=>{ if (d !== details) d.open = false; });
+            details.open = true;
+          }catch(err){}
+        }, 0);
+      });
       details.appendChild(body);
       container.appendChild(details);
 
@@ -2283,6 +2380,72 @@ function closeReader(){
     try{ renderAll(); }catch(e){}
   });
 
+
+  // === POPUP DE CONQUISTA DO MÊS ===
+  function showMonthUnlock(monthIdx, stats){
+    const modal = document.getElementById("monthUnlockModal");
+    const body = document.getElementById("unlockBody");
+    const name = monthNames[monthIdx];
+    body.innerHTML = `<b>${name} liberado!</b><br>✅ ${stats.done}/${stats.total} dias concluídos`;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+  }
+
+  document.getElementById("unlockCloseBtn").addEventListener("click", ()=>{
+    const modal = document.getElementById("monthUnlockModal");
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+  });
+
+  function checkMonthUnlock(prevState, newState){
+    if (!prevState || !newState) return;
+    for (let m = 0; m < 11; m++){
+      if (!isMonthCompleteFromState(prevState, m) && isMonthCompleteFromState(newState, m)){
+        showMonthUnlock(m+1, getMonthStats(m, newState));
+        break;
+      }
+    }
+  }
+
+  function isMonthCompleteFromState(state, mIdx){
+    const first = new Date(YEAR, mIdx, 1);
+    const last = new Date(YEAR, mIdx + 1, 0);
+    for (let d = new Date(first); d <= last; d.setDate(d.getDate()+1)){
+      const k = ymd(d);
+      if (!state.days?.[k]?.done) return false;
+    }
+    return true;
+  }
+
+  function getMonthStats(mIdx, state){
+    let total = 0, done = 0;
+    const first = new Date(YEAR, mIdx, 1);
+    const last = new Date(YEAR, mIdx + 1, 0);
+    for (let d = new Date(first); d <= last; d.setDate(d.getDate()+1)){
+      total++;
+      const k = ymd(d);
+      if (state.days?.[k]?.done) done++;
+    }
+    return { total, done };
+  }
+
+  const _saveState = saveState;
+  saveState = function(state){
+    const prev = loadState();
+    _saveState(state);
+    checkMonthUnlock(prev, state);
+  };
 </script>
+
+
+  <!-- Popup Mês Liberado -->
+  <div class="unlockModal" id="monthUnlockModal" aria-hidden="true">
+    <div class="unlockBox">
+      <div class="unlockTitle">🎉 Mês liberado!</div>
+      <div class="unlockBody" id="unlockBody"></div>
+      <button class="readerBtn" id="unlockCloseBtn">Continuar</button>
+    </div>
+  </div>
 </body>
+
 </html>
