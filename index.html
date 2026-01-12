@@ -265,6 +265,8 @@
       box-shadow: 0 12px 25px rgba(0,0,0,0.20);
     }
     .notice.show{display:block;}
+    .notice.good{border-color:rgba(90, 200, 140, .35);background:rgba(90,200,140,.10);}
+    .notice.good b{color:rgba(240,255,250,1);}
     .notice.danger{border-color: rgba(255,107,107,0.30);background: rgba(255,107,107,0.10);}
 
     /* Months + table */
@@ -875,6 +877,7 @@
         <div class="guidedNow" id="guidedNow">Hoje: —</div>
 
         <div class="notice danger" id="lateNotice"></div>
+        <div class="notice good" id="encourageNotice"></div>
         <div class="notice" id="guidedNotice"></div>
 
         <div class="guidedControls">
@@ -1324,7 +1327,67 @@
     hint.textContent = `Hoje: ${text}${done ? " ✅" : ""}`;
   }
 
-  function updateLateUI(state){
+  
+  // === Mensagem pastoral (encorajamento) ===
+  function getProgressStats(plan, state){
+    const doneKeys = Object.keys(state.days || {}).filter(k => state.days?.[k]?.done);
+    let chapters = 0;
+    const books = new Set();
+
+    for (const k of doneKeys){
+      const p = plan[k];
+      if (!p?.active) continue;
+      const list = (p.guidedList || []);
+      // conta capítulos do dia (AT/NT/Salmos etc.)
+      for (const it of list){
+        chapters++;
+        if (it?.book) books.add(String(it.book).trim());
+      }
+    }
+    return { daysDone: doneKeys.length, chapters, booksCount: books.size };
+  }
+
+  function buildPastoralMessage({late, stats}){
+    // mensagens bem curtas (2–3 linhas), tom pastoral
+    const { daysDone, chapters, booksCount } = stats;
+
+    // frases base por cenário
+    if (late > 0){
+      return `🕊️ <b>Mesmo com alguns dias de atraso, você não parou.</b><br>
+      Você já avançou em <b>${booksCount}</b> livro(s) e leu <b>${chapters}</b> capítulo(s).<br>
+      Deus trabalha na constância — recomeçar também faz parte da caminhada.`;
+    }
+
+    if (daysDone >= 20){
+      return `📖 <b>Você já caminhou por muitos textos das Escrituras.</b><br>
+      Até aqui, foram <b>${booksCount}</b> livro(s) e <b>${chapters}</b> capítulo(s).<br>
+      Persevere — um dia de cada vez, Deus vai falando ao coração.`;
+    }
+
+    return `🌱 <b>Você está indo bem até aqui.</b><br>
+    Já são <b>${chapters}</b> capítulo(s) lidos em <b>${booksCount}</b> livro(s).<br>
+    Continue firme — a Palavra cria raízes na constância.`;
+  }
+
+  function updateEncourageUI(plan, state){
+    const el = document.getElementById("encourageNotice");
+    if (!el) return;
+
+    const today = new Date();
+    if (today.getFullYear() !== YEAR){
+      el.classList.remove("show");
+      return;
+    }
+
+    const late = getLateDays(state);
+    const stats = getProgressStats(plan, state);
+    el.innerHTML = buildPastoralMessage({ late, stats });
+
+    // Mostra sempre que estiver no ano correto (mesmo sem atraso)
+    el.classList.add("show");
+  }
+
+function updateLateUI(state){
     const lateEl = document.getElementById("lateNotice");
     const catchUpBtn = document.getElementById("catchUpBtn");
     const chipLate = document.getElementById("chipLate");
@@ -1444,6 +1507,7 @@
 
     updateTodayHint(plan, state, today);
     updateLateUI(state);
+    updateEncourageUI(plan, state);
     updateGuidedUI(plan, state, today);
 
     // progresso anual
