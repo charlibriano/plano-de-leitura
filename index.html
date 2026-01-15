@@ -744,6 +744,7 @@
         <div class="readerActions">
           <button class="readerBtn" id="readerPlanPrevBtn" type="button" title="Voltar no plano">◀ Plano</button>
           <button class="readerBtn" id="readerPlanNextBtn" type="button" title="Avançar no plano">Plano ▶</button>
+          <button class="readerBtn" id="readerDoneBtn" type="button" title="Marcar dia como concluído">Concluir dia ✅</button>
           <button class="readerBtn" id="readerExternalBtn" type="button">Abrir externo</button>
           <button class="readerBtn danger" id="readerCloseBtn" type="button">Fechar ✕</button>
         </div>
@@ -2070,6 +2071,7 @@ b.addEventListener("click", ()=>{
     const errEl = document.getElementById("readerError");
     const refEl = document.getElementById("readerRef");
     const extBtn = document.getElementById("readerExternalBtn");
+    const doneBtn = document.getElementById("readerDoneBtn");
 
     textEl.innerHTML = "";
     errEl.style.display = "none";
@@ -2093,6 +2095,23 @@ b.addEventListener("click", ()=>{
       const url = bibleOnlineUrl(st.translation, book, chapter);
       window.open(url, READING_WINDOW_NAME, "noopener,noreferrer");
     };
+
+    // Concluir dia: marca o dia selecionado como concluído e fecha o leitor
+    if (doneBtn){
+      doneBtn.onclick = ()=>{
+        const st2 = ensureStateDefaults(loadState());
+        const dayKey = st2.ui?.selectedDay || todayKey;
+        st2.days = st2.days || {};
+        st2.days[dayKey] = st2.days[dayKey] || {};
+        st2.days[dayKey].done = true;
+        saveState(st2);
+        // Atualiza UI principal
+        try{ renderAll(); }catch(e){}
+        // Fecha modal
+        modal.classList.remove("open");
+        modal.setAttribute("aria-hidden","true");
+      };
+    }
 
     const bookId = getBookId(book);
     if (!bookId){
