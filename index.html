@@ -1184,7 +1184,7 @@
     const st = ensureStateDefaults(loadState());
     st.ui = st.ui || {};
     st.ui.selectedDay = key;
-          try{ st.ui.openMonth = (new Date(key)).getMonth(); }catch(e){}
+          try{ st.ui.openMonth = (parseInt((key.split("-")[1]||"1"),10)-1); }catch(e){}
     saveState(st);
     renderAll();
 
@@ -1560,31 +1560,41 @@ function updateLateUI(state){
       return keys.length > 0 && keys.every(k => state.days?.[k]?.done);
     }
 
-    // unlockedMaxMonth = índice do mês vigente (primeiro não completo). Ex.: terminou Jan => 1 (Fev)
+    // unlockedMaxMonth = índice do primeiro mês NÃO completo (recurso de “liberar próximo”)
     let unlockedMaxMonth = 0;
     while (unlockedMaxMonth < 11 && isMonthComplete(unlockedMaxMonth)) unlockedMaxMonth++;
 
-    // Controla qual mês está aberto no calendário (por padrão, o vigente)
-    state.ui = state.ui || {};
-    if (state.ui.openMonth === undefined || state.ui.openMonth === null) state.ui.openMonth = unlockedMaxMonth;
-    // Se o usuário estava com mês aberto no futuro (não liberado), volta pro vigente
-    if (state.ui.openMonth > unlockedMaxMonth) state.ui.openMonth = unlockedMaxMonth;
+    // Mês atual = mês do dia de hoje (se o ano do sistema for diferente do YEAR, cai para Janeiro)
+    const now = new Date();
+    const currentMonthIndex = (now.getFullYear() === YEAR) ? now.getMonth() : 0;
 
-    // Se o usuário selecionou um dia de um mês futuro não liberado, traz para hoje/mes vigente
+    // Regra solicitada: mês atual fica “ativo”; meses anteriores podem ser consultados; meses futuros ficam ocultos.
+    // Então o último mês exibido é, no mínimo, o mês atual (mesmo que o mês anterior não esteja 100% concluído).
+    const visibleMaxMonth = Math.min(11, Math.max(unlockedMaxMonth, currentMonthIndex));
+
+    // Controla qual mês está aberto no calendário (por padrão, o mês atual)
+    state.ui = state.ui || {};
+    if (state.ui.openMonth === undefined || state.ui.openMonth === null) state.ui.openMonth = currentMonthIndex;
+
+    // Se o usuário estava com mês aberto no futuro (não exibido), volta para o mês atual
+    if (state.ui.openMonth > visibleMaxMonth) state.ui.openMonth = currentMonthIndex;
+
+    // Se o usuário selecionou um dia de um mês futuro (não exibido), traz para hoje
     if (state.ui.selectedDay){
       const sel = state.ui.selectedDay;
       const selMonth = parseInt(sel.split("-")[1] || "1", 10) - 1;
-      if (selMonth > unlockedMaxMonth) state.ui.selectedDay = todayKey;
+      if (selMonth > visibleMaxMonth) state.ui.selectedDay = todayKey;
     }
+
     saveState(state);
 
-    // Controles
+// Controles
     const controls = document.createElement("div");
     controls.className = "monthControls";
     controls.innerHTML = `
-      <div class="monthControlsLeft"><b>📅 Mês vigente:</b> <span class="muted">${monthNames[unlockedMaxMonth]}</span></div>
+      <div class="monthControlsLeft"><b>📅 Mês atual:</b> <span class="muted">${monthNames[currentMonthIndex]}</span></div>
       <div class="monthControlsRight">
-        <button class="miniBtn" id="btnOpenCurrentMonth" type="button">Ir para mês vigente</button>
+        <button class="miniBtn" id="btnOpenCurrentMonth" type="button">Ir para mês atual</button>
         <div class="monthUnlock">${unlockedMaxMonth>=11 && isMonthComplete(11) ? "✅ Ano completo!" : "🔓 Conclua o mês para liberar o próximo"}</div>
       </div>
     `;
@@ -1595,7 +1605,7 @@ function updateLateUI(state){
       if (btn) btn.onclick = ()=>{
         const st = ensureStateDefaults(loadState());
         st.ui = st.ui || {};
-        st.ui.openMonth = unlockedMaxMonth;
+        st.ui.openMonth = currentMonthIndex;
         saveState(st);
         renderAll();
       };
@@ -1603,7 +1613,7 @@ function updateLateUI(state){
 
 for (let m = 0; m < 12; m++){
       // Oculta meses futuros não liberados
-      if (m > unlockedMaxMonth) continue;
+      if (m > visibleMaxMonth) continue;
       const details = document.createElement("details");
       details.className = "month";
       details.id = `m-${YEAR}-${pad2(m+1)}`;
@@ -1668,7 +1678,7 @@ b.addEventListener("click", ()=>{
           const st = ensureStateDefaults(loadState());
           st.ui = st.ui || {};
           st.ui.selectedDay = key;
-          try{ st.ui.openMonth = (new Date(key)).getMonth(); }catch(e){}
+          try{ st.ui.openMonth = (parseInt((key.split("-")[1]||"1"),10)-1); }catch(e){}
           saveState(st);
           renderAll();
           setTimeout(()=>{
