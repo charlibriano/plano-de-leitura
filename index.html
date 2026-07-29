@@ -4,733 +4,881 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Plano de Leitura 2026</title>
-  <meta name="theme-color" content="#0b0f14" />
+  <meta name="description" content="Plano de leitura bíblica de 2026: acompanhe o capítulo de hoje, marque o progresso e recupere os dias em atraso." />
+  <meta name="theme-color" content="#FAF8F5" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600;7..72,700&amp;display=swap" rel="stylesheet" />
+  <script>
+    (function(){
+      try{
+        var t = localStorage.getItem("planoLeitura_tema");
+        if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      }catch(e){ document.documentElement.setAttribute("data-theme","light"); }
+    })();
+  </script>
   <style>
+    /* ===========================================================
+       Plano de Leitura — sistema visual
+       Tipografia: Literata (leitura/títulos) + Inter (interface)
+       Paleta: papel quente, tinta quase-preta, vermelho tijolo
+       =========================================================== */
     :root{
-      --bg:#070a10;
-      --bg2:#0b0f14;
-      --card:#0f1726;
-      --card2:#0b1220;
-      --text:#eaf0f7;
-      --muted:#aab6c7;
-      --ok:#2ee59d;
-      --warn:#ffcc66;
-      --accent:#7aa7ff;
-      --accent2:#b27aff;
-      --danger:#ff6b6b;
-      --border: rgba(255,255,255,0.10);
-      --shadow: 0 14px 40px rgba(0,0,0,0.45);
-      --shadow2: 0 10px 30px rgba(0,0,0,0.32);
-      --radius: 18px;
-      --radius2: 14px;
+      color-scheme: light;
+
+      --paper:#FAF8F5;
+      --surface:#FFFFFF;
+      --surface-2:#F4F1EB;
+      --surface-3:#EFEAE2;
+
+      --ink:#17130F;
+      --ink-2:#5F5852;
+      --ink-3:#8C847B;
+
+      --line:#E7E1D7;
+      --line-strong:#D6CEC2;
+
+      --accent:#B8332C;
+      --accent-hover:#9C2822;
+      --accent-soft:#FBEDEB;
+
+      --gold:#9A6E22;
+      --gold-soft:#FBF1DF;
+
+      --green:#2C7A57;
+      --green-soft:#E8F4EE;
+
+      --danger:#B8332C;
+      --danger-soft:#FBEDEB;
+
+      /* aliases mantidos por compatibilidade */
+      --bg:var(--paper);
+      --bg2:var(--paper);
+      --card:var(--surface);
+      --card2:var(--surface-2);
+      --text:var(--ink);
+      --muted:var(--ink-2);
+      --ok:var(--green);
+      --warn:var(--gold);
+      --accent2:var(--accent);
+      --border:var(--line);
+
+      --shadow:0 1px 2px rgba(23,19,15,.05), 0 12px 32px rgba(23,19,15,.06);
+      --shadow2:0 1px 2px rgba(23,19,15,.04), 0 6px 18px rgba(23,19,15,.05);
+
+      --r1:10px;
+      --r2:14px;
+      --r3:20px;
+      --radius:var(--r3);
+      --radius2:var(--r2);
+
+      --ui:"Inter","Inter var",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+      --serif:"Literata",Georgia,"Times New Roman",serif;
+
+      --measure:66ch;
+    }
+
+    html[data-theme="dark"]{
+      color-scheme: dark;
+
+      --paper:#14110F;
+      --surface:#1C1815;
+      --surface-2:#231E1A;
+      --surface-3:#2B2521;
+
+      --ink:#F4F0EA;
+      --ink-2:#A79E95;
+      --ink-3:#7E756C;
+
+      --line:rgba(255,255,255,.10);
+      --line-strong:rgba(255,255,255,.18);
+
+      --accent:#E97F72;
+      --accent-hover:#F09A8F;
+      --accent-soft:rgba(233,127,114,.13);
+
+      --gold:#D6A757;
+      --gold-soft:rgba(214,167,87,.13);
+
+      --green:#5FBE91;
+      --green-soft:rgba(95,190,145,.13);
+
+      --danger:#E97F72;
+      --danger-soft:rgba(233,127,114,.13);
+
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.35);
+      --shadow2:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
     }
 
     *{box-sizing:border-box}
-    html, body{height:100%}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(900px 600px at 15% -10%, rgba(122,167,255,0.20), transparent 60%),
-        radial-gradient(900px 600px at 95% 10%, rgba(178,122,255,0.18), transparent 55%),
-        radial-gradient(800px 600px at 60% 110%, rgba(46,229,157,0.10), transparent 55%),
-        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 60%, #06070b 100%);
+      font-family:var(--ui);
+      font-size:15px;
+      color:var(--ink);
+      background:var(--paper);
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
       overflow-x:hidden;
     }
 
-    /* Top bar */
-    header{
-      max-width:1100px;
-      margin:0 auto;
-      padding:18px 16px 8px 16px;
+    :focus-visible{
+      outline:2px solid var(--accent);
+      outline-offset:2px;
+      border-radius:4px;
     }
+
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{
+        animation-duration:.001ms !important;
+        transition-duration:.001ms !important;
+        scroll-behavior:auto !important;
+      }
+    }
+
+    /* ---------- Cabeçalho ---------- */
+    header{max-width:1080px;margin:0 auto;padding:28px 20px 4px}
+
     .hero{
-      border-radius: 22px;
-      padding:16px 16px;
-      border:1px solid rgba(255,255,255,0.08);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
-        radial-gradient(1000px 260px at 10% 0%, rgba(122,167,255,0.25), transparent 60%),
-        radial-gradient(800px 240px at 95% 0%, rgba(178,122,255,0.22), transparent 60%);
-      box-shadow: var(--shadow2);
       position:relative;
-      overflow:hidden;
+      padding:0 0 24px;
+      border-bottom:1px solid var(--line);
     }
-    .hero:after{
-      content:"";
-      position:absolute;
-      inset:-2px -2px auto auto;
-      width:240px;height:240px;
-      background: radial-gradient(circle at 25% 25%, rgba(46,229,157,0.20), transparent 60%);
-      transform: rotate(15deg);
-      pointer-events:none;
-    }
+    .hero:after{content:none}
     .heroTop{
       display:flex;
-      align-items:flex-start;
+      align-items:flex-end;
       justify-content:space-between;
-      gap:14px;
+      gap:20px;
       flex-wrap:wrap;
     }
     h1{
-      margin:0 0 6px 0;
-      font-size:22px;
-      letter-spacing:0.25px;
-      font-weight: 950;
+      margin:0 0 8px;
+      font-family:var(--serif);
+      font-size:clamp(30px,5vw,44px);
+      font-weight:600;
+      letter-spacing:-.02em;
+      line-height:1.08;
     }
     .subtitle{
       margin:0;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.5;
-      max-width: 740px;
+      color:var(--ink-2);
+      font-size:14px;
+      line-height:1.6;
+      max-width:52ch;
     }
+    .subtitle b{color:var(--ink);font-weight:600}
+
     .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .chip{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 10px;
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 11px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.06);
+      border:1px solid var(--line);
+      background:var(--surface);
       font-size:12px;
-      color: var(--text);
-      font-weight:900;
+      font-weight:500;
+      color:var(--ink-2);
       white-space:nowrap;
-      backdrop-filter: blur(8px);
+      letter-spacing:.01em;
     }
-    .chip.ok{border-color: rgba(46,229,157,0.28); background: rgba(46,229,157,0.10);}
-    .chip.warn{border-color: rgba(255,204,102,0.28); background: rgba(255,204,102,0.10);}
-    .chip.danger{border-color: rgba(255,107,107,0.30); background: rgba(255,107,107,0.10);}
+    .chip.ok{border-color:var(--green);color:var(--green);background:var(--green-soft)}
+    .chip.warn{border-color:var(--gold);color:var(--gold);background:var(--gold-soft)}
+    .chip.danger{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 
-    main{max-width:1100px;margin:0 auto;padding:10px 16px 170px 16px;}
+    /* botão de tema */
+    .themeBtn{
+      flex:0 0 auto;
+      width:38px;height:38px;padding:0;
+      display:inline-flex;align-items:center;justify-content:center;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:var(--surface);
+      color:var(--ink-2);
+      font-size:15px;
+      box-shadow:none;
+    }
+    .themeBtn:hover{border-color:var(--line-strong);background:var(--surface-2);color:var(--ink)}
 
-    .grid{display:grid;grid-template-columns: 1.2fr 1fr;gap:14px;}
-    @media (max-width: 980px){ .grid{grid-template-columns:1fr;} }
+    /* ---------- Layout ---------- */
+    main{max-width:1080px;margin:0 auto;padding:24px 20px 180px}
+    .grid{display:grid;grid-template-columns:1.35fr 1fr;gap:20px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr;gap:16px}}
 
     .card{
-      border-radius: var(--radius);
-      padding:14px;
-      border:1px solid rgba(255,255,255,0.08);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
-      box-shadow: var(--shadow2);
       position:relative;
+      padding:22px;
+      border-radius:var(--r3);
+      border:1px solid var(--line);
+      background:var(--surface);
+      box-shadow:var(--shadow2);
       overflow:hidden;
     }
-    .card:before{
-      content:"";
-      position:absolute;inset:auto -100px -120px auto;
-      width:280px;height:280px;
-      background: radial-gradient(circle at 30% 30%, rgba(122,167,255,0.18), transparent 60%);
-      transform: rotate(-10deg);
-      pointer-events:none;
-    }
+    .card:before{content:none}
     .card h2{
-      margin:0 0 10px 0;
-      font-size:15px;
-      font-weight:950;
-      letter-spacing:0.2px;
-      display:flex;align-items:center;gap:10px;
+      margin:0 0 18px;
+      font-family:var(--serif);
+      font-size:19px;
+      font-weight:600;
+      letter-spacing:-.01em;
+      display:flex;align-items:center;gap:8px;
     }
 
-    .row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
-    label.small{font-size:12px;color:var(--muted);font-weight:800}
+    .row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+    label.small{
+      display:block;
+      margin-bottom:6px;
+      font-size:11px;
+      color:var(--ink-3);
+      font-weight:600;
+      letter-spacing:.07em;
+      text-transform:uppercase;
+    }
 
+    /* ---------- Controles ---------- */
     select{
-      background: rgba(0,0,0,0.25);
-      color:var(--text);
-      border:1px solid rgba(255,255,255,0.14);
-      border-radius: 14px;
-      padding:12px 12px;
+      appearance:none;
+      background:var(--surface);
+      background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
+      background-position:calc(100% - 18px) 51%,calc(100% - 13px) 51%;
+      background-size:5px 5px,5px 5px;
+      background-repeat:no-repeat;
+      color:var(--ink);
+      border:1px solid var(--line-strong);
+      border-radius:var(--r1);
+      padding:11px 36px 11px 13px;
       outline:none;
-      min-width: 240px;
-      font-weight:850;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.25) inset;
+      min-width:238px;
+      font-family:var(--ui);
+      font-size:14px;
+      font-weight:500;
+      cursor:pointer;
+      transition:border-color .15s ease;
     }
+    select:hover{border-color:var(--ink-3)}
 
     button{
       cursor:pointer;
-      background: linear-gradient(180deg, rgba(122,167,255,0.20), rgba(122,167,255,0.08));
-      color: var(--text);
-      border: 1px solid rgba(122,167,255,0.28);
-      padding: 12px 14px;
-      border-radius: 16px;
-      font-weight:950;
-      letter-spacing:0.2px;
-      transition: transform .06s ease, filter .15s ease, opacity .15s ease;
+      font-family:var(--ui);
+      font-size:14px;
+      font-weight:600;
+      letter-spacing:-.005em;
+      padding:11px 18px;
+      border-radius:var(--r1);
+      border:1px solid transparent;
+      background:var(--accent);
+      color:#fff;
+      transition:background .15s ease, border-color .15s ease, color .15s ease, opacity .15s ease;
       user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      box-shadow: 0 14px 26px rgba(0,0,0,0.25);
+      -webkit-tap-highlight-color:transparent;
     }
-    button:hover{filter:brightness(1.08)}
-    button:active{transform: translateY(1px)}
+    button:hover{background:var(--accent-hover)}
+    button:active{transform:translateY(.5px)}
+
     button.secondary{
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.14);
-      box-shadow: none;
-      font-weight:900;
+      background:var(--surface);
+      border-color:var(--line-strong);
+      color:var(--ink);
     }
+    button.secondary:hover{background:var(--surface-2);border-color:var(--ink-3)}
+
+    /* .warn = ação primária do dia ("Começar a leitura") */
+    button.warn{background:var(--accent);color:#fff;border-color:transparent}
+    button.warn:hover{background:var(--accent-hover)}
+
+    /* .ok = confirmação ("Marcar hoje como lido") — contorno, para não competir */
     button.ok{
-      background: linear-gradient(180deg, rgba(46,229,157,0.20), rgba(46,229,157,0.08));
-      border:1px solid rgba(46,229,157,0.28);
+      background:var(--surface);
+      border-color:var(--green);
+      color:var(--green);
     }
-    button.warn{
-      background: linear-gradient(180deg, rgba(255,204,102,0.20), rgba(255,204,102,0.08));
-      border:1px solid rgba(255,204,102,0.28);
-    }
+    button.ok:hover{background:var(--green-soft)}
+
     button.danger{
-      background: linear-gradient(180deg, rgba(255,107,107,0.20), rgba(255,107,107,0.08));
-      border:1px solid rgba(255,107,107,0.30);
+      background:transparent;
+      border-color:var(--line-strong);
+      color:var(--accent);
     }
-    button:disabled{opacity:0.45;cursor:not-allowed;filter:none;transform:none;box-shadow:none;}
+    button.danger:hover{background:var(--accent-soft);border-color:var(--accent)}
 
-    .stat{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-top:12px;
-    }
-    @media (max-width: 520px){ .stat{grid-template-columns:1fr;} }
+    button:disabled{opacity:.4;cursor:not-allowed;filter:none;transform:none}
+
+    /* ---------- Indicadores ---------- */
+    .stat{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+    @media (max-width:520px){.stat{grid-template-columns:1fr}}
+
     .kpi{
-      padding:14px;border-radius: var(--radius);
-      border:1px solid rgba(255,255,255,0.10);
-      background:
-        linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.16));
-      box-shadow: var(--shadow2);
-      position:relative;overflow:hidden;
+      position:relative;
+      padding:18px;
+      border-radius:var(--r2);
+      border:1px solid var(--line);
+      background:var(--surface-2);
+      overflow:hidden;
     }
-    .kpi:before{
-      content:"";
-      position:absolute;inset:-60px -70px auto auto;
-      width:220px;height:220px;
-      background: radial-gradient(circle at 30% 30%, rgba(122,167,255,0.26), transparent 60%);
-      transform: rotate(12deg);
-      pointer-events:none;
-    }
+    .kpi:before{content:none}
     .kpiHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .kpi .k{font-size:12px;color:var(--muted);font-weight:950;letter-spacing:0.2px}
-    .kpi .v{font-size:26px;font-weight:980;margin-top:4px}
-    .kpi .sub{margin-top:8px;font-size:12px;color:var(--muted);line-height:1.35}
+    .kpi .k{
+      font-size:11px;color:var(--ink-3);font-weight:600;
+      letter-spacing:.07em;text-transform:uppercase;
+    }
+    .kpi .v{
+      font-family:var(--serif);
+      font-size:34px;font-weight:600;line-height:1.05;
+      margin-top:10px;
+      font-variant-numeric:tabular-nums;
+      letter-spacing:-.02em;
+    }
+    .kpi .sub{margin-top:8px;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+
     .bar{
-      height:12px;background: rgba(255,255,255,0.10);
-      border-radius:999px;overflow:hidden;margin-top:10px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.25) inset;
+      height:6px;
+      background:var(--surface-3);
+      border-radius:999px;overflow:hidden;margin-top:14px;
     }
-    .bar > div{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, rgba(122,167,255,1), rgba(46,229,157,1));
+    .bar>div{
+      height:100%;width:0%;
+      background:var(--accent);
       border-radius:999px;
-      transition: width .25s ease;
-    }
-    .kbd{
-      font-size:11px;color:var(--muted);
-      border:1px solid rgba(255,255,255,0.14);
-      padding:5px 9px;border-radius:999px;
-      background: rgba(255,255,255,0.06);
-      white-space:nowrap;
-      font-weight:950;
+      transition:width .4s cubic-bezier(.4,0,.2,1);
     }
 
-    /* Guided */
-    .guidedBox{
-      margin-top:12px;
-      padding:12px;
-      border-radius: var(--radius);
-      border:1px solid rgba(255,255,255,0.10);
-      background:
-        radial-gradient(500px 240px at 10% 0%, rgba(46,229,157,0.10), transparent 60%),
-        rgba(0,0,0,0.18);
-      box-shadow: var(--shadow2);
+    .kbd,.badge,.pill{
+      display:inline-block;
+      font-size:11px;color:var(--ink-2);
+      border:1px solid var(--line);
+      padding:4px 9px;border-radius:999px;
+      background:var(--surface);
+      white-space:nowrap;
+      font-weight:600;
+      font-variant-numeric:tabular-nums;
     }
-    .guidedTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .guidedTitle{font-weight:980;font-size:14px;margin:0}
-    .guidedMeta{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}
-    .guidedNow{margin-top:10px;font-size:13px;font-weight:900;line-height:1.55}
-    .guidedControls{margin-top:12px;display:grid;grid-template-columns: 1fr 1fr;gap:10px;}
-    @media (max-width: 520px){ .guidedControls{grid-template-columns: 1fr;} }
-    .guidedControls button{padding:15px 14px;border-radius:16px;font-size:14px}
+
+    /* ---------- Leitura guiada ---------- */
+    .guidedBox{
+      margin-top:22px;
+      padding-top:22px;
+      border-top:1px solid var(--line);
+    }
+    .guidedTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .guidedTitle{
+      font-family:var(--serif);
+      font-weight:600;font-size:17px;margin:0;letter-spacing:-.01em;
+    }
+    .guidedMeta{font-size:12.5px;color:var(--ink-2);margin-top:5px;line-height:1.5;max-width:46ch}
+    .guidedNow{
+      margin-top:16px;
+      padding:16px;
+      border-radius:var(--r2);
+      background:var(--surface-2);
+      border:1px solid var(--line);
+      font-family:var(--serif);
+      font-size:16px;
+      font-weight:500;
+      line-height:1.6;
+    }
+    .guidedControls{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:520px){.guidedControls{grid-template-columns:1fr}}
+    .guidedControls button{padding:13px 16px;font-size:14px}
 
     .notice{
-      margin-top:10px;
-      padding:12px 12px;
-      border-radius: 16px;
-      border:1px solid rgba(255,204,102,0.22);
-      background: rgba(255,204,102,0.08);
-      color: var(--text);
-      font-size:12px;
-      line-height:1.45;
+      margin-top:12px;
+      padding:13px 15px;
+      border-radius:var(--r2);
+      border:1px solid var(--gold);
+      border-left-width:3px;
+      background:var(--gold-soft);
+      color:var(--ink);
+      font-size:13px;
+      line-height:1.55;
       display:none;
-      box-shadow: 0 12px 25px rgba(0,0,0,0.20);
     }
-    .notice.show{display:block;}
-    .notice.good{border-color:rgba(90, 200, 140, .35);background:rgba(90,200,140,.10);}
-    .notice.good b{color:rgba(240,255,250,1);}
-    .notice.danger{border-color: rgba(255,107,107,0.30);background: rgba(255,107,107,0.10);}
+    .notice.show{display:block}
+    .notice b{font-weight:600}
+    .notice.good{border-color:var(--green);background:var(--green-soft)}
+    .notice.good b{color:var(--green)}
+    .notice.danger{border-color:var(--accent);background:var(--accent-soft)}
+    .notice.danger b{color:var(--accent)}
 
-    /* Months + table */
-    details{
+    /* ---------- Meses ---------- */
+    details,.month{
       margin-top:14px;
-      border-radius: var(--radius);
-      border:1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.16);
+      border-radius:var(--r3);
+      border:1px solid var(--line);
+      background:var(--surface);
       overflow:hidden;
-      box-shadow: var(--shadow2);
+      box-shadow:var(--shadow2);
     }
     summary{
       list-style:none;
-      padding:14px;
+      padding:18px 22px;
       cursor:pointer;
       display:flex;align-items:center;justify-content:space-between;gap:12px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background:var(--surface);
+      transition:background .15s ease;
     }
+    summary:hover{background:var(--surface-2)}
+    details[open]>summary{border-bottom:1px solid var(--line)}
     summary::-webkit-details-marker{display:none}
 
-    .monthControls{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-top:14px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.14);box-shadow:var(--shadow2);}
-    .monthControls .muted{color:var(--muted);}
-    .monthControlsRight{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
-    .miniBtn{padding:9px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:rgba(235,245,255,.95);font-weight:900;cursor:pointer;}
-    .miniBtn:hover{filter:brightness(1.06);border-color:rgba(122,167,255,.22);background:rgba(122,167,255,.10);}
-    .monthUnlock{font-size:12px;color:rgba(200,210,225,.75);padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);}
+    .monthControls{
+      display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+      margin-top:18px;padding:14px 18px;
+      border-radius:var(--r2);
+      border:1px solid var(--line);
+      background:var(--surface-2);
+      font-size:13.5px;
+    }
+    .monthControls .muted{color:var(--ink-2)}
+    .monthControlsLeft{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .monthControlsRight{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .miniBtn{
+      padding:8px 13px;border-radius:var(--r1);
+      border:1px solid var(--line-strong);
+      background:var(--surface);color:var(--ink);
+      font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer;
+    }
+    .miniBtn:hover{background:var(--surface-2);border-color:var(--ink-3)}
+    .monthUnlock{
+      font-size:12px;color:var(--ink-3);
+      padding:5px 11px;border-radius:999px;
+      border:1px solid var(--line);background:var(--surface);
+    }
 
-    .monthTitle{display:flex;align-items:center;gap:10px;font-weight:980}
-    .badge{
-      font-size:12px;color:var(--muted);
-      border:1px solid rgba(255,255,255,0.14);
-      padding:5px 9px;border-radius:999px;
-      background: rgba(255,255,255,0.06);
-      white-space:nowrap;font-weight:950;
+    .monthTitle{
+      display:flex;align-items:center;gap:12px;
+      font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:-.01em;
     }
-    .monthBody{padding:0 12px 12px 12px;}
+    .monthBody{padding:0 22px 22px}
 
-    .tableWrap{
-      border-radius: var(--radius2);
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.02);
-    }
-    table{width:100%;border-collapse:collapse;}
-    thead th{
-      position: sticky;
-      top:0;
-      z-index:2;
-      background: rgba(15,23,38,0.95);
-      backdrop-filter: blur(10px);
-      color: var(--muted);
-      font-weight: 980;
-      font-size:12px;
-      text-transform: uppercase;
-      letter-spacing:0.6px;
-      border-bottom:1px solid rgba(255,255,255,0.07);
-    }
-    th, td{
-      text-align:left;
-      padding:10px 10px;
-      border-bottom:1px solid rgba(255,255,255,0.07);
-      vertical-align:top;
-      font-size:13px;
-    }
-    tbody tr:nth-child(2n){
-      background: rgba(255,255,255,0.02);
-    }
-    tbody tr:hover{
-      background: rgba(122,167,255,0.06);
-    }
-    tr:last-child td{border-bottom:none;}
-    .dayCell{white-space:nowrap;color:var(--muted);font-weight:980;}
-    .readCell{font-weight:850}
+    /* tabela antiga: desativada */
+    .tableWrap{display:none !important}
+    table{width:100%;border-collapse:collapse}
+    th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top;font-size:13px}
+    .dayCell{white-space:nowrap;color:var(--ink-2);font-weight:600}
+    .readCell{font-weight:500}
+
     .note{
-      width:100%;
-      min-height:40px;
-      resize:vertical;
-      background: rgba(0,0,0,0.22);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius: 14px;
-      color: var(--text);
-      padding:10px;
-      outline:none;
-      font-weight: 700;
+      width:100%;min-height:44px;resize:vertical;
+      background:var(--surface);
+      border:1px solid var(--line-strong);
+      border-radius:var(--r1);
+      color:var(--ink);
+      font-family:var(--ui);font-size:14px;font-weight:400;line-height:1.6;
+      padding:11px 13px;outline:none;
     }
-    .note:focus{
-      border-color: rgba(122,167,255,0.35);
-      box-shadow: 0 0 0 3px rgba(122,167,255,0.12);
-    }
-    .checkWrap{display:flex;align-items:center;gap:10px}
-    input[type="checkbox"]{width:18px;height:18px;accent-color: var(--ok);cursor:pointer}
-    .today{
-      outline:2px solid rgba(255,204,102,0.32);
-      outline-offset:-2px;
-      background: rgba(255,204,102,0.07) !important;
-    }
-    .tiny{font-size:12px;color:var(--muted);line-height:1.35}
+    .note::placeholder{color:var(--ink-3)}
+    .note:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
-    /* Floating "Ir para hoje" */
+    .checkWrap{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500}
+    input[type="checkbox"]{width:19px;height:19px;accent-color:var(--green);cursor:pointer}
+    .tiny{font-size:13px;color:var(--ink-2);line-height:1.6}
+    .tiny b{color:var(--ink);font-weight:600}
+
+    .today{background:var(--gold-soft) !important}
+
+    /* ---------- Botão flutuante ---------- */
     .fabToday{
-      position:fixed;
-      right:16px;
-      bottom:92px; /* acima da actionBar no mobile */
-      z-index:1001;
-      padding:12px 14px;
-      border-radius: 999px;
-      font-weight: 980;
-      letter-spacing:0.2px;
-      border:1px solid rgba(255,204,102,0.35);
-      background: linear-gradient(180deg, rgba(255,204,102,0.20), rgba(255,204,102,0.08));
-      box-shadow: 0 14px 26px rgba(0,0,0,0.25);
-      backdrop-filter: blur(10px);
+      position:fixed;right:20px;bottom:104px;z-index:1001;
+      padding:11px 18px;border-radius:999px;
+      font-size:13.5px;font-weight:600;
+      border:1px solid var(--line-strong);
+      background:var(--surface);color:var(--ink);
+      box-shadow:var(--shadow);
     }
-    .fabToday:hover{filter:brightness(1.06)}
-    .fabToday:active{transform: translateY(1px)}
-    @media (min-width: 981px){
-      .fabToday{ bottom:26px; }
-    }
+    .fabToday:hover{background:var(--surface-2);border-color:var(--ink-3)}
+    @media (min-width:981px){.fabToday{bottom:88px}}
 
-    /* Clickable reading cards */
+    /* ---------- Cartões de leitura ---------- */
     .readCard{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      padding:10px 10px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.18);
-      cursor:pointer;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .06s ease, filter .15s ease, border-color .15s ease;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+      display:flex;flex-direction:column;gap:7px;
+      padding:14px;
+      border-radius:var(--r2);
+      border:1px solid var(--line);
+      background:var(--surface);
+      cursor:pointer;user-select:none;
+      -webkit-tap-highlight-color:transparent;
+      text-align:left;
+      transition:border-color .15s ease, background .15s ease;
     }
-    .readCard:hover{filter:brightness(1.06); border-color: rgba(122,167,255,0.22);}
-    .readCard:active{transform: translateY(1px)}
+    .readCard:hover{border-color:var(--accent);background:var(--accent-soft)}
     .readCard .lbl{
-      font-size:11px;
-      color:var(--muted);
-      font-weight: 980;
-      letter-spacing:0.4px;
-      text-transform: uppercase;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      font-size:10.5px;color:var(--ink-3);font-weight:600;
+      letter-spacing:.08em;text-transform:uppercase;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
     }
-    .readCard .txt{
-      font-weight: 900;
-      line-height:1.25;
-      font-size:13px;
-    }
+    .readCard .txt{font-family:var(--serif);font-weight:500;line-height:1.35;font-size:15px}
     .readCard .openTag{
-      font-size:11px;
-      color:var(--text);
-      border:1px solid rgba(122,167,255,0.24);
-      background: rgba(122,167,255,0.10);
-      padding:4px 8px;
-      border-radius:999px;
-      white-space:nowrap;
-      font-weight: 950;
+      font-size:10.5px;color:var(--accent);
+      border:1px solid var(--line);background:var(--surface);
+      padding:3px 8px;border-radius:999px;white-space:nowrap;font-weight:600;
+      letter-spacing:.02em;text-transform:none;
     }
-    .readCard.disabled{
-      opacity:0.55;
-      cursor:not-allowed;
-      box-shadow:none;
-    }
+    .readCard.disabled,.readCard.disabledClass{opacity:.45;cursor:not-allowed}
+    .readCard.disabled:hover{border-color:var(--line);background:var(--surface)}
 
-    /* Monthly calendar (B - moderno e limpo) */
+    /* ---------- Calendário mensal ---------- */
     .monthCal{
-      margin: 10px 0 12px 0;
-      border-radius: var(--radius);
-      border:1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.14);
+      margin:16px 0;
+      border-radius:var(--r2);
+      border:1px solid var(--line);
+      background:var(--surface);
       overflow:hidden;
-      box-shadow: var(--shadow2);
     }
     .monthCalHead{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap:0;
-      border-bottom:1px solid rgba(255,255,255,0.07);
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      display:grid;grid-template-columns:repeat(7,1fr);
+      border-bottom:1px solid var(--line);
+      background:var(--surface-2);
     }
     .monthCalHead div{
-      padding:10px 8px;
-      text-align:center;
-      font-size:11px;
-      color: var(--muted);
-      font-weight: 980;
-      letter-spacing:0.6px;
-      text-transform: uppercase;
+      padding:11px 8px;text-align:center;
+      font-size:10.5px;color:var(--ink-3);font-weight:600;
+      letter-spacing:.08em;text-transform:uppercase;
     }
-    .monthCalGrid{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap:8px;
-      padding:10px;
-    }
+    .monthCalGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:10px}
 
-    .dayBlank{
-      border:0;
-      margin:0;
-      background: transparent;
-      min-height: 56px;
-      opacity:0.15;
-    }
+    .dayBlank{border:0;margin:0;background:transparent;min-height:52px}
 
     .dayBtn{
-      position: relative;
-      min-height: 56px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      color: var(--text);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight: 980;
-      font-size: 15px;
+      position:relative;min-height:52px;
+      border-radius:var(--r1);
+      border:1px solid transparent;
+      background:transparent;color:var(--ink);
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--ui);
+      font-size:15px;font-weight:500;
+      font-variant-numeric:tabular-nums;
       cursor:pointer;
-      -webkit-tap-highlight-color: transparent;
-      transition: background .15s ease, transform .08s ease, border-color .15s ease, filter .15s ease;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.16);
+      -webkit-tap-highlight-color:transparent;
+      transition:background .15s ease, border-color .15s ease;
     }
-    .dayBtn:hover{
-      background: rgba(122,167,255,0.08);
-      border-color: rgba(122,167,255,0.18);
-      filter: brightness(1.04);
-    }
-    .dayBtn:active{ transform: translateY(1px); }
+    .dayBtn:hover{background:var(--surface-2);border-color:var(--line-strong)}
 
     .dayBtn.today{
-      outline:2px solid rgba(255,204,102,0.6);
-      outline-offset:-2px;
-      box-shadow: 0 0 14px rgba(255,204,102,0.22), 0 10px 22px rgba(0,0,0,0.16);
-      background: rgba(255,204,102,0.05);
+      border-color:var(--ink);
+      font-weight:700;
     }
 
-    .dayBtn .dNum{ line-height:1; }
-
+    .dayBtn .dNum{line-height:1}
     .dayBtn .dDot{
-      position:absolute;
-      bottom:8px;
-      right:8px;
-      width:9px;
-      height:9px;
-      border-radius:999px;
-      background: rgba(255,255,255,0.22); /* pendente */
-      border:1px solid rgba(255,255,255,0.10);
+      position:absolute;bottom:7px;left:50%;transform:translateX(-50%);
+      width:5px;height:5px;border-radius:999px;
+      background:var(--line-strong);
     }
-    .dayBtn.done .dDot{
-      background: rgba(46,229,157,0.95);
-      border-color: rgba(46,229,157,0.25);
-      box-shadow: 0 0 10px rgba(46,229,157,0.18);
-    }
-    .dayBtn.late .dDot{
-      background: rgba(255,107,107,0.95);
-      border-color: rgba(255,107,107,0.25);
-      box-shadow: 0 0 10px rgba(255,107,107,0.18);
-    }
+    .dayBtn.done{background:var(--green-soft)}
+    .dayBtn.done .dDot{background:var(--green)}
+    .dayBtn.late{background:var(--accent-soft)}
+    .dayBtn.late .dDot{background:var(--accent)}
 
-
-
-    /* Plano do dia (abaixo do calendário) - sem tabela para não parecer "2 calendários" */
+    /* ---------- Plano do dia ---------- */
     .dayPlan{
-      margin: 12px 0 0 0;
-      padding: 12px;
-      border-radius: var(--radius);
-      border:1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.16);
-      box-shadow: var(--shadow2);
+      margin-top:16px;padding:20px;
+      border-radius:var(--r2);
+      border:1px solid var(--line);
+      background:var(--surface-2);
     }
     .dayPlanHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-      flex-wrap:wrap;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:12px;margin-bottom:16px;flex-wrap:wrap;
     }
     .dayPlanHead .title{
-      font-weight: 980;
-      letter-spacing:.2px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
+      font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:-.01em;
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
     }
-    .dayPlanGrid{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-    }
-    @media (max-width: 980px){
-      .dayPlanGrid{ grid-template-columns: 1fr; }
-    }
+    .dayPlanGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    @media (max-width:980px){.dayPlanGrid{grid-template-columns:1fr}}
+
     .dayBlock{
-      border-radius: 16px;
-      border:1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      padding: 12px;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.14);
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      min-height: 126px;
+      border-radius:var(--r2);
+      border:1px solid var(--line);
+      background:var(--surface);
+      padding:16px;
+      display:flex;flex-direction:column;gap:12px;
+      min-height:120px;
     }
     .dayBlock .h{
-      font-size:11px;
-      color: var(--muted);
-      font-weight: 980;
-      letter-spacing:0.6px;
-      text-transform: uppercase;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      font-size:10.5px;color:var(--ink-3);font-weight:600;
+      letter-spacing:.08em;text-transform:uppercase;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
     }
     .dayBlock .t{
-      font-weight: 980;
-      line-height:1.25;
-      font-size: 14px;
-      flex:1;
+      font-family:var(--serif);font-weight:500;line-height:1.35;font-size:16px;flex:1;
     }
     .btnOpen{
-      padding: 10px 12px;
-      border-radius: 12px;
-      border:1px solid rgba(122,167,255,0.22);
-      background: rgba(122,167,255,0.10);
-      color: var(--text);
-      font-weight: 980;
-      cursor:pointer;
-      width:100%;
+      padding:9px 14px;border-radius:var(--r1);
+      border:1px solid var(--line-strong);
+      background:var(--surface);color:var(--ink);
+      font-family:var(--ui);font-size:13px;font-weight:600;
+      cursor:pointer;width:100%;
     }
-    .btnOpen:hover{ filter:brightness(1.06); }
-    .btnOpen:active{ transform: translateY(1px); }
+    .btnOpen:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
 
-    .dayMeta{
-      margin-top: 12px;
-      display:grid;
-      grid-template-columns: 220px 1fr;
-      gap:10px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .dayMeta{ grid-template-columns: 1fr; }
-    }
-    .dayMeta textarea.note{ min-height: 86px; }
+    .dayMeta{margin-top:16px;display:grid;grid-template-columns:220px 1fr;gap:14px;align-items:start}
+    @media (max-width:980px){.dayMeta{grid-template-columns:1fr}}
+    .dayMeta textarea.note{min-height:86px}
 
-    /* Esconde a tabela mensal antiga (para não parecer 2 calendários) */
-    .tableWrap{ display:none !important; }
-
-
-    /* row pulse highlight when jumping */
     @keyframes pulseRing{
-      0%{ box-shadow: 0 0 0 0 rgba(255,204,102,0.0); }
-      25%{ box-shadow: 0 0 0 6px rgba(255,204,102,0.14); }
-      55%{ box-shadow: 0 0 0 12px rgba(255,204,102,0.10); }
-      100%{ box-shadow: 0 0 0 0 rgba(255,204,102,0.0); }
+      0%{box-shadow:0 0 0 0 var(--accent-soft)}
+      50%{box-shadow:0 0 0 8px var(--accent-soft)}
+      100%{box-shadow:0 0 0 0 transparent}
     }
-    tr.pulse{ animation: pulseRing 900ms ease-out; }
+    tr.pulse,.pulse{animation:pulseRing 900ms ease-out}
 
-    /* Leitor bíblico interno (texto via API) */
-    .readerModal{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:12px;backdrop-filter: blur(6px);}
-    .readerModal.open{display:flex;}
-    .readerSheet{width:min(900px,100%);height:90vh;background:rgba(10,12,16,.96);border-radius:18px;border:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,.5);overflow:hidden;}
-    .readerTop{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.1);}
-    .readerRef{margin:10px 0 12px 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:rgba(220,235,255,.95);font-size:13px;line-height:1.4;}
-    .readerTitle{font-weight:980;}
-    .readerActions{display:flex;gap:8px;}
-    .readerBtn{border-radius:12px;padding:8px 12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font-weight:980;}
-    .readerBtn:hover{filter:brightness(1.06);border-color: rgba(122,167,255,.22);background: rgba(122,167,255,.10);}
-    .readerBtn:disabled{opacity:.45;cursor:not-allowed;filter:none;}
+    /* ===========================================================
+       LEITOR — o coração do app.
+       Medida controlada, serifa grande, zero enfeite.
+       =========================================================== */
+    .readerModal{
+      position:fixed;inset:0;z-index:3000;
+      background:rgba(23,19,15,.5);
+      display:none;align-items:center;justify-content:center;
+      padding:16px;
+      backdrop-filter:blur(3px);
+    }
+    .readerModal.open{display:flex}
+    .readerSheet{
+      width:min(820px,100%);height:92vh;
+      background:var(--paper);
+      border-radius:var(--r3);
+      border:1px solid var(--line);
+      display:flex;flex-direction:column;
+      box-shadow:0 24px 60px rgba(0,0,0,.28);
+      overflow:hidden;
+    }
+    .readerTop{
+      padding:12px 16px;
+      display:flex;justify-content:space-between;align-items:center;gap:12px;
+      border-bottom:1px solid var(--line);
+      background:var(--surface);
+      flex-wrap:wrap;
+    }
+    .readerTitle{
+      font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink-2);
+    }
+    .readerActions{display:flex;gap:6px;flex-wrap:wrap}
+    .readerBtn{
+      border-radius:var(--r1);padding:7px 12px;
+      border:1px solid var(--line);
+      background:var(--surface);color:var(--ink);
+      font-family:var(--ui);font-size:12.5px;font-weight:600;
+      cursor:pointer;
+      transition:background .15s ease, border-color .15s ease;
+    }
+    .readerBtn:hover{background:var(--surface-2);border-color:var(--ink-3)}
+    .readerBtn:disabled{opacity:.35;cursor:not-allowed;background:var(--surface)}
+    .readerBtn.danger{color:var(--accent)}
+    .readerBtn.danger:hover{background:var(--accent-soft);border-color:var(--accent)}
 
-    .readerBtn.danger:hover{border-color: rgba(255,107,107,.28);background: rgba(255,107,107,.12);}
-    .readerBody{padding:14px;overflow-y:auto;line-height:1.7;font-size:16px;}
-    .readerLoading{color:#aaa;font-style:italic;}
-    .readerError{margin:10px 0 12px 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,107,107,.25);background:rgba(255,107,107,.10);color: rgba(255,220,220,.95);font-size:13px;line-height:1.5;white-space:pre-wrap;}
-    .readerText p{margin-bottom:10px;}
-    
-    .readerRef{margin:10px 0 12px 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:rgba(220,235,255,.95);font-size:13px;line-height:1.4;}
-    .readerTools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 12px 0;}
-    .readerSearch{flex:1;min-width:220px;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:rgba(240,248,255,.98);outline:none;font-weight:700;}
-    .readerSearch::placeholder{color:rgba(200,210,225,.55);font-weight:700;}
-    .readerSearch:focus{border-color:rgba(122,167,255,.32);background:rgba(122,167,255,.08);}
-    .verse{padding:8px 10px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);cursor:pointer;transition:transform .05s ease, filter .12s ease, background .12s ease, border-color .12s ease;}
-    .verse:hover{filter:brightness(1.06);border-color:rgba(122,167,255,.20);}
-    .verse:active{transform:translateY(1px);}
-    .verse b{display:inline-block;min-width:22px;text-align:right;margin-right:8px;}
-    .verse.hl{border-color:rgba(255,215,102,0.35);background:rgba(255,215,102,0.12);box-shadow:0 10px 18px rgba(0,0,0,0.18);}
-    .verse.active{border-color:rgba(122,167,255,.35);background:rgba(122,167,255,.10);}
-    mark.readerMark{padding:0 4px;border-radius:8px;background:rgba(122,167,255,.22);color:rgba(255,255,255,.98);}
+    .readerBody{
+      padding:32px 24px 80px;
+      overflow-y:auto;
+      scroll-behavior:smooth;
+    }
+    .readerTools{
+      display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+      max-width:var(--measure);margin:0 auto 28px;
+    }
+    .readerSearch{
+      flex:1;min-width:200px;
+      padding:10px 13px;border-radius:var(--r1);
+      border:1px solid var(--line-strong);
+      background:var(--surface);color:var(--ink);
+      font-family:var(--ui);font-size:14px;outline:none;
+    }
+    .readerSearch::placeholder{color:var(--ink-3)}
+    .readerSearch:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
-    @media(max-width:980px){.readerSheet{height:95vh;}.readerBody{font-size:17px;}}
+    .readerRef{
+      max-width:var(--measure);margin:0 auto 24px;
+      padding:0 0 18px;
+      border:0;background:none;
+      border-bottom:1px solid var(--line);
+      font-family:var(--serif);
+      font-size:clamp(24px,4vw,32px);
+      font-weight:600;
+      letter-spacing:-.02em;
+      color:var(--ink);
+      line-height:1.15;
+    }
+    .readerLoading{
+      max-width:var(--measure);margin:0 auto;
+      color:var(--ink-3);font-size:14px;font-style:normal;
+    }
+    .readerError{
+      max-width:var(--measure);margin:0 auto 16px;
+      padding:14px 16px;border-radius:var(--r2);
+      border:1px solid var(--accent);border-left-width:3px;
+      background:var(--accent-soft);
+      color:var(--ink);font-size:13.5px;line-height:1.6;white-space:pre-wrap;
+    }
+    .readerText{max-width:var(--measure);margin:0 auto}
 
-    /* Diário do dia (Resumo + Versículo do dia) */
-    .diaryModal{position:fixed;inset:0;z-index:3200;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:12px;backdrop-filter: blur(6px);}
-    .diaryModal.open{display:flex;}
-    .diarySheet{width:min(900px,100%);height:88vh;background:rgba(10,12,16,.96);border-radius:18px;border:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,.5);overflow:hidden;}
-    .diaryTop{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.1);}
-    .diaryTitle{font-weight:980;}
-    .diaryActions{display:flex;gap:8px;}
-    .diaryBody{padding:14px;overflow-y:auto;line-height:1.6;}
-    .diaryRef{margin: 2px 0 10px 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:rgba(220,235,255,.95);font-size:13px;}
-    .diaryLabel{display:block;margin:8px 0 6px 0;color:rgba(235,245,255,.9);font-weight:900;}
-    .diarySummary{width:100%;resize:vertical;min-height:90px;padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:rgba(240,248,255,.98);outline:none;font-weight:700;}
-    .diarySummary:focus{border-color:rgba(122,167,255,.32);background:rgba(122,167,255,.08);}
-    .diaryDivider{height:1px;background:rgba(255,255,255,.10);margin:14px 0;}
-    .diaryRow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;}
-    .diaryRowTitle{font-weight:980;}
-    .diaryHint{color:rgba(200,210,225,.70);font-size:13px;margin-bottom:10px;}
-    .diaryVerses{display:flex;flex-direction:column;gap:10px;}
-    .diaryVerse{padding:12px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);cursor:pointer;}
-    .diaryVerse:hover{filter:brightness(1.06);border-color:rgba(122,167,255,.20);}
-    .diaryVerse.selected{border-color:rgba(255,215,102,0.40);background:rgba(255,215,102,0.10);}
-    .diaryVerseTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
-    .diaryVerseRef{font-weight:980;}
-    .diaryVerseText{color:rgba(240,248,255,.92);margin-top:6px;white-space:pre-wrap;}
-    @media(max-width:980px){.diarySheet{height:95vh;}}
+    .verse{
+      margin:0;
+      padding:3px 10px 3px 8px;
+      border:0;border-radius:6px;
+      background:none;
+      font-family:var(--serif);
+      font-size:19px;
+      line-height:1.78;
+      color:var(--ink);
+      cursor:pointer;
+      transition:background .12s ease;
+    }
+    .verse:hover{background:var(--surface-2)}
+    .verse:active{transform:none}
+    .verse b{
+      display:inline-block;min-width:0;
+      margin-right:7px;
+      font-family:var(--ui);
+      font-size:11px;font-weight:600;
+      color:var(--accent);
+      vertical-align:.42em;
+      text-align:left;
+      font-variant-numeric:tabular-nums;
+    }
+    .verse.hl{
+      background:var(--gold-soft);
+      box-shadow:inset 3px 0 0 var(--gold);
+    }
+    .verse.active{box-shadow:inset 3px 0 0 var(--line-strong)}
+    .verse.hl.active{box-shadow:inset 3px 0 0 var(--gold)}
+    mark.readerMark{
+      padding:1px 3px;border-radius:3px;
+      background:var(--gold-soft);
+      box-shadow:0 0 0 1px var(--gold) inset;
+      color:inherit;
+    }
 
+    @media(max-width:980px){
+      .readerSheet{height:100vh;border-radius:0;border:0;width:100%}
+      .readerModal{padding:0}
+      .readerBody{padding:24px 18px 80px}
+      .verse{font-size:19px;line-height:1.8}
+    }
 
+    /* ---------- Diário ---------- */
+    .diaryModal{
+      position:fixed;inset:0;z-index:3200;
+      background:rgba(23,19,15,.5);
+      display:none;align-items:center;justify-content:center;padding:16px;
+      backdrop-filter:blur(3px);
+    }
+    .diaryModal.open{display:flex}
+    .diarySheet{
+      width:min(720px,100%);height:min(88vh,760px);
+      background:var(--paper);
+      border-radius:var(--r3);
+      border:1px solid var(--line);
+      display:flex;flex-direction:column;
+      box-shadow:0 24px 60px rgba(0,0,0,.28);
+      overflow:hidden;
+    }
+    .diaryTop{
+      padding:12px 16px;
+      display:flex;justify-content:space-between;align-items:center;gap:12px;
+      border-bottom:1px solid var(--line);
+      background:var(--surface);
+    }
+    .diaryTitle{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink-2)}
+    .diaryActions{display:flex;gap:6px}
+    .diaryBody{padding:24px;overflow-y:auto}
+    .diaryRef{
+      margin:0 0 20px;padding:0 0 16px;
+      border:0;background:none;
+      border-bottom:1px solid var(--line);
+      font-family:var(--serif);font-size:24px;font-weight:600;
+      letter-spacing:-.01em;color:var(--ink);
+    }
+    .diaryLabel{
+      display:block;margin:0 0 8px;
+      font-size:11px;color:var(--ink-3);font-weight:600;
+      letter-spacing:.07em;text-transform:uppercase;
+    }
+    .diarySummary{
+      width:100%;resize:vertical;min-height:110px;
+      padding:14px;border-radius:var(--r2);
+      border:1px solid var(--line-strong);
+      background:var(--surface);color:var(--ink);
+      font-family:var(--serif);font-size:16px;line-height:1.65;font-weight:400;
+      outline:none;
+    }
+    .diarySummary::placeholder{color:var(--ink-3);font-family:var(--ui);font-size:14px}
+    .diarySummary:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+    .diaryDivider{height:1px;background:var(--line);margin:26px 0 20px}
+    .diaryRow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
+    .diaryRowTitle{font-family:var(--serif);font-size:16px;font-weight:600}
+    .diaryHint{color:var(--ink-3);font-size:13px;line-height:1.55;margin-bottom:14px}
+    .diaryVerses{display:flex;flex-direction:column;gap:10px}
+    .diaryVerse{
+      padding:14px 16px;border-radius:var(--r2);
+      border:1px solid var(--line);
+      background:var(--surface);cursor:pointer;
+      transition:border-color .15s ease, background .15s ease;
+    }
+    .diaryVerse:hover{border-color:var(--ink-3)}
+    .diaryVerse.selected{border-color:var(--gold);background:var(--gold-soft)}
+    .diaryVerseTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .diaryVerseRef{
+      font-family:var(--ui);font-size:11px;font-weight:600;
+      letter-spacing:.06em;text-transform:uppercase;color:var(--accent);
+    }
+    .diaryVerseText{
+      font-family:var(--serif);font-size:16px;line-height:1.6;
+      color:var(--ink);margin-top:8px;white-space:pre-wrap;
+    }
+    @media(max-width:980px){
+      .diarySheet{height:100vh;border-radius:0;border:0;width:100%}
+      .diaryModal{padding:0}
+    }
 
-    /* Mobile bottom bar */
+    /* ---------- Barra fixa ---------- */
     .actionBar{
-      position:fixed;left:0; right:0; bottom:0;
-      padding:10px 12px 14px 12px;
-      background: rgba(7,10,16,0.90);
-      border-top: 1px solid rgba(255,255,255,0.10);
-      backdrop-filter: blur(12px);
+      position:fixed;left:0;right:0;bottom:0;
+      padding:12px 20px calc(12px + env(safe-area-inset-bottom));
+      background:var(--surface);
+      border-top:1px solid var(--line);
       z-index:999;
     }
     .actionBar .wrap{
-      max-width:1100px;margin:0 auto;
-      display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+      max-width:1080px;margin:0 auto;
+      display:flex;gap:10px;align-items:center;justify-content:flex-start;flex-wrap:wrap;
     }
-    .actionBar .btnBig{
-      flex:1;min-width: 190px;
-      padding:15px 14px;border-radius:16px;font-size:14px;
-    }
+    .actionBar .btnBig{flex:1;min-width:180px;padding:13px 18px;font-size:14px}
     .actionBar .hint{
-      width:100%;
-      margin-top:6px;
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.35;
-      opacity:0.95;
+      width:100%;margin-top:8px;
+      font-size:12.5px;color:var(--ink-2);line-height:1.5;
     }
-    @media (min-width: 981px){
-      main{padding-bottom:140px;}
-      .actionBar{padding:8px 12px 10px 12px;}
-      .actionBar .btnBig{max-width: 380px;flex:0 1 auto;padding:12px 14px;}
+    @media (min-width:981px){
+      main{padding-bottom:150px}
+      .actionBar .btnBig{max-width:300px;flex:0 1 auto}
+      .actionBar .hint{width:auto;margin-top:0;margin-left:8px;flex:1}
     }
-  
-    /* Popup mês liberado */
-    .unlockModal{position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;
-      background:rgba(0,0,0,.65);backdrop-filter:blur(6px)}
+
+    /* ---------- Popup de mês ---------- */
+    .unlockModal{
+      position:fixed;inset:0;z-index:4000;
+      display:none;align-items:center;justify-content:center;
+      background:rgba(23,19,15,.5);backdrop-filter:blur(3px);
+      padding:20px;
+    }
     .unlockModal.open{display:flex}
-    .unlockBox{background:rgba(15,18,24,.98);border-radius:22px;padding:22px 24px;
-      border:1px solid rgba(255,255,255,.15);text-align:center;max-width:420px;width:90%;
-      box-shadow:0 30px 70px rgba(0,0,0,.6)}
-    .unlockTitle{font-size:22px;font-weight:900;margin-bottom:12px}
-    .unlockBody{font-size:15px;line-height:1.6;margin-bottom:18px;color:rgba(235,245,255,.95)}
+    .unlockBox{
+      background:var(--surface);
+      border-radius:var(--r3);
+      padding:36px 32px 28px;
+      border:1px solid var(--line);
+      text-align:center;max-width:400px;width:100%;
+      box-shadow:0 24px 60px rgba(0,0,0,.28);
+    }
+    .unlockTitle{
+      font-family:var(--serif);
+      font-size:26px;font-weight:600;margin-bottom:12px;letter-spacing:-.01em;
+    }
+    .unlockBody{font-size:15px;line-height:1.65;margin-bottom:24px;color:var(--ink-2)}
+    .unlockBody b{color:var(--ink);font-weight:600}
+    .unlockBox .readerBtn{padding:11px 24px;font-size:14px}
 </style>
 
 </head>
@@ -740,43 +888,17 @@
   <div class="readerModal" id="readerModal" aria-hidden="true">
     <div class="readerSheet" role="dialog" aria-modal="true" aria-label="Leitura bíblica">
       <div class="readerTop">
-        <div class="readerTitle">📖 Leitura bíblica</div>
+        <div class="readerTitle">Leitura bíblica</div>
         <div class="readerActions">
-          <button class="readerBtn" id="readerPlanPrevBtn" type="button" title="Voltar no plano">◀ Plano</button>
-          <button class="readerBtn" id="readerPlanNextBtn" type="button" title="Avançar no plano">Plano ▶</button>
-          <button class="readerBtn" id="readerDoneBtn" type="button" title="Marcar dia como concluído">Concluir dia ✅</button>
+          <button class="readerBtn" id="readerPlanPrevBtn" type="button" title="Voltar no plano">Anterior</button>
+          <button class="readerBtn" id="readerPlanNextBtn" type="button" title="Avançar no plano">Próximo</button>
+          <button class="readerBtn" id="readerDiaryBtn" type="button" title="Abrir o diário deste dia">Diário</button>
+          <button class="readerBtn" id="readerDoneBtn" type="button" title="Marcar dia como concluído">Concluir dia</button>
           <button class="readerBtn" id="readerExternalBtn" type="button">Abrir externo</button>
-          <button class="readerBtn danger" id="readerCloseBtn" type="button">Fechar ✕</button>
+          <button class="readerBtn danger" id="readerCloseBtn" type="button">Fechar</button>
         </div>
       </div>
 
-  <!-- Diário do dia (Resumo + Versículo do dia) -->
-  <div class="diaryModal" id="diaryModal" aria-hidden="true">
-    <div class="diarySheet" role="dialog" aria-modal="true" aria-label="Diário do dia">
-      <div class="diaryTop">
-        <div class="diaryTitle">📌 Diário do dia</div>
-        <div class="diaryActions">
-          <button class="readerBtn" id="diarySaveBtn" type="button">Salvar</button>
-          <button class="readerBtn danger" id="diaryCloseBtn" type="button">Fechar ✕</button>
-        </div>
-      </div>
-      <div class="diaryBody">
-        <div class="diaryRef" id="diaryRef">Dia —</div>
-        <label class="diaryLabel" for="diarySummary">Resumo rápido (2–3 linhas)</label>
-        <textarea id="diarySummary" class="diarySummary" rows="3" placeholder="Ex.: O que Deus falou comigo hoje? O que aprendi? Como aplicar?"></textarea>
-
-        <div class="diaryDivider"></div>
-
-        <div class="diaryRow">
-          <div class="diaryRowTitle">🔖 Versículo do dia (a partir dos seus destaques)</div>
-          <button class="readerBtn" id="diaryRefreshBtn" type="button" title="Atualizar lista de destaques">Atualizar</button>
-        </div>
-        <div class="diaryHint" id="diaryHint">Dica: destaque versículos no leitor (clicando no verso) e depois selecione aqui.</div>
-
-        <div class="diaryVerses" id="diaryVerses"></div>
-      </div>
-    </div>
-  </div>
       <div class="readerBody">
         <div class="readerTools">
           <input id="readerSearch" class="readerSearch" type="search" placeholder="Buscar no capítulo (ex.: fé, Deus, amor)..." autocomplete="off" />
@@ -791,6 +913,34 @@
     </div>
   </div>
 
+  <!-- Diário do dia (Resumo + Versículo do dia) -->
+  <div class="diaryModal" id="diaryModal" aria-hidden="true">
+    <div class="diarySheet" role="dialog" aria-modal="true" aria-label="Diário do dia">
+      <div class="diaryTop">
+        <div class="diaryTitle">Diário do dia</div>
+        <div class="diaryActions">
+          <button class="readerBtn" id="diarySaveBtn" type="button">Salvar</button>
+          <button class="readerBtn danger" id="diaryCloseBtn" type="button">Fechar</button>
+        </div>
+      </div>
+      <div class="diaryBody">
+        <div class="diaryRef" id="diaryRef">Dia —</div>
+        <label class="diaryLabel" for="diarySummary">Resumo rápido (2–3 linhas)</label>
+        <textarea id="diarySummary" class="diarySummary" rows="3" placeholder="Ex.: O que Deus falou comigo hoje? O que aprendi? Como aplicar?"></textarea>
+
+        <div class="diaryDivider"></div>
+
+        <div class="diaryRow">
+          <div class="diaryRowTitle">Versículo do dia</div>
+          <button class="readerBtn" id="diaryRefreshBtn" type="button" title="Atualizar lista de destaques">Atualizar</button>
+        </div>
+        <div class="diaryHint" id="diaryHint">Dica: destaque versículos no leitor (clicando no verso) e depois selecione aqui.</div>
+
+        <div class="diaryVerses" id="diaryVerses"></div>
+      </div>
+    </div>
+  </div>
+
 
 <header>
   <div class="hero">
@@ -798,14 +948,14 @@
       <div>
         <h1>Plano de Leitura 2026</h1>
         <p class="subtitle">
-          Plano fixo inicia em <b>01/01/2026</b>. Se você começou depois, o site mostra seu <b>atraso</b> e ajuda a recuperar.
+          O plano começa em <b>01/01/2026</b>. Se você entrou depois, o site calcula quantos dias faltam e monta o pacote para recuperar.
         </p>
       </div>
       <div class="chips">
-        <span class="chip ok">✅ Salva automático</span>
-        <span class="chip warn">📅 2026</span>
-        <span class="chip" id="chipPlan">📖 Plano: —</span>
-        <span class="chip danger" id="chipLate" style="display:none;">⚠️ Atraso: —</span>
+        <span class="chip ok">Salva automático</span>
+        <span class="chip" id="chipPlan">Plano: —</span>
+        <span class="chip danger" id="chipLate" style="display:none;">Atraso: —</span>
+        <button class="themeBtn" id="themeBtn" type="button" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">◐</button>
       </div>
     </div>
   </div>
@@ -814,7 +964,7 @@
 <main>
   <div class="grid">
     <section class="card">
-      <h2>⚙️ Configuração</h2>
+      <h2>Configuração</h2>
 
       <div class="row">
         <div>
@@ -857,7 +1007,7 @@
         <div class="kpi">
           <div class="kpiHead">
             <div class="k">Dias consecutivos</div>
-            <div class="kbd">🔥 streak</div>
+            <div class="kbd">sequência</div>
           </div>
           <div class="v" id="streakText">0</div>
           <div class="sub" id="streakSub">Marque a leitura de hoje para iniciar a sequência.</div>
@@ -867,7 +1017,7 @@
       <div class="guidedBox">
         <div class="guidedTop">
           <div>
-            <p class="guidedTitle">📖 Leitura guiada (1 aba)</p>
+            <p class="guidedTitle">Leitura guiada</p>
             <div class="guidedMeta">
               “Iniciar” abre 1 aba. “Colocar em dia” abre um pacote maior para recuperar atraso.
             </div>
@@ -882,11 +1032,11 @@
         <div class="notice" id="guidedNotice"></div>
 
         <div class="guidedControls">
-          <button class="warn" id="guidedStartBtn">📖 Iniciar (1 aba)</button>
-          <button class="danger" id="catchUpBtn">⏩ Colocar em dia (atraso)</button>
-          <button class="secondary" id="guidedPrevBtn">⬅️ Capítulo anterior</button>
-          <button class="secondary" id="guidedNextBtn">Próximo capítulo ➡️</button>
-          <button class="ok" id="guidedFinishBtn">✅ Finalizei a leitura de hoje</button>
+          <button class="warn" id="guidedStartBtn">Começar a leitura</button>
+          <button class="danger" id="catchUpBtn">Colocar em dia</button>
+          <button class="secondary" id="guidedPrevBtn">Capítulo anterior</button>
+          <button class="secondary" id="guidedNextBtn">Próximo capítulo</button>
+          <button class="ok" id="guidedFinishBtn">Marcar hoje como lido</button>
         </div>
 
         <div class="tiny" style="margin-top:10px">
@@ -896,32 +1046,40 @@
     </section>
 
     <section class="card">
-      <h2>✨ Dicas rápidas</h2>
+      <h2>Como usar</h2>
       
       <div class="tiny" style="line-height:1.85">
         <div style="display:grid; gap:10px">
-          <div><b>📅 Ir para hoje:</b> use o botão flutuante <span class="kbd">“Ir para hoje”</span> para pular direto para a leitura do dia.</div>
-          <div><b>🧩 Cards clicáveis:</b> toque em cada card de leitura do dia (AT/NT/etc.) para abrir o <b>capítulo</b> direto na Bíblia Online.</div>
-          <div><b>🗓️ Visão mensal:</b> cada mês agora tem um <b>calendário</b>. Toque no dia para ir para a linha dele e marcar como feito.</div>
-          <div><b>⏩ Atraso:</b> se estiver atrasado, o topo mostra quantos dias faltam e o botão <span class="kbd">“Colocar em dia”</span> abre o pacote acumulado.</div>
+          <div><b>Ir para hoje.</b> use o botão flutuante <span class="kbd">“Ir para hoje”</span> para pular direto para a leitura do dia.</div>
+          <div><b>Cartões de leitura.</b> toque em cada card de leitura do dia (AT/NT/etc.) para abrir o <b>capítulo</b> direto na Bíblia Online.</div>
+          <div><b>Visão mensal.</b> cada mês agora tem um <b>calendário</b>. Toque no dia para ir para a linha dele e marcar como feito.</div>
+          <div><b>Atraso.</b> se estiver atrasado, o topo mostra quantos dias faltam e o botão <span class="kbd">“Colocar em dia”</span> abre o pacote acumulado.</div>
         </div>
       </div>
-    </div>
     </section>
   </div>
 
   <div id="months"></div>
 </main>
 
-<button class="fabToday" id="fabToday" title="Ir para a leitura de hoje">📅 Ir para hoje</button>
+<button class="fabToday" id="fabToday" title="Ir para a leitura de hoje">Ir para hoje</button>
 
 <div class="actionBar">
   <div class="wrap">
-    <button class="btnBig warn" id="startTodayReadingBtn">📖 Iniciar leitura de hoje</button>
-    <button class="btnBig ok" id="finishTodayBtn">✅ Finalizei a leitura de hoje</button>
+    <button class="btnBig warn" id="startTodayReadingBtn">Começar a leitura de hoje</button>
+    <button class="btnBig ok" id="finishTodayBtn">Marcar hoje como lido</button>
     <div class="hint" id="todayHint">Hoje: —</div>
   </div>
 </div>
+
+  <!-- Popup Mês Liberado -->
+  <div class="unlockModal" id="monthUnlockModal" aria-hidden="true">
+    <div class="unlockBox">
+      <div class="unlockTitle">Mês concluído</div>
+      <div class="unlockBody" id="unlockBody"></div>
+      <button class="readerBtn" id="unlockCloseBtn">Continuar</button>
+    </div>
+  </div>
 
 <script>
   const YEAR = 2026;
@@ -1002,6 +1160,7 @@
     const bb = new Date(b.getFullYear(),b.getMonth(),b.getDate()).getTime();
     return Math.floor((bb-aa)/ms);
   }
+  function todayKeyNow(){ return ymd(new Date()); }
   function totalChapters(list){ return list.reduce((acc,[,c])=>acc+c,0); }
   function chapterAt(globalIndex, list){
     let idx = globalIndex;
@@ -1247,7 +1406,7 @@
 
     const late = getLateDays(state);
     if (late <= 0){
-      alert("Você está em dia! ✅");
+      alert("Você está em dia.");
       return;
     }
 
@@ -1261,7 +1420,7 @@
         break;
       }
     }
-    if (!firstMissing) return alert("Você está em dia! ✅");
+    if (!firstMissing) return alert("Você está em dia.");
 
     const pack = [];
     for (let d = new Date(firstMissing); d <= today; d.setDate(d.getDate()+1)){
@@ -1325,7 +1484,7 @@
     if (!p?.active){ hint.textContent = "Hoje está fora do período do plano."; return; }
     const done = !!state.days?.[key]?.done;
     const text = (p.blocks || []).map(b => `${b.label}: ${b.text}`).join(" • ");
-    hint.textContent = `Hoje: ${text}${done ? " ✅" : ""}`;
+    hint.textContent = `Hoje: ${text}${done ? " · concluído" : ""}`;
   }
 
   
@@ -1354,18 +1513,18 @@
 
     // frases base por cenário
     if (late > 0){
-      return `🕊️ <b>Mesmo com alguns dias de atraso, você não parou.</b><br>
+      return `<b>Mesmo com alguns dias de atraso, você não parou.</b><br>
       Você já avançou em <b>${booksCount}</b> livro(s) e leu <b>${chapters}</b> capítulo(s).<br>
       Deus trabalha na constância — recomeçar também faz parte da caminhada.`;
     }
 
     if (daysDone >= 20){
-      return `📖 <b>Você já caminhou por muitos textos das Escrituras.</b><br>
+      return `<b>Você já caminhou por muitos textos das Escrituras.</b><br>
       Até aqui, foram <b>${booksCount}</b> livro(s) e <b>${chapters}</b> capítulo(s).<br>
       Persevere — um dia de cada vez, Deus vai falando ao coração.`;
     }
 
-    return `🌱 <b>Você está indo bem até aqui.</b><br>
+    return `<b>Você está indo bem até aqui.</b><br>
     Já são <b>${chapters}</b> capítulo(s) lidos em <b>${booksCount}</b> livro(s).<br>
     Continue firme — a Palavra cria raízes na constância.`;
   }
@@ -1403,12 +1562,12 @@ function updateLateUI(state){
 
     const late = getLateDays(state);
     if (late > 0){
-      lateEl.textContent = `⚠️ Você está ${late} dia(s) atrasado. Use “Colocar em dia” para abrir a leitura acumulada.`;
+      lateEl.textContent = `Você está ${late} dia(s) atrasado. Use “Colocar em dia” para abrir a leitura acumulada.`;
       lateEl.classList.add("show");
       catchUpBtn.disabled = false;
 
       chipLate.style.display = "inline-flex";
-      chipLate.textContent = `⚠️ Atraso: ${late} dia(s)`;
+      chipLate.textContent = `Atraso: ${late} dia(s)`;
     } else {
       lateEl.classList.remove("show");
       catchUpBtn.disabled = true;
@@ -1457,7 +1616,7 @@ function updateLateUI(state){
     const done = !!state.days?.[key]?.done;
 
     if (!total){
-      nowEl.innerHTML = `Hoje:<br/>${blocksText}${done ? " ✅" : ""}<br/><br/><b>Sem capítulos para navegação.</b>`;
+      nowEl.innerHTML = `Hoje:<br/>${blocksText}${done ? " · concluído" : ""}<br/><br/><b>Sem capítulos para navegação.</b>`;
       stepEl.textContent = "Capítulo 0/0";
       prevBtn.disabled = true;
       nextBtn.disabled = true;
@@ -1476,14 +1635,14 @@ function updateLateUI(state){
       : "";
 
     nowEl.innerHTML =
-      `Hoje:<br/>${blocksText}${done ? " ✅" : ""}<br/>
+      `Hoje:<br/>${blocksText}${done ? " · concluído" : ""}<br/>
        ${packTag ? `<br/>${packTag}<br/>` : `<br/>`}
        Agora: <b>${escapeHtml(cur.book)} ${cur.chapter}</b> • Faltam: <b>${remaining}</b>`;
 
     stepEl.textContent = `Capítulo ${idx+1}/${total}`;
 
     if (idx === total - 1){
-      noticeEl.textContent = "Você está no ÚLTIMO capítulo carregado. Depois de ler, clique “✅ Finalizei a leitura de hoje”.";
+      noticeEl.textContent = "Você está no ÚLTIMO capítulo carregado. Depois de ler, use “Marcar hoje como lido”.";
       noticeEl.classList.add("show");
     } else {
       noticeEl.classList.remove("show");
@@ -1497,7 +1656,7 @@ function updateLateUI(state){
     versionSelectEl.value = state.version;
     planModeEl.value = state.planMode;
 
-    document.getElementById("chipPlan").textContent = `📖 Plano: ${modeLabel(state.planMode)}`;
+    document.getElementById("chipPlan").textContent = `Plano: ${modeLabel(state.planMode)}`;
 
     const plan = buildPlanForYear(state);
     const container = document.getElementById("months");
@@ -1592,10 +1751,10 @@ function updateLateUI(state){
     const controls = document.createElement("div");
     controls.className = "monthControls";
     controls.innerHTML = `
-      <div class="monthControlsLeft"><b>📅 Mês atual:</b> <span class="muted">${monthNames[currentMonthIndex]}</span></div>
+      <div class="monthControlsLeft"><b>Mês atual:</b> <span class="muted">${monthNames[currentMonthIndex]}</span></div>
       <div class="monthControlsRight">
         <button class="miniBtn" id="btnOpenCurrentMonth" type="button">Ir para mês atual</button>
-        <div class="monthUnlock">${unlockedMaxMonth>=11 && isMonthComplete(11) ? "✅ Ano completo!" : "🔓 Conclua o mês para liberar o próximo"}</div>
+        <div class="monthUnlock">${unlockedMaxMonth>=11 && isMonthComplete(11) ? "Ano completo" : "Conclua o mês para liberar o próximo"}</div>
       </div>
     `;
     container.appendChild(controls);
@@ -1622,7 +1781,7 @@ for (let m = 0; m < 12; m++){
       const summary = document.createElement("summary");
       const left = document.createElement("div");
       left.className = "monthTitle";
-      left.textContent = `📌 ${monthNames[m]}`;
+      left.textContent = `${monthNames[m]}`;
 
       const monthStats = document.createElement("div");
       monthStats.className = "badge";
@@ -1720,7 +1879,7 @@ b.addEventListener("click", ()=>{
 
       const title = document.createElement("div");
       title.className = "title";
-      title.innerHTML = `📌 <span>Plano do dia <b>${dayNum}</b> · <b>${monthName}</b></span> ${
+      title.innerHTML = `<span>Plano do dia <b>${dayNum}</b> · <b>${monthName}</b></span> ${
         doneSel ? `<span class="pill ok">Concluído</span>` :
         (isLateSel ? `<span class="pill late">Atrasado</span>` : `<span class="pill">Pendente</span>`)
       }`;
@@ -1949,7 +2108,7 @@ b.addEventListener("click", ()=>{
 
       const monthTotal = lastDay;
       const pctM = Math.round((monthDone/monthTotal)*100);
-      document.getElementById(`badge-${m}`).textContent = `✅ ${monthDone}/${monthTotal} (${pctM}%)`;
+      document.getElementById(`badge-${m}`).textContent = `${monthDone}/${monthTotal} · ${pctM}%`;
     }
   }
 
@@ -1982,6 +2141,27 @@ b.addEventListener("click", ()=>{
   });
 
   document.getElementById("fabToday").addEventListener("click", goToToday);
+
+  // Tema claro/escuro
+  (function(){
+    const btn = document.getElementById("themeBtn");
+    const meta = document.querySelector('meta[name="theme-color"]');
+    const paint = ()=>{
+      const dark = document.documentElement.getAttribute("data-theme") === "dark";
+      btn.textContent = dark ? "☀" : "☾";
+      btn.title = dark ? "Mudar para tema claro" : "Mudar para tema escuro";
+      btn.setAttribute("aria-label", btn.title);
+      if (meta) meta.setAttribute("content", dark ? "#14110F" : "#FAF8F5");
+    };
+    btn.addEventListener("click", ()=>{
+      const dark = document.documentElement.getAttribute("data-theme") === "dark";
+      const next = dark ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      try{ localStorage.setItem("planoLeitura_tema", next); }catch(e){}
+      paint();
+    });
+    paint();
+  })();
 
   document.getElementById("guidedStartBtn").addEventListener("click", ()=> openGuidedAtIndex(0));
   document.getElementById("catchUpBtn").addEventListener("click", openCatchUpPack);
@@ -2024,38 +2204,6 @@ b.addEventListener("click", ()=>{
   // init
   renderAll();
 
-  // === LEITOR BÍBLICO INTERNO (texto via API) ===
-  function normalizeBookName(str){
-    return (str||"")
-      .toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9 ]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
-  function apiBookName(ptName){
-    const k = normalizeBookName(ptName);
-    const map = {
-      "genesis":"Genesis","exodo":"Exodus","levitico":"Leviticus","numeros":"Numbers","deuteronomio":"Deuteronomy",
-      "josue":"Joshua","juizes":"Judges","rute":"Ruth",
-      "1 samuel":"1 Samuel","2 samuel":"2 Samuel","1 reis":"1 Kings","2 reis":"2 Kings",
-      "1 cronicas":"1 Chronicles","2 cronicas":"2 Chronicles","esdras":"Ezra","neemias":"Nehemiah","ester":"Esther",
-      "jo":"Job","salmos":"Psalms","proverbios":"Proverbs","eclesiastes":"Ecclesiastes","canticos":"Song of Solomon","cantares":"Song of Solomon",
-      "isaias":"Isaiah","jeremias":"Jeremiah","lamentacoes":"Lamentations","ezequiel":"Ezekiel","daniel":"Daniel",
-      "oseias":"Hosea","joel":"Joel","amos":"Amos","obadias":"Obadiah","jonas":"Jonah","miqueias":"Micah",
-      "naum":"Nahum","habacuque":"Habakkuk","sofonias":"Zephaniah","ageu":"Haggai","zacarias":"Zechariah","malaquias":"Malachi",
-      "mateus":"Matthew","marcos":"Mark","lucas":"Luke","joao":"John","atos":"Acts",
-      "romanos":"Romans","1 corintios":"1 Corinthians","2 corintios":"2 Corinthians","galatas":"Galatians","efesios":"Ephesians",
-      "filipenses":"Philippians","colossenses":"Colossians","1 tessalonicenses":"1 Thessalonians","2 tessalonicenses":"2 Thessalonians",
-      "1 timoteo":"1 Timothy","2 timoteo":"2 Timothy","tito":"Titus","filemom":"Philemon",
-      "hebreus":"Hebrews","tiago":"James","1 pedro":"1 Peter","2 pedro":"2 Peter",
-      "1 joao":"1 John","2 joao":"2 John","3 joao":"3 John","judas":"Jude",
-      "apocalipse":"Revelation"
-    };
-    return map[k] || ptName;
-  }
-
-  
   // === LEITOR BÍBLICO INTERNO (bible-api.com /data) — Português (almeida) ===
   function normalizeBookName(str){
     return (str||"")
@@ -2073,6 +2221,7 @@ b.addEventListener("click", ()=>{
 
     // Contexto da leitura atual para navegação no plano
   let currentReadingCtx = null;
+  let readerScrollHandler = null;
 
   function openBibleReader(book, chapter, ctx){
     const modal = document.getElementById("readerModal");
@@ -2102,7 +2251,13 @@ b.addEventListener("click", ()=>{
 
     // Externo: respeita a tradução escolhida no app (ACF/ARA/etc) no BibleOnline
     extBtn.onclick = ()=>{
-      const url = bibleOnlineUrl(st.translation, book, chapter);
+      const stNow = ensureStateDefaults(loadState());
+      const url = bibleOnlineUrl(stNow.version || DEFAULT_VERSION, book, chapter);
+      if (!url){
+        errEl.style.display = "block";
+        errEl.textContent = `Não há link externo para o livro "${book}".`;
+        return;
+      }
       window.open(url, READING_WINDOW_NAME, "noopener,noreferrer");
     };
 
@@ -2110,7 +2265,7 @@ b.addEventListener("click", ()=>{
     if (doneBtn){
       doneBtn.onclick = ()=>{
         const st2 = ensureStateDefaults(loadState());
-        const dayKey = st2.ui?.selectedDay || todayKey;
+        const dayKey = st2.ui?.selectedDay || todayKeyNow();
         st2.days = st2.days || {};
         st2.days[dayKey] = st2.days[dayKey] || {};
         st2.days[dayKey].done = true;
@@ -2251,12 +2406,16 @@ const keyRef = `${book}|${chapter}|${translationId}`;
             const setActive = (vn)=>{
               versesEls.forEach(el=> el.classList.toggle("active", String(el.dataset.verse||"")===String(vn)));
             };
+            let saveLastTimer = null;
             const saveLast = (vn)=>{
-              const st5 = ensureStateDefaults(loadState());
-              st5.reader = st5.reader || {};
-              st5.reader.last = st5.reader.last || {};
-              st5.reader.last[keyRef] = String(vn);
-              saveState(st5);
+              clearTimeout(saveLastTimer);
+              saveLastTimer = setTimeout(()=>{
+                const st5 = ensureStateDefaults(loadState());
+                st5.reader = st5.reader || {};
+                st5.reader.last = st5.reader.last || {};
+                st5.reader.last[keyRef] = String(vn);
+                saveState(st5);
+              }, 400);
             };
 
             let raf = null;
@@ -2276,10 +2435,12 @@ const keyRef = `${book}|${chapter}|${translationId}`;
               }
             };
 
-            bodyEl.addEventListener("scroll", ()=>{
+            if (readerScrollHandler) bodyEl.removeEventListener("scroll", readerScrollHandler);
+            readerScrollHandler = ()=>{
               if (raf) return;
               raf = requestAnimationFrame(computeTopVerse);
-            });
+            };
+            bodyEl.addEventListener("scroll", readerScrollHandler);
 
             // Restaurar último versículo salvo
             const lastVN = st2.reader.last[keyRef];
@@ -2357,11 +2518,24 @@ function closeReader(){
   document.getElementById("readerPlanNextBtn").addEventListener("click", ()=>goPlanDelta(1));
 
   document.getElementById("readerModal").addEventListener("click", (e)=>{ if (e.target.id === "readerModal") closeReader(); });
-  window.addEventListener("keydown", (e)=>{ if (e.key === "Escape" && document.getElementById("readerModal").classList.contains("open")) closeReader(); });
+  window.addEventListener("keydown", (e)=>{
+    if (e.key !== "Escape") return;
+    // fecha primeiro o modal que está por cima
+    if (document.getElementById("diaryModal").classList.contains("open")) return closeDiary();
+    if (document.getElementById("readerModal").classList.contains("open")) return closeReader();
+  });
 
 
   // === DIÁRIO DO DIA (Resumo + Versículo do dia) ===
   let currentDiaryDayKey = null;
+
+  // Blocos de leitura de um dia (usado pelo Diário para achar os destaques do dia)
+  function getPlanForDate(dateKey){
+    const st = ensureStateDefaults(loadState());
+    const plan = buildPlanForYear(st);
+    const p = plan[dateKey];
+    return (p && p.active) ? (p.blocks || []) : [];
+  }
 
   function openDiaryForDay(dateKey){
     const modal = document.getElementById("diaryModal");
@@ -2449,6 +2623,13 @@ function closeReader(){
     modal.setAttribute("aria-hidden","true");
   }
 
+  // Abre o diário do dia que está sendo lido (ou do dia selecionado)
+  document.getElementById("readerDiaryBtn").addEventListener("click", ()=>{
+    const st = ensureStateDefaults(loadState());
+    const dayKey = currentReadingCtx?.dateKey || st.ui?.selectedDay || todayKeyNow();
+    openDiaryForDay(dayKey);
+  });
+
   document.getElementById("diaryCloseBtn").addEventListener("click", closeDiary);
   document.getElementById("diaryModal").addEventListener("click", (e)=>{ if (e.target.id === "diaryModal") closeDiary(); });
 
@@ -2479,7 +2660,7 @@ function closeReader(){
     const modal = document.getElementById("monthUnlockModal");
     const body = document.getElementById("unlockBody");
     const name = monthNames[monthIdx];
-    body.innerHTML = `<b>${name} liberado!</b><br>✅ ${stats.done}/${stats.total} dias concluídos`;
+    body.innerHTML = `<b>${name} liberado!</b><br><b>${stats.done}/${stats.total}</b> dias concluídos`;
     modal.classList.add("open");
     modal.setAttribute("aria-hidden","false");
   }
@@ -2492,9 +2673,9 @@ function closeReader(){
 
   function checkMonthUnlock(prevState, newState){
     if (!prevState || !newState) return;
-    for (let m = 0; m < 11; m++){
+    for (let m = 0; m < 12; m++){
       if (!isMonthCompleteFromState(prevState, m) && isMonthCompleteFromState(newState, m)){
-        showMonthUnlock(m+1, getMonthStats(m, newState));
+        showMonthUnlock(m, getMonthStats(m, newState));
         break;
       }
     }
@@ -2531,14 +2712,6 @@ function closeReader(){
 </script>
 
 
-  <!-- Popup Mês Liberado -->
-  <div class="unlockModal" id="monthUnlockModal" aria-hidden="true">
-    <div class="unlockBox">
-      <div class="unlockTitle">🎉 Mês liberado!</div>
-      <div class="unlockBody" id="unlockBody"></div>
-      <button class="readerBtn" id="unlockCloseBtn">Continuar</button>
-    </div>
-  </div>
 </body>
 
 </html>
