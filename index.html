@@ -1088,6 +1088,38 @@
     </section>
 
     <section class="card">
+      <h2>Devocionais</h2>
+      <div class="tiny" style="margin:-8px 0 14px">
+        Navegue livremente por qualquer devocional já escrito — sem precisar esperar o dia dele chegar no plano.
+      </div>
+
+      <div class="row">
+        <label class="small" style="flex:1 1 200px">
+          Livro
+          <select id="devoBook"></select>
+        </label>
+        <label class="small" style="flex:1 1 140px">
+          Capítulo
+          <select id="devoChapter"></select>
+        </label>
+      </div>
+
+      <div class="devotionalCard" id="devoBrowseCard" style="margin-top:16px">
+        <div class="devotionalKicker" id="devoBrowseRef">—</div>
+        <p class="devotionalTexto" id="devoBrowseTexto"></p>
+        <div class="devotionalPergunta" id="devoBrowsePergunta"></div>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <button class="secondary" id="devoPrevBtn">← Anterior</button>
+        <button class="secondary" id="devoNextBtn">Próximo →</button>
+        <button class="secondary" id="devoReadBtn">Ler o capítulo</button>
+      </div>
+
+      <div class="tiny" id="devoCoverage" style="margin-top:12px;opacity:.75"></div>
+    </section>
+
+    <section class="card">
       <h2>Como usar</h2>
       
       <div class="tiny" style="line-height:1.85">
@@ -1650,6 +1682,120 @@ function updateLateUI(state){
     }
   }
 
+  // ── NAVEGADOR DE DEVOCIONAIS ─────────────────────────────────
+  // Monta-se sozinho a partir das chaves de DEVOTIONALS: conforme
+  // novos devocionais entram no devocionais.js, aparecem aqui sem
+  // precisar mexer nesta lógica.
+  const CANON_ORDER = [
+    ...OT_ALL.map(b=>b[0]),
+    "Salmos","Provérbios",
+    ...NT_ALL.map(b=>b[0])
+  ];
+
+  function devoIndexAvailable(){
+    const byBook = {};
+    for (const chave of Object.keys(DEVOTIONALS)){
+      const m = chave.match(/^(.+)\s+(\d+)$/);
+      if (!m) continue;
+      const book = m[1], chap = Number(m[2]);
+      (byBook[book] = byBook[book] || []).push(chap);
+    }
+    for (const b of Object.keys(byBook)) byBook[b].sort((a,z)=>a-z);
+    // ordena os livros pela ordem canônica, não alfabética
+    const books = Object.keys(byBook).sort((a,z)=>{
+      const ia = CANON_ORDER.indexOf(a), iz = CANON_ORDER.indexOf(z);
+      return (ia < 0 ? 999 : ia) - (iz < 0 ? 999 : iz);
+    });
+    return { byBook, books };
+  }
+
+  function renderDevoBrowser(){
+    const bookSel = document.getElementById("devoBook");
+    const chapSel = document.getElementById("devoChapter");
+    if (!bookSel || !chapSel) return;
+
+    const { byBook, books } = devoIndexAvailable();
+    if (!books.length) return;
+
+    // preenche livros só na primeira vez
+    if (!bookSel.options.length){
+      bookSel.innerHTML = books.map(b=>`<option value="${b}">${b}</option>`).join("");
+    }
+
+    const bookAtual = bookSel.value || books[0];
+    bookSel.value = bookAtual;
+
+    const caps = byBook[bookAtual] || [];
+    const capAnterior = Number(chapSel.value);
+    chapSel.innerHTML = caps.map(c=>`<option value="${c}">${c}</option>`).join("");
+    chapSel.value = caps.includes(capAnterior) ? capAnterior : caps[0];
+
+    mostrarDevoSelecionado();
+    atualizarCoberturaDevo(byBook, books);
+  }
+
+  function mostrarDevoSelecionado(){
+    const book = document.getElementById("devoBook")?.value;
+    const chap = document.getElementById("devoChapter")?.value;
+    if (!book || !chap) return;
+    const devo = DEVOTIONALS[`${book} ${chap}`];
+    document.getElementById("devoBrowseRef").textContent = `${book} ${chap}`;
+    document.getElementById("devoBrowseTexto").textContent = devo ? devo.texto : "—";
+    const pEl = document.getElementById("devoBrowsePergunta");
+    pEl.textContent = devo ? devo.pergunta : "";
+    pEl.style.display = devo ? "block" : "none";
+  }
+
+  function atualizarCoberturaDevo(byBook, books){
+    const total = Object.keys(DEVOTIONALS).length;
+    const resumo = books.map(b=>`${b} (${byBook[b].length})`).join(" · ");
+    const el = document.getElementById("devoCoverage");
+    if (el) el.textContent = `${total} devocionais disponíveis: ${resumo}`;
+  }
+
+  // Navegação sequencial: atravessa livros, não só capítulos
+  function pularDevo(passo){
+    const { byBook, books } = devoIndexAvailable();
+    const lista = [];
+    for (const b of books) for (const c of byBook[b]) lista.push([b, c]);
+
+    const book = document.getElementById("devoBook").value;
+    const chap = Number(document.getElementById("devoChapter").value);
+    const i = lista.findIndex(([b,c]) => b === book && c === chap);
+    if (i < 0) return;
+
+    const alvo = lista[i + passo];
+    if (!alvo) return; // início ou fim da lista
+
+    document.getElementById("devoBook").value = alvo[0];
+    renderDevoBrowser();
+    document.getElementById("devoChapter").value = alvo[1];
+    mostrarDevoSelecionado();
+  }
+
+  let devoBrowserPronto = false;
+  function initDevoBrowser(){
+    const bookSel = document.getElementById("devoBook");
+    const chapSel = document.getElementById("devoChapter");
+    if (!bookSel) return;
+
+    // renderAll() roda a cada mudança de estado — os listeners só
+    // podem ser ligados uma vez, senão cada clique dispararia várias.
+    if (devoBrowserPronto){ renderDevoBrowser(); return; }
+    devoBrowserPronto = true;
+
+    bookSel.addEventListener("change", ()=>{ chapSel.value = ""; renderDevoBrowser(); });
+    chapSel.addEventListener("change", mostrarDevoSelecionado);
+    document.getElementById("devoPrevBtn")?.addEventListener("click", ()=> pularDevo(-1));
+    document.getElementById("devoNextBtn")?.addEventListener("click", ()=> pularDevo(1));
+    document.getElementById("devoReadBtn")?.addEventListener("click", ()=>{
+      const book = bookSel.value, chap = Number(chapSel.value);
+      if (book && chap) openBibleReader(book, chap, null);
+    });
+
+    renderDevoBrowser();
+  }
+
   function updateGuidedUI(plan, state, today){
     const nowEl = document.getElementById("guidedNow");
     const stepEl = document.getElementById("guidedStep");
@@ -1745,6 +1891,7 @@ function updateLateUI(state){
     updateEncourageUI(plan, state);
     updateGuidedUI(plan, state, today);
     renderDevocionalHoje(plan, state, today);
+    initDevoBrowser();
 
     // progresso anual
     const yearDays = [];
