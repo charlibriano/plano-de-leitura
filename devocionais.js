@@ -19,11 +19,20 @@
 
   // ── DEVOCIONAIS ──────────────────────────────────────────────
   // Chave: "Livro capítulo" (mesmo formato usado no guidedList).
-  // Cobre por enquanto a 1ª semana do plano padrão (Evangelho +
-  // História + Salmos): Gênesis 1-14, Mateus 1-7, Salmos 1-4,
-  // Provérbios 1-3. O resto da Bíblia vai sendo preenchido aos
-  // poucos — quando a chave não existe, o card mostra um aviso
-  // gentil de "em breve" em vez de sumir ou dar erro.
+  //
+  // COBERTURA ATUAL:
+  //   ✔ Gênesis 1-50 (livro completo)
+  //   ✔ Mateus 1-7
+  //   ✔ Salmos 1-4  |  ✔ Provérbios 1-3
+  //
+  // PRÓXIMOS (ordem de prioridade — o que o plano padrão abre
+  // como PRIMEIRA leitura do dia, que é o que este card usa):
+  //   Êxodo → Números → Deuteronômio → Josué → Juízes → Rute →
+  //   1-2 Samuel → 1-2 Reis → Esdras → Neemias → Ester,
+  //   e em paralelo o restante de Mateus, Marcos, Lucas, João, Atos.
+  //
+  // Capítulo sem devocional não quebra nada — o app mostra um
+  // aviso gentil de "em breve" em vez de sumir ou dar erro.
   const DEVOTIONALS = {
     "Gênesis 1": {
       texto: "Antes de qualquer mandamento, antes de qualquer aliança, a Bíblia começa com Deus criando por puro querer. Não havia necessidade — havia amor transbordando em forma de luz, mar, céu e vida. E no fim de cada dia, o mesmo veredito: \"viu que era bom\". Você também nasceu de uma decisão boa, não de um acidente.",
@@ -132,6 +141,150 @@
     "Provérbios 2": {
       texto: "A sabedoria é comparada a um tesouro escondido — não cai do céu pronta, é buscada com esforço, como quem cava atrás de prata. E a promessa é clara: quem clama por discernimento, o encontra, porque é o próprio Senhor quem dá sabedoria.",
       pergunta: "Tenho buscado sabedoria com a mesma intensidade que buscaria um tesouro perdido?"
+    },
+    "Gênesis 15": {
+      texto: "Abrão questiona Deus abertamente: “que me darás, se não tenho filhos?”. Deus não o repreende pela pergunta — leva-o para fora e mostra as estrelas. E vem o versículo que o Novo Testamento citará como fundamento da salvação: “creu Abrão ao Senhor, e isso lhe foi imputado para justiça”. Na cerimônia da aliança, quem passa entre os animais é Deus sozinho, comprometendo-se unilateralmente.",
+      pergunta: "Levo minhas dúvidas honestas a Deus, ou finjo que não as tenho?"
+    },
+    "Gênesis 16": {
+      texto: "Cansados de esperar, Sarai e Abrão tentam cumprir a promessa por atalho humano — e o resultado é dor para todos, especialmente para Hagar, usada e depois desprezada. É no deserto, fugindo, que Hagar recebe a visita de Deus e o chama de “El-Roi”: o Deus que vê. Ele encontra justamente quem todos descartaram.",
+      pergunta: "Onde tenho tentado apressar Deus por conta própria em vez de esperar Nele?"
+    },
+    "Gênesis 17": {
+      texto: "Aos noventa e nove anos, quando qualquer possibilidade humana já se esgotou, Deus se apresenta como El-Shaddai, o Todo-Poderoso, e reafirma a aliança. Muda os nomes: Abrão vira Abraão, pai de multidão; Sarai vira Sara. Deus dá nomes novos antes de a realidade mudar — a identidade vem da promessa, não da circunstância.",
+      pergunta: "Que nome Deus me dá que ainda não corresponde ao que eu vejo em mim?"
+    },
+    "Gênesis 18": {
+      texto: "Sara ri escondida ao ouvir a promessa, e Deus responde com a pergunta que atravessa toda a Escritura: “acaso para o Senhor há coisa demasiadamente difícil?”. Depois, algo notável: Deus escuta Abraão intercedendo por Sodoma, cedendo de cinquenta até dez justos. O Deus santo é também o Deus que ouve quem intercede.",
+      pergunta: "Por quem eu tenho intercedido ultimamente — ou só tenho orado por mim?"
+    },
+    "Gênesis 19": {
+      texto: "O juízo sobre Sodoma é real e sério, mas repare no gesto no meio dele: os anjos tomam Ló pela mão e o retiram à força, porque ele hesitava. A salvação de Ló não foi mérito dele, foi misericórdia insistente. E a mulher de Ló nos lembra que olhar para trás com o coração é diferente de apenas caminhar.",
+      pergunta: "Existe algo que Deus está me tirando das mãos, e eu ainda estou hesitando em soltar?"
+    },
+    "Gênesis 20": {
+      texto: "Abraão, o pai da fé, repete exatamente o mesmo medo de antes: mente sobre Sara para se proteger. Deus intervém — falando até com um rei pagão em sonho — não porque Abraão merecia, mas porque a promessa não dependia do desempenho dele. A fé genuína convive com fraquezas recorrentes.",
+      pergunta: "Que medo antigo continua me levando a agir de um jeito que já sei que é errado?"
+    },
+    "Gênesis 21": {
+      texto: "“E o Senhor visitou Sara como tinha dito.” Vinte e cinco anos depois da promessa, no tempo exato, Isaque nasce e o riso de dúvida se transforma em riso de alegria. No mesmo capítulo, Deus ouve o choro de Ismael no deserto e abre os olhos de Hagar para um poço que já estava ali.",
+      pergunta: "Estou disposto(a) a esperar o tempo de Deus mesmo quando ele parece longo demais?"
+    },
+    "Gênesis 22": {
+      texto: "Este é um dos textos mais difíceis da Bíblia, e deve ser lido com reverência: Deus prova Abraão, e no momento decisivo detém a mão dele. O cordeiro está preso no mato — “Deus proverá”. Um pai, um filho único, um monte e um substituto: os cristãos leem aqui, há séculos, a sombra do que Deus mesmo faria em favor de nós.",
+      pergunta: "O que Deus me pede que eu solte, confiando que Ele mesmo provê?"
+    },
+    "Gênesis 23": {
+      texto: "Sara morre, e Abraão compra uma caverna — o único pedaço de terra que ele possuirá na terra prometida a ele. Morre peregrino, com a promessa ainda no futuro, e mesmo assim crendo. Hebreus dirá depois que ele esperava uma cidade cujo arquiteto é Deus.",
+      pergunta: "Consigo confiar em promessas de Deus cujo cumprimento talvez eu não veja por completo?"
+    },
+    "Gênesis 24": {
+      texto: "O servo de Abraão não faz nada espetacular: ele ora, espera junto ao poço e observa. Nenhuma voz do céu, nenhum sinal impossível — apenas fidelidade comum e um pedido sincero. E ao final ele testemunha: “o Senhor me guiou no caminho”. Deus dirige mais pela obediência simples do que por sinais extraordinários.",
+      pergunta: "Tenho buscado sinais espetaculares quando Deus quer me guiar pela obediência do dia comum?"
+    },
+    "Gênesis 25": {
+      texto: "Abraão morre “farto de dias”, e a história segue com dois irmãos que já lutavam no ventre. Então Esaú vende o direito de primogênito por um prato de comida — troca o eterno pelo imediato porque estava com fome agora. É assim que quase sempre se perdem coisas sagradas: não por grandes decisões, mas por pequenas urgências.",
+      pergunta: "Que coisa valiosa eu tenho trocado por alívio imediato?"
+    },
+    "Gênesis 26": {
+      texto: "Isaque repete o erro do pai mentindo sobre a esposa, mas também mostra outra face: diante de disputas pelos poços, ele cede, cava outro, cede de novo — até chegar a Reobote, “o Senhor nos deu largueza”. Nem toda batalha precisa ser vencida para que Deus abra espaço.",
+      pergunta: "Que disputa eu poderia simplesmente ceder, confiando que Deus abre outro espaço?"
+    },
+    "Gênesis 27": {
+      texto: "Uma família inteira em ruínas: um pai que prefere um filho, uma mãe que arma o engano, um filho que mente na cara do pai cego. O texto não aprova nada disso — narra as consequências, que incluem vinte anos de exílio para Jacó. Deus cumpre seu propósito apesar do pecado, nunca por causa dele.",
+      pergunta: "Tenho tentado alcançar por manipulação algo que só Deus pode dar?"
+    },
+    "Gênesis 28": {
+      texto: "Jacó dorme no chão, fugindo das consequências do próprio engano, e é exatamente ali que Deus se revela — sem cobrança, com promessa. Ele acorda espantado: “certamente o Senhor está neste lugar, e eu não o sabia”. Deus encontra o fugitivo antes de ele consertar qualquer coisa.",
+      pergunta: "Em que lugar “comum” da minha vida Deus pode estar presente sem eu perceber?"
+    },
+    "Gênesis 29": {
+      texto: "Jacó serve sete anos por Raquel, e ao amor “pareceram-lhe poucos dias”. Depois é enganado por Labão — o enganador provando o próprio veneno. E no meio dessa história de preferências, há Lia, não amada, cujos filhos recebem nomes que são orações: “o Senhor atendeu à minha aflição”.",
+      pergunta: "Já levei a Deus a dor de me sentir preterido(a), como Lia fez?"
+    },
+    "Gênesis 30": {
+      texto: "Rivalidade entre irmãs, barganhas, disputa por filhos, negociação de rebanhos — é um capítulo humanamente sujo. E é dessa família desordenada que nascem as doze tribos de Israel. Deus não aprova a disfunção, mas também não desiste de trabalhar dentro dela.",
+      pergunta: "Acredito que Deus pode fazer algo bom a partir da minha história desordenada?"
+    },
+    "Gênesis 31": {
+      texto: "Depois de vinte anos e dez mudanças de salário, Jacó reconhece o que sustentou tudo: “o Deus de meu pai esteve comigo”. Ele não saiu vitorioso por esperteza própria; ele foi guardado. Em Mispá, ergue-se um monte de testemunho — Deus vigia entre os dois quando a confiança humana falha.",
+      pergunta: "Ao olhar meus últimos anos, consigo apontar onde Deus esteve comigo?"
+    },
+    "Gênesis 32": {
+      texto: "Na beira do rio, sozinho e com medo, Jacó luta a noite inteira e se recusa a soltar: “não te deixarei ir se me não abençoares”. Sai dali com um nome novo — Israel — e com o quadril desconjuntado. Prevaleceu, e saiu manquejando. Encontros verdadeiros com Deus abençoam e marcam ao mesmo tempo.",
+      pergunta: "Estou disposto(a) a um encontro com Deus que me abençoe mas também me mude?"
+    },
+    "Gênesis 33": {
+      texto: "Jacó esperava um exército inimigo e recebeu um abraço. Esaú corre, o abraça e chora — e Jacó diz: “vi o teu rosto como se tivesse visto o rosto de Deus”. A reconciliação que ele passou vinte anos temendo custou menos do que o medo que ele carregou.",
+      pergunta: "Que reconciliação eu tenho evitado por medo de uma reação que talvez nem venha?"
+    },
+    "Gênesis 34": {
+      texto: "Este é um capítulo de dor: uma violência grave contra Diná, seguida de vingança sangrenta dos irmãos e da passividade do pai. A Escritura não ameniza nem justifica nada disso — registra o horror com honestidade. Deus não fala neste capítulo, e esse silêncio nos ensina a não usar Seu nome para cobrir nossos próprios acertos de contas.",
+      pergunta: "Já tentei justificar uma reação minha usando a linguagem da fé?"
+    },
+    "Gênesis 35": {
+      texto: "“Levantemo-nos e subamos a Betel.” Jacó volta ao lugar do primeiro encontro, e o retorno começa com uma limpeza: enterrar os deuses estranhos que a família vinha carregando. No mesmo capítulo, Raquel morre dando à luz Benjamim — luto e adoração ocupando o mesmo espaço, como acontece na vida real.",
+      pergunta: "Que “deus estranho” eu ainda carrego, mesmo sabendo a quem pertenço?"
+    },
+    "Gênesis 36": {
+      texto: "Uma genealogia longa dos descendentes de Esaú — a linhagem que não recebeu a aliança. Deus registra esses nomes com o mesmo cuidado. Ele não é descuidado com ninguém, nem com quem fica fora do caminho central da história que Ele está escrevendo.",
+      pergunta: "Trato as pessoas “fora do meu círculo” com o mesmo cuidado que Deus tem por elas?"
+    },
+    "Gênesis 37": {
+      texto: "A túnica dada por favoritismo virou o pano ensanguentado que enganou o pai. Os sonhos de José irritaram os irmãos, e a inveja os levou a vendê-lo. Nada aqui parece plano de Deus — parece desastre puro. E é exatamente dentro desse desastre que Deus já estava trabalhando, sem avisar ninguém.",
+      pergunta: "Que situação atual eu chamo de desastre, mas ainda não sei o fim?"
+    },
+    "Gênesis 38": {
+      texto: "Um capítulo desconfortável no meio da história de José: Judá falha gravemente com Tamar, que age em desespero buscando o que lhe era devido. No fim, é Judá quem admite: “ela é mais justa do que eu”. E Mateus, séculos depois, colocará o nome de Tamar na genealogia de Jesus — a graça não apaga histórias difíceis, ela as redime.",
+      pergunta: "Sou capaz de admitir, como Judá, quando o erro maior foi meu?"
+    },
+    "Gênesis 39": {
+      texto: "Duas vezes neste capítulo o texto repete: “o Senhor era com José” — uma na casa de Potifar, outra na prisão. A presença de Deus não dependia da circunstância melhorar. E ao ser tentado, José define o pecado corretamente: “pecaria contra Deus”. Antes de ser contra alguém, o pecado é contra Ele.",
+      pergunta: "Reconheço que meus pecados “privados” são, antes de tudo, contra Deus?"
+    },
+    "Gênesis 40": {
+      texto: "José serve na prisão, interpreta os sonhos de dois companheiros, pede apenas para ser lembrado — e é esquecido por dois anos inteiros. O texto não romantiza isso. Fidelidade sem recompensa visível é uma das provas mais duras, e José a atravessa sem deixar de servir.",
+      pergunta: "Consigo continuar fiel em algo que ninguém está vendo nem reconhecendo?"
+    },
+    "Gênesis 41": {
+      texto: "Chamado diante do homem mais poderoso do mundo, José não aproveita o palco para si: “isso não está em mim; Deus é que dará resposta”. A promoção vem, mas o crédito é devolvido a quem pertence. E os nomes que ele dá aos filhos contam sua teologia: Deus o fez esquecer a dor e frutificar na terra da aflição.",
+      pergunta: "Quando algo dá certo comigo, para quem vai o crédito na prática?"
+    },
+    "Gênesis 42": {
+      texto: "José testa os irmãos, e algo desperta neles depois de vinte anos: “verdadeiramente somos culpados”. A providência de Deus não os trouxe ao Egito apenas por comida — trouxe-os ao lugar onde a consciência finalmente falou. Deus cuida das nossas necessidades e, no caminho, trata do nosso coração.",
+      pergunta: "Deus pode estar usando uma necessidade minha para tratar de algo mais profundo?"
+    },
+    "Gênesis 43": {
+      texto: "A fome aperta e eles precisam levar Benjamim. Judá — o mesmo que propôs vender José — agora se oferece como fiador do irmão mais novo. E José, ao ver o irmão, precisa sair da sala para chorar. Deus estava mudando os dois lados dessa história ao mesmo tempo.",
+      pergunta: "Onde Deus tem trabalhado em mim de um jeito que só quem me conhece de longe notaria?"
+    },
+    "Gênesis 44": {
+      texto: "O momento decisivo: com a taça na bagagem de Benjamim, Judá se oferece para ficar como escravo no lugar do irmão. O homem que vendeu um irmão agora se entrega por outro. Arrependimento verdadeiro não se prova com palavras — se prova quando a mesma situação aparece e a escolha é diferente.",
+      pergunta: "Se a situação do meu maior erro se repetisse hoje, eu agiria diferente?"
+    },
+    "Gênesis 45": {
+      texto: "“Não fostes vós que me enviastes para cá, senão Deus.” José não nega o que sofreu nem finge que foi tudo bonito — ele reconhece a mão de Deus acima da maldade humana. E chora, abraça, alimenta e perdoa. A soberania de Deus não elimina a dor; ela abre espaço para a graça.",
+      pergunta: "Consigo enxergar a mão de Deus em algo que outras pessoas me fizeram de mal?"
+    },
+    "Gênesis 46": {
+      texto: "Jacó, já velho, hesita em descer ao Egito, e Deus fala à noite: “não temas descer ao Egito... eu descerei contigo”. Deus não promete evitar o Egito — promete acompanhá-lo até lá. Às vezes a fidelidade de Deus se mostra não na circunstância evitada, mas na presença dentro dela.",
+      pergunta: "Estou pedindo a Deus que mude minha circunstância, quando Ele está oferecendo Sua presença nela?"
+    },
+    "Gênesis 47": {
+      texto: "Diante de Faraó, Jacó descreve a própria vida como uma “peregrinação” de dias “poucos e maus”. É uma avaliação sincera de uma vida difícil — e ainda assim ele abençoa o rei mais poderoso da terra. Ser honesto sobre as dores não impede alguém de ser canal de bênção.",
+      pergunta: "Consigo ser honesto(a) sobre minhas dores sem deixar de abençoar quem está ao meu redor?"
+    },
+    "Gênesis 48": {
+      texto: "Jacó cruza as mãos e coloca a direita sobre o mais novo, contrariando a ordem esperada — Deus segue escolhendo fora da lógica humana. E o velho patriarca resume sua vida numa frase: “o Deus que me sustentou toda a minha vida até este dia”. Depois de tudo, o veredito dele é sustento, não abandono.",
+      pergunta: "Se eu resumisse minha vida numa frase hoje, ela reconheceria o sustento de Deus?"
+    },
+    "Gênesis 49": {
+      texto: "Nas últimas palavras, Jacó abençoa cada filho com franqueza — inclusive apontando pecados. E sobre Judá, anuncia que o cetro não se apartará dele até que venha Aquele a quem pertence. As palavras de um moribundo carregam a esperança messiânica que atravessará todo o Antigo Testamento.",
+      pergunta: "O que eu gostaria que ficasse das minhas palavras para quem vem depois de mim?"
+    },
+    "Gênesis 50": {
+      texto: "Gênesis fecha com uma das frases mais profundas da Bíblia: “vós bem intentastes mal contra mim, porém Deus o intentou para bem”. José não reescreve o passado — chama o mal de mal e reconhece que Deus, sem ser cúmplice dele, o superou. E morre pedindo que seus ossos sejam levados, porque acreditava na promessa que ainda não tinha visto.",
+      pergunta: "Existe um “intentaram mal” na minha história que eu ainda não entreguei a Deus?"
     },
     "Provérbios 3": {
       texto: "\"Confia no Senhor de todo o teu coração e não te estribes no teu próprio entendimento.\" É um dos versículos mais conhecidos da Bíblia, e por um motivo: ele resume a essência da fé prática — reconhecer a Deus em tudo, não só nas grandes decisões.",
