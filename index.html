@@ -1089,9 +1089,6 @@
 
     <section class="card">
       <h2>Devocionais</h2>
-      <div class="tiny" style="margin:-8px 0 14px">
-        Navegue livremente por qualquer devocional já escrito — sem precisar esperar o dia dele chegar no plano.
-      </div>
 
       <div class="row">
         <label class="small" style="flex:1 1 200px">
@@ -1116,7 +1113,6 @@
         <button class="secondary" id="devoReadBtn">Ler o capítulo</button>
       </div>
 
-      <div class="tiny" id="devoCoverage" style="margin-top:12px;opacity:.75"></div>
     </section>
 
     <section class="card">
@@ -1731,7 +1727,6 @@ function updateLateUI(state){
     chapSel.value = caps.includes(capAnterior) ? capAnterior : caps[0];
 
     mostrarDevoSelecionado();
-    atualizarCoberturaDevo(byBook, books);
   }
 
   function mostrarDevoSelecionado(){
@@ -1744,13 +1739,6 @@ function updateLateUI(state){
     const pEl = document.getElementById("devoBrowsePergunta");
     pEl.textContent = devo ? devo.pergunta : "";
     pEl.style.display = devo ? "block" : "none";
-  }
-
-  function atualizarCoberturaDevo(byBook, books){
-    const total = Object.keys(DEVOTIONALS).length;
-    const resumo = books.map(b=>`${b} (${byBook[b].length})`).join(" · ");
-    const el = document.getElementById("devoCoverage");
-    if (el) el.textContent = `${total} devocionais disponíveis: ${resumo}`;
   }
 
   // Navegação sequencial: atravessa livros, não só capítulos
