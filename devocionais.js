@@ -21,20 +21,13 @@
   // Chave: "Livro capítulo" (mesmo formato usado no guidedList).
   //
   // ══════════════════════════════════════════════════════════
-  // COBERTURA ATUAL
+  // COBERTURA: BÍBLIA COMPLETA ✔
   //
-  //   >>> ANTIGO TESTAMENTO: 100% COMPLETO <<<
-  //   39 livros, 929 capítulos — de Gênesis 1 a Malaquias 4.
+  //   66 livros · 1.189 capítulos · 1.189 devocionais
+  //   de Gênesis 1 a Apocalipse 22 — sem nenhuma lacuna.
   //
-  //   NOVO TESTAMENTO: em andamento
-  //     ✔ Mateus 1-7
-  //
-  // ORDEM RESTANTE (Novo Testamento):
-  //   Mateus (8-28) → Marcos → Lucas → João → Atos →
-  //   Romanos → 1-2 Coríntios → Gálatas → Efésios → Filipenses →
-  //   Colossenses → 1-2 Tessalonicenses → 1-2 Timóteo → Tito →
-  //   Filemom → Hebreus → Tiago → 1-2 Pedro → 1-2-3 João →
-  //   Judas → Apocalipse
+  //   Antigo Testamento: 39 livros, 929 capítulos ✔
+  //   Novo Testamento:   27 livros, 260 capítulos ✔
   // ══════════════════════════════════════════════════════════
 
   const DEVOTIONALS = {
@@ -3781,6 +3774,1018 @@
     "Malaquias 4": {
       texto: "O Antigo Testamento fecha anunciando o “sol da justiça” que trará cura em suas asas, e a promessa de um mensageiro que voltaria o coração dos pais aos filhos. Depois disso, quatrocentos anos de silêncio — até um anjo aparecer a Zacarias no templo.",
       pergunta: "Tenho esperança de que Deus fala de novo, mesmo depois de longos períodos de silêncio?"
+    },
+    "Mateus 8": {
+      texto: "Um leproso se aproxima dizendo “se quiseres, podes limpar-me”, e Jesus faz o impensável: estende a mão e o toca antes de curá-lo. Ele podia curar só com a palavra — o toque era desnecessário para a cura, e essencial para a pessoa.",
+      pergunta: "Tenho me aproximado de quem a sociedade evita, ou ajudado sempre à distância?"
+    },
+    "Mateus 9": {
+      texto: "Jesus chama Mateus, cobrador de impostos, do próprio posto de trabalho, e come com “publicanos e pecadores”. Aos que criticam, responde: “os sãos não precisam de médico, senão os doentes”. E ao ver as multidões, “moveu-se de íntima compaixão”.",
+      pergunta: "Tenho me movido de compaixão pelas pessoas, ou de julgamento sobre elas?"
+    },
+    "Mateus 10": {
+      texto: "Ao enviar os doze, Jesus não promete facilidade: “eis que vos envio como ovelhas ao meio de lobos”. E ainda assim garante que nem um pardal cai sem o Pai saber, e que os cabelos da cabeça estão todos contados.",
+      pergunta: "Consigo aceitar um chamado difícil confiando no cuidado detalhado de Deus?"
+    },
+    "Mateus 11": {
+      texto: "João Batista, na prisão, manda perguntar se Jesus é mesmo aquele que havia de vir. Jesus não o repreende pela dúvida — responde com evidências. E convida: “vinde a mim, todos os que estais cansados e oprimidos”.",
+      pergunta: "Tenho levado minhas dúvidas honestas a Jesus, como João fez?"
+    },
+    "Mateus 12": {
+      texto: "Diante da acusação de quebrar o sábado, Jesus declara: “misericórdia quero, e não sacrifício” e afirma ser Senhor do sábado. Ele não quebrou a lei — revelou o propósito dela, que sempre foi o bem das pessoas.",
+      pergunta: "Tenho usado princípios corretos de um jeito que machuca em vez de ajudar?"
+    },
+    "Mateus 13": {
+      texto: "As parábolas do Reino: o semeador, o joio, o grão de mostarda, o tesouro escondido. O Reino cresce devagar, cresce escondido e vale tudo que a pessoa tem — três verdades que contrariam a expectativa de espetáculo.",
+      pergunta: "Que tipo de solo meu coração tem sido para a Palavra que recebo?"
+    },
+    "Mateus 14": {
+      texto: "Ao saber da morte de João, Jesus se retira para orar — e é seguido pela multidão. Alimenta cinco mil, depois anda sobre as águas. Pedro caminha até olhar para o vento; Jesus estende a mão imediatamente.",
+      pergunta: "Tenho tirado os olhos de Jesus por causa do “vento” ao redor?"
+    },
+    "Mateus 15": {
+      texto: "Jesus confronta a tradição que anulava o mandamento de honrar pai e mãe, citando Isaías: “este povo honra-me com os lábios, mas o seu coração está longe de mim”. Depois, elogia a fé insistente de uma mulher cananeia.",
+      pergunta: "Existe alguma tradição minha que, na prática, está anulando o que Deus pede?"
+    },
+    "Mateus 16": {
+      texto: "Pedro confessa “tu és o Cristo, o Filho do Deus vivo” e é elogiado — e minutos depois é repreendido por rejeitar a cruz. Fé verdadeira reconhece quem Jesus é e aceita o caminho que Ele escolheu percorrer.",
+      pergunta: "Aceito o Jesus real, ou a versão Dele que eu preferiria que existisse?"
+    },
+    "Mateus 17": {
+      texto: "Na transfiguração, Pedro quer construir três tendas e ficar ali. A voz do Pai interrompe: “este é o meu Filho amado... a ele ouvi”. Descer do monte para enfrentar a necessidade lá embaixo fazia parte do plano.",
+      pergunta: "Tenho querido permanecer nos momentos altos, evitando descer para o trabalho real?"
+    },
+    "Mateus 18": {
+      texto: "Sobre grandeza, Jesus coloca uma criança no meio. Sobre a ovelha perdida, o pastor deixa as noventa e nove. E sobre perdão, responde a Pedro: setenta vezes sete — número que existe para acabar com a contagem.",
+      pergunta: "Tenho contado ofensas, quando Jesus mandou parar de contar?"
+    },
+    "Mateus 19": {
+      texto: "Jesus reafirma o casamento como união que “o homem não separe”, abençoa crianças e conversa com o jovem rico, que se afasta triste. A única pessoa nos evangelhos que Jesus convida e vai embora sai por causa de bens.",
+      pergunta: "Existe algo que eu não conseguiria soltar se Jesus pedisse?"
+    },
+    "Mateus 20": {
+      texto: "Na parábola dos trabalhadores, todos recebem o mesmo salário e os primeiros reclamam. E Jesus define a grandeza: “o Filho do homem não veio para ser servido, mas para servir, e dar a sua vida em resgate de muitos”.",
+      pergunta: "Já me incomodei com a generosidade de Deus para com outra pessoa?"
+    },
+    "Mateus 21": {
+      texto: "Jesus entra em Jerusalém montado num jumentinho, aclamado como rei — e vai direto purificar o templo, derrubando as mesas dos cambistas. “A minha casa será chamada casa de oração, mas vós a tendes convertido em covil de salteadores.”",
+      pergunta: "Existe algo na minha vida que deveria ser lugar de oração e virou outra coisa?"
+    },
+    "Mateus 22": {
+      texto: "Perguntado sobre o maior mandamento, Jesus resume tudo: amar a Deus de todo o coração e ao próximo como a si mesmo — “destes dois mandamentos dependem toda a lei e os profetas”.",
+      pergunta: "Se toda a lei depende desses dois, como eu tenho me saído neles?"
+    },
+    "Mateus 23": {
+      texto: "Sete “ais” contra a hipocrisia religiosa: sepulcros caiados, bonitos por fora e mortos por dentro; guias que coam o mosquito e engolem o camelo. Jesus é mais duro com religiosos hipócritas do que com qualquer pecador público.",
+      pergunta: "Existe alguma área em que estou caiado por fora e vazio por dentro?"
+    },
+    "Mateus 24": {
+      texto: "Sobre o fim dos tempos, Jesus adverte contra falsos cristos e alarmismo, e afirma que ninguém sabe o dia nem a hora — “nem os anjos, nem o Filho”. O foco não é calcular a data, é permanecer fiel até lá.",
+      pergunta: "Tenho me distraído com especulações em vez de viver preparado hoje?"
+    },
+    "Mateus 25": {
+      texto: "Três parábolas sobre estar pronto: as virgens com azeite, os talentos investidos, e as ovelhas separadas dos bodes — “quando o fizestes a um destes meus pequeninos irmãos, a mim o fizestes”.",
+      pergunta: "O que tenho feito aos “pequeninos” que Jesus diz representarem Ele mesmo?"
+    },
+    "Mateus 26": {
+      texto: "No Getsêmani, Jesus ora suando e pedindo que o cálice passe, mas conclui: “não seja como eu quero, mas como tu queres”. Enquanto isso os discípulos dormem, Judas negocia e Pedro promete o que não cumpriria.",
+      pergunta: "Consigo terminar minhas orações com “seja feita a tua vontade”, e não a minha?"
+    },
+    "Mateus 27": {
+      texto: "O julgamento, a zombaria, os pregos. Do alto da cruz, o grito do Salmo 22: “Deus meu, Deus meu, por que me desamparaste?”. E o véu do templo rasgado de alto a baixo — o caminho até Deus aberto de dentro para fora.",
+      pergunta: "Tenho dimensionado o que custou o acesso a Deus que hoje tenho de graça?"
+    },
+    "Mateus 28": {
+      texto: "O túmulo vazio, o anjo, o encontro com as mulheres. E a comissão final, com a promessa que fecha o evangelho: “ide, ensinai todas as nações... e eis que eu estou convosco todos os dias, até a consumação dos séculos”.",
+      pergunta: "Tenho vivido como quem sabe que Ele está comigo todos os dias, inclusive hoje?"
+    },
+    "Marcos 1": {
+      texto: "O evangelho mais rápido começa sem genealogia e sem infância: João batiza, Jesus é batizado, tentado, e já chama discípulos. A palavra “logo” aparece o tempo todo — urgência de quem tem uma missão a cumprir.",
+      pergunta: "Tenho tratado o chamado de Deus com urgência, ou com adiamento constante?"
+    },
+    "Marcos 2": {
+      texto: "Quatro amigos abrem o telhado para descer um paralítico até Jesus, e o texto diz que Ele “vendo a fé deles” perdoou e curou. A fé de quem carrega alguém também conta.",
+      pergunta: "Tenho carregado alguém até Jesus, ou esperado que a pessoa chegue sozinha?"
+    },
+    "Marcos 3": {
+      texto: "Jesus cura no sábado e os religiosos se reúnem para matá-Lo. Ele olha ao redor “com indignação, condoendo-se da dureza dos seus corações”. Indignação e compaixão no mesmo olhar.",
+      pergunta: "Minha indignação com o erro alheio vem acompanhada de compaixão?"
+    },
+    "Marcos 4": {
+      texto: "A parábola do semeador e a tempestade acalmada no mesmo capítulo. Jesus dorme no barco durante o temporal, e ao ser acordado, repreende o vento e pergunta: “por que sois tão tímidos? Como é que não tendes fé?”.",
+      pergunta: "O que tenho tratado como tempestade impossível, com Ele dormindo no meu barco?"
+    },
+    "Marcos 5": {
+      texto: "Três encontros: o endemoninhado gadareno restaurado, a mulher com fluxo de sangue curada ao tocar a veste, e a filha de Jairo ressuscitada. Jesus para no meio de uma emergência para atender alguém que ninguém via.",
+      pergunta: "Tenho parado por pessoas que interrompem meus planos mais urgentes?"
+    },
+    "Marcos 6": {
+      texto: "Rejeitado na própria terra, Jesus “admirou-se da incredulidade deles”. Envia os doze, alimenta cinco mil e anda sobre o mar. Entre um milagre e outro, o convite aos discípulos: “vinde vós à parte, e repousai um pouco”.",
+      pergunta: "Tenho respeitado o descanso que Jesus mesmo recomendou aos discípulos?"
+    },
+    "Marcos 7": {
+      texto: "Contra a tradição que anulava o mandamento, Jesus ensina que o que contamina não é o que entra, mas o que sai do coração. Depois, cura a filha de uma mulher grega, movido pela resposta humilde e insistente dela.",
+      pergunta: "O que tem saído do meu coração ultimamente revela o quê sobre ele?"
+    },
+    "Marcos 8": {
+      texto: "Jesus cura um cego em duas etapas — primeiro ele vê homens como árvores, depois enxerga claramente. Logo em seguida, Pedro O confessa como o Cristo, mas ainda enxerga o Messias pela metade.",
+      pergunta: "Existe alguma verdade sobre Jesus que eu ainda enxergo pela metade?"
+    },
+    "Marcos 9": {
+      texto: "Um pai desesperado pede ajuda para o filho e diz a frase mais honesta dos evangelhos: “eu creio, Senhor! Ajuda a minha incredulidade”. Jesus atende essa fé imperfeita, sem exigir certeza absoluta primeiro.",
+      pergunta: "Consigo trazer a Jesus uma fé misturada com dúvida, como esse pai fez?"
+    },
+    "Marcos 10": {
+      texto: "O jovem rico se afasta, e Jesus olha para ele “e amou-o” mesmo assim. Depois Tiago e João pedem os melhores lugares, e Ele ensina: “o que quiser entre vós ser o primeiro será servo de todos”.",
+      pergunta: "Tenho buscado posição, quando Jesus fala em serviço?"
+    },
+    "Marcos 11": {
+      texto: "Jesus entra em Jerusalém, amaldiçoa a figueira sem fruto e purifica o templo. Depois ensina sobre fé e acrescenta: “quando estiverdes orando, perdoai, se tendes alguma coisa contra alguém”.",
+      pergunta: "Existe algo que estou guardando contra alguém e levo comigo até a oração?"
+    },
+    "Marcos 12": {
+      texto: "Depois de responder aos que tentavam pegá-Lo em contradição, Jesus se senta em frente ao cofre e observa uma viúva pobre lançar duas moedinhas — e diz que ela deu mais que todos, porque deu tudo que tinha.",
+      pergunta: "Minha oferta é do que sobra, ou do que realmente tenho?"
+    },
+    "Marcos 13": {
+      texto: "O discurso sobre o fim, com a advertência repetida: “vigiai”. E a certeza no meio da incerteza: “passará o céu e a terra, mas as minhas palavras não passarão”.",
+      pergunta: "Tenho me ancorado no que passa, ou nas palavras que não passarão?"
+    },
+    "Marcos 14": {
+      texto: "Uma mulher quebra o vaso de nardo sobre Jesus e é criticada pelo desperdício. Ele a defende: “ela fez o que podia”. No mesmo capítulo, Judas negocia e Pedro nega três vezes.",
+      pergunta: "Tenho feito o que posso, mesmo que outros achem desperdício?"
+    },
+    "Marcos 15": {
+      texto: "A crucificação narrada com a crueza característica de Marcos. E é um centurião romano — não um discípulo — quem faz a confissão que o evangelho vinha construindo: “verdadeiramente este homem era o Filho de Deus”.",
+      pergunta: "Tenho reconhecido quem Jesus é com a clareza que até estranhos alcançaram?"
+    },
+    "Marcos 16": {
+      texto: "As mulheres vão ao túmulo preocupadas com quem removeria a pedra — e a encontram já removida. O anjo manda avisar “aos discípulos e a Pedro”, incluindo nominalmente quem tinha negado.",
+      pergunta: "Tenho me preocupado com pedras que Deus já removeu antes de eu chegar?"
+    },
+    "Lucas 1": {
+      texto: "Lucas escreve a Teófilo depois de investigar tudo com cuidado. Zacarias duvida e fica mudo; Maria pergunta “como se fará isto?” e responde “eis aqui a serva do Senhor”. Duas reações diferentes à mesma notícia impossível.",
+      pergunta: "Minha reação diante do inesperado de Deus tem sido dúvida travada ou entrega?"
+    },
+    "Lucas 2": {
+      texto: "Não havia lugar na estalagem, e os primeiros a saber foram pastores — gente de baixa reputação naquela sociedade. Simeão e Ana, dois idosos, reconhecem o menino que ninguém mais notou.",
+      pergunta: "Tenho reconhecido a ação de Deus quando ela chega sem nenhuma pompa?"
+    },
+    "Lucas 3": {
+      texto: "João prega arrependimento e o povo pergunta “que faremos?”. As respostas são práticas: reparta a túnica, não cobre a mais, não oprima ninguém. Arrependimento medido por mudança concreta de conduta.",
+      pergunta: "Meu arrependimento tem produzido mudanças práticas ou só sentimentos?"
+    },
+    "Lucas 4": {
+      texto: "Tentado no deserto, Jesus responde três vezes com a Escritura. Depois, na sinagoga de Nazaré, lê Isaías 61 e declara: “hoje se cumpriu esta escritura em vossos ouvidos”. Os conterrâneos tentam matá-Lo.",
+      pergunta: "Tenho recebido bem a verdade quando ela vem de alguém próximo demais?"
+    },
+    "Lucas 5": {
+      texto: "Depois de uma noite sem pescar nada, Pedro obedece — “sobre a tua palavra lançarei a rede” — e a pesca quase afunda o barco. Sua reação é recuar: “aparta-te de mim, porque sou um homem pecador”.",
+      pergunta: "Tenho obedecido mesmo quando a instrução contraria minha experiência?"
+    },
+    "Lucas 6": {
+      texto: "O sermão da planície: bem-aventurados os pobres, ai dos ricos. E o mandamento mais difícil: “amai a vossos inimigos, fazei bem aos que vos odeiam”. Amor definido por ação, não por sentimento.",
+      pergunta: "Tenho feito bem a alguém que não me trata bem?"
+    },
+    "Lucas 7": {
+      texto: "Na casa de Simão, uma mulher de má fama molha os pés de Jesus com lágrimas. Ele confronta o anfitrião: quem é perdoado de muito, ama muito. O julgamento do religioso contrastado com a gratidão da pecadora.",
+      pergunta: "Tenho dimensionado o tamanho do meu perdão, ou me achado alguém que devia pouco?"
+    },
+    "Lucas 8": {
+      texto: "A parábola do semeador, a tempestade acalmada, a mulher curada no meio da multidão, a filha de Jairo. Entre tantas pessoas encostando, Jesus percebe o toque de uma só — e para tudo por ela.",
+      pergunta: "Tenho confiado que Deus percebe meu toque no meio de tanta gente?"
+    },
+    "Lucas 9": {
+      texto: "Jesus alimenta cinco mil, é confessado como o Cristo e anuncia a cruz. E define o discipulado: “tome cada um a sua cruz e siga-me”. Depois, três candidatos aparecem com condições — e Ele não facilita para nenhum.",
+      pergunta: "Tenho seguido a Jesus com condições, ou de verdade?"
+    },
+    "Lucas 10": {
+      texto: "O bom samaritano: dois religiosos passam direto, e o estrangeiro despreza é quem para, gasta e cuida. Depois, Marta se irrita com o serviço e Maria escolhe “a boa parte” — ouvir.",
+      pergunta: "Tenho me ocupado tanto em servir que deixei de sentar e ouvir?"
+    },
+    "Lucas 11": {
+      texto: "Jesus ensina a orar e conta a parábola do amigo importuno, encerrando com “pedi, e dar-se-vos-á”. E promete que o Pai dará o Espírito Santo aos que pedirem — o melhor presente possível.",
+      pergunta: "Tenho persistido na oração, ou desistido no primeiro silêncio?"
+    },
+    "Lucas 12": {
+      texto: "A parábola do rico insensato, que planeja celeiros maiores e morre naquela noite. E o antídoto: “não andeis inquietos... buscai antes o reino de Deus”. Os corvos não semeiam e são sustentados.",
+      pergunta: "Tenho construído celeiros maiores, ou riqueza para com Deus?"
+    },
+    "Lucas 13": {
+      texto: "Diante de tragédias, Jesus recusa a lógica de que as vítimas eram piores pecadoras. Cura uma mulher encurvada há dezoito anos num sábado, e chama Jerusalém como galinha que junta os pintinhos — “e tu não quiseste”.",
+      pergunta: "Tenho julgado quem sofre como se merecesse o que aconteceu?"
+    },
+    "Lucas 14": {
+      texto: "Convidados escolhem os primeiros lugares e Jesus ensina o contrário. Depois manda convidar “os pobres, os aleijados, os coxos e os cegos” — gente que não pode retribuir o convite.",
+      pergunta: "Tenho feito o bem esperando retribuição, mesmo que indireta?"
+    },
+    "Lucas 15": {
+      texto: "Três parábolas do perdido: a ovelha, a moeda e o filho. O pai avista o filho “ainda longe”, corre e o abraça antes do discurso ensaiado. E o irmão mais velho fica de fora, irritado com a festa.",
+      pergunta: "Estou mais parecido com o filho que voltou, ou com o que ficou e reclamou?"
+    },
+    "Lucas 16": {
+      texto: "A parábola do administrador infiel e a do rico e Lázaro. E o princípio: “quem é fiel no mínimo, também é fiel no muito”. Fidelidade não se prova nas grandes ocasiões, mas no pouco.",
+      pergunta: "Tenho sido fiel naquilo que parece pequeno demais para importar?"
+    },
+    "Lucas 17": {
+      texto: "Dez leprosos são curados e apenas um volta para agradecer — e era samaritano. Jesus pergunta: “não foram dez os limpos? E os nove, onde estão?”. Gratidão como exceção, não como regra.",
+      pergunta: "Tenho voltado para agradecer, ou seguido em frente com o que recebi?"
+    },
+    "Lucas 18": {
+      texto: "A viúva insistente, o fariseu e o publicano, as crianças e o jovem rico. O publicano nem levanta os olhos: “ó Deus, tem misericórdia de mim, pecador”. E é esse que desce justificado.",
+      pergunta: "Minha oração se parece mais com a do fariseu ou com a do publicano?"
+    },
+    "Lucas 19": {
+      texto: "Zaqueu sobe numa árvore só para ver, e Jesus para embaixo dela e o chama pelo nome. O encontro muda a economia da casa: metade dos bens aos pobres, restituição em quádruplo.",
+      pergunta: "Meu encontro com Jesus tem afetado meu dinheiro e minhas reparações?"
+    },
+    "Lucas 20": {
+      texto: "Perguntas armadas sobre imposto e ressurreição são respondidas com sabedoria que desarma. E a advertência contra escribas que “devoram as casas das viúvas, e isto com pretexto de longas orações”.",
+      pergunta: "Tenho usado linguagem espiritual para encobrir algum interesse próprio?"
+    },
+    "Lucas 21": {
+      texto: "A viúva pobre lança duas moedinhas e Jesus diz que ela deu mais que todos. Depois, o discurso sobre o fim, com a advertência de que os corações não fiquem “sobrecarregados com os cuidados desta vida”.",
+      pergunta: "Meu coração tem ficado sobrecarregado com preocupações que roubam a vigilância?"
+    },
+    "Lucas 22": {
+      texto: "Na última ceia, os discípulos discutem quem é o maior. Jesus avisa Pedro que orou por ele, e depois, no Getsêmani, ora com suor como gotas de sangue: “não se faça a minha vontade, mas a tua”.",
+      pergunta: "Consigo dizer “seja feita a tua vontade” quando a minha é bem diferente?"
+    },
+    "Lucas 23": {
+      texto: "Na cruz, Jesus ora pelos que O crucificam: “Pai, perdoa-lhes, porque não sabem o que fazem”. E ao ladrão arrependido, promete o paraíso — a última conversão registrada antes da morte Dele.",
+      pergunta: "Consigo perdoar quem me feriu sem esperar que peçam desculpa?"
+    },
+    "Lucas 24": {
+      texto: "No caminho de Emaús, Jesus caminha com dois discípulos desanimados e lhes explica as Escrituras — e eles só O reconhecem ao partir o pão. “Não ardia em nós o nosso coração?”. Ele estava junto o tempo todo.",
+      pergunta: "Em que parte da minha caminhada Ele pode estar presente sem eu ter reconhecido?"
+    },
+    "João 1": {
+      texto: "“No princípio era o Verbo... e o Verbo se fez carne, e habitou entre nós.” João não começa com genealogia nem manjedoura, mas na eternidade. E João Batista aponta: “eis o Cordeiro de Deus, que tira o pecado do mundo”.",
+      pergunta: "Tenho contemplado quem Jesus era antes de tudo começar, e não só o que Ele fez?"
+    },
+    "João 2": {
+      texto: "O primeiro milagre não resolve uma tragédia — salva uma festa de casamento do constrangimento. Jesus transforma água em vinho, e o melhor vinho vem por último. Depois, purifica o templo com zelo.",
+      pergunta: "Tenho crido que Deus se importa também com o que parece pequeno demais?"
+    },
+    "João 3": {
+      texto: "Nicodemos vem de noite e ouve que precisa nascer de novo. E vem o versículo mais conhecido do mundo: “Deus amou o mundo de tal maneira que deu o seu Filho unigênito”. Amor medido pelo que Ele entregou.",
+      pergunta: "Tenho tratado João 3:16 como frase conhecida, ou como algo que ainda me alcança?"
+    },
+    "João 4": {
+      texto: "Jesus atravessa a Samaria — o caminho que os judeus evitavam — e conversa com uma mulher em dupla exclusão social. Oferece “água viva” e revela quem é. Ela larga o cântaro e vira a primeira evangelista da cidade.",
+      pergunta: "Tenho evitado caminhos e pessoas que Jesus faria questão de atravessar?"
+    },
+    "João 5": {
+      texto: "Junto ao tanque de Betesda, um paralítico há trinta e oito anos ouve a pergunta: “queres ficar são?”. Parece óbvia, mas não é — depois de tanto tempo, a condição virou identidade.",
+      pergunta: "Existe algo em mim que virou identidade, e eu já não quero mais que seja curado?"
+    },
+    "João 6": {
+      texto: "Depois de alimentar cinco mil, Jesus se declara “o pão da vida” — e muitos discípulos O abandonam por causa do ensino difícil. Pedro responde: “Senhor, para quem iremos? Tu tens as palavras da vida eterna”.",
+      pergunta: "Tenho permanecido mesmo diante de ensinos que não entendo ou não gosto?"
+    },
+    "João 7": {
+      texto: "No meio da festa, Jesus clama: “se alguém tem sede, venha a mim e beba”. As opiniões se dividem, a família não crê, e os guardas voltam sem prendê-Lo dizendo: “nunca homem algum falou assim”.",
+      pergunta: "Tenho ido a Ele com minha sede, ou tentado saciá-la em outro lugar?"
+    },
+    "João 8": {
+      texto: "Diante da mulher pega em adultério, Jesus escreve no chão e diz: “aquele que dentre vós está sem pecado seja o primeiro que atire pedra”. Todos vão embora. E Ele: “nem eu também te condeno; vai, e não peques mais”.",
+      pergunta: "Tenho segurado pedras que Jesus me pediria para largar?"
+    },
+    "João 9": {
+      texto: "O cego de nascença é curado e interrogado. Sem teologia elaborada, ele responde o que sabe: “uma coisa sei: eu era cego, e agora vejo”. Testemunho simples que os doutores não conseguiram derrubar.",
+      pergunta: "Tenho compartilhado o que Deus fez comigo, mesmo sem saber explicar tudo?"
+    },
+    "João 10": {
+      texto: "“Eu sou o bom pastor; o bom pastor dá a sua vida pelas ovelhas.” Ele as chama pelo nome, elas reconhecem Sua voz, e ninguém as arrebata da Sua mão.",
+      pergunta: "Tenho reconhecido a voz Dele em meio a tantas outras vozes?"
+    },
+    "João 11": {
+      texto: "Diante do túmulo de Lázaro, mesmo sabendo que o ressuscitaria em minutos, Jesus chora. O versículo mais curto da Bíblia mostra um Deus que não trata a dor humana como problema a ser ignorado.",
+      pergunta: "Tenho crido que Deus chora comigo, e não apenas resolve por mim?"
+    },
+    "João 12": {
+      texto: "Maria unge os pés de Jesus com nardo caríssimo e Judas critica o desperdício. Jesus a defende. E declara: “se o grão de trigo não morrer, fica ele só; mas se morrer, dá muito fruto”.",
+      pergunta: "O que precisa morrer em mim para que algo possa frutificar?"
+    },
+    "João 13": {
+      texto: "Jesus se levanta da ceia, toma a toalha e lava os pés dos discípulos — inclusive os de Judas. E dá o mandamento novo: “que vos ameis uns aos outros, como eu vos amei”.",
+      pergunta: "A quem eu teria dificuldade de lavar os pés hoje?"
+    },
+    "João 14": {
+      texto: "“Não se turbe o vosso coração... na casa de meu Pai há muitas moradas.” Jesus se declara “o caminho, a verdade e a vida”, e promete o Consolador que ficaria com eles para sempre.",
+      pergunta: "Meu coração tem descansado nas promessas Dele, ou se turbado com o que não controlo?"
+    },
+    "João 15": {
+      texto: "“Eu sou a videira, vós as varas.” Frutificar não é esforço da vara — é consequência de permanecer ligada. E o amor definido no limite: “ninguém tem maior amor do que este, de dar alguém a sua vida pelos seus amigos”.",
+      pergunta: "Tenho tentado produzir fruto por esforço, em vez de permanecer ligado a Ele?"
+    },
+    "João 16": {
+      texto: "Jesus avisa que haverá tribulação, mas conclui: “tende bom ânimo, eu venci o mundo”. E promete o Espírito da verdade, que guiaria os discípulos em tudo que ainda não podiam suportar ouvir.",
+      pergunta: "Tenho enfrentado dificuldades sabendo que Ele já venceu o mundo?"
+    },
+    "João 17": {
+      texto: "A oração sacerdotal: Jesus ora pelos discípulos e também “pelos que hão de crer em mim por meio da palavra deles” — ou seja, por nós. E o pedido central: “que todos sejam um”.",
+      pergunta: "Tenho contribuído para a unidade pela qual Jesus orou nominalmente?"
+    },
+    "João 18": {
+      texto: "No jardim, Jesus se entrega dizendo “sou eu” e protege os discípulos. Pedro nega três vezes junto ao fogo. E Pilatos pergunta “que é a verdade?” tendo a Verdade em pé diante dele.",
+      pergunta: "Já procurei respostas sem perceber que a resposta estava bem na minha frente?"
+    },
+    "João 19": {
+      texto: "A cruz, a coroa de espinhos, o soldado que fura o lado. E a última palavra de Jesus: “está consumado” — não um lamento de derrota, mas o anúncio de uma obra terminada.",
+      pergunta: "Tenho vivido como quem crê que a obra da minha salvação está consumada?"
+    },
+    "João 20": {
+      texto: "Maria chora no jardim e O confunde com o jardineiro, até Ele dizer seu nome. Tomé exige provas e as recebe. E o propósito do livro é declarado: “estes foram escritos para que creiais”.",
+      pergunta: "Já precisei ouvir meu nome de Deus para reconhecer que Ele estava ali?"
+    },
+    "João 21": {
+      texto: "Jesus prepara o café da manhã na praia e restaura Pedro com três perguntas — uma para cada negação. Não pede explicação nem desculpa: pergunta “tu me amas?” e devolve a missão.",
+      pergunta: "Tenho crido que Deus restaura e devolve missão, mesmo depois de eu falhar feio?"
+    },
+    "Atos 1": {
+      texto: "Antes de subir aos céus, Jesus manda esperar a promessa do Pai e define o alcance da missão: “em Jerusalém, em toda a Judeia e Samaria, e até aos confins da terra”. Os discípulos ainda perguntam sobre restaurar o reino — e Ele redireciona do calendário para a missão.",
+      pergunta: "Tenho me preocupado com prazos de Deus em vez da tarefa que Ele já me deu?"
+    },
+    "Atos 2": {
+      texto: "No Pentecostes, o Espírito desce e cada um ouve na própria língua. Pedro — o mesmo que negara — prega e três mil se convertem. A igreja nasce perseverando na doutrina, na comunhão, no partir do pão e nas orações.",
+      pergunta: "Minha vida cristã tem as quatro marcas da primeira igreja, ou só algumas delas?"
+    },
+    "Atos 3": {
+      texto: "Diante do coxo à porta do templo, Pedro diz: “não tenho prata nem ouro, mas o que tenho isso te dou”. Ele não tinha o que o homem pedia, e tinha o que ele realmente precisava.",
+      pergunta: "Tenho oferecido o que realmente possuo, em vez de lamentar o que não tenho?"
+    },
+    "Atos 4": {
+      texto: "Presos e ameaçados, Pedro e João respondem: “julgai se é justo diante de Deus ouvir-vos antes a vós do que a Deus”. E a igreja ora — não por proteção, mas por ousadia para continuar falando.",
+      pergunta: "Minhas orações pedem alívio, ou coragem para continuar?"
+    },
+    "Atos 5": {
+      texto: "Ananias e Safira mentem sobre a oferta e morrem — o pecado não foi dar menos, foi fingir que davam tudo. E os apóstolos, açoitados, saem “alegres por terem sido julgados dignos de padecer afronta por aquele nome”.",
+      pergunta: "Tenho aparentado uma entrega maior do que a real?"
+    },
+    "Atos 6": {
+      texto: "Diante de uma reclamação legítima sobre viúvas negligenciadas, os apóstolos não ignoram nem abandonam a pregação — criam uma estrutura nova e escolhem sete homens cheios do Espírito para servir às mesas.",
+      pergunta: "Tenho resolvido conflitos com estrutura e sabedoria, ou apenas com boa intenção?"
+    },
+    "Atos 7": {
+      texto: "Estêvão reconta toda a história de Israel e é apedrejado. Enquanto morre, ora pelos que o matam — e um jovem chamado Saulo guarda as capas dos executores, testemunhando tudo.",
+      pergunta: "Consigo orar por quem me faz mal, como Estêvão fez?"
+    },
+    "Atos 8": {
+      texto: "A perseguição espalha os cristãos, e o evangelho se espalha junto. Filipe é enviado a um caminho deserto para encontrar um único etíope lendo Isaías 53 — e explicar a quem aquele texto se referia.",
+      pergunta: "Tenho ido onde Deus manda, mesmo quando parece pouco estratégico?"
+    },
+    "Atos 9": {
+      texto: "A caminho de Damasco para prender cristãos, Saulo é derrubado por uma luz e ouve: “por que me persegues?”. Ananias hesita em recebê-lo, mas obedece — e o maior perseguidor vira o maior missionário.",
+      pergunta: "Já limitei o que Deus pode fazer com alguém que considero caso perdido?"
+    },
+    "Atos 10": {
+      texto: "Deus prepara Pedro com uma visão e Cornélio com um anjo, para que se encontrem. Pedro conclui: “agora reconheço com verdade que Deus não faz acepção de pessoas”. O evangelho atravessa a barreira mais rígida daquela cultura.",
+      pergunta: "Que barreira cultural ou social eu ainda preciso deixar Deus derrubar em mim?"
+    },
+    "Atos 11": {
+      texto: "Criticado por comer com gentios, Pedro explica passo a passo o que Deus fez e conclui: “quem era eu, para que pudesse resistir a Deus?”. E em Antioquia, os discípulos são chamados cristãos pela primeira vez.",
+      pergunta: "Tenho resistido a algo que Deus está claramente fazendo de um jeito diferente do meu?"
+    },
+    "Atos 12": {
+      texto: "A igreja ora por Pedro na prisão, um anjo o liberta, e quando ele bate à porta, ninguém acredita — a moça que o reconhece é chamada de louca. Deus responde além do que a fé dos que oravam esperava.",
+      pergunta: "Já orei por algo e fiquei surpreso quando Deus atendeu?"
+    },
+    "Atos 13": {
+      texto: "Enquanto a igreja jejuava e ministrava ao Senhor, o Espírito separa Barnabé e Saulo. Começa a primeira viagem missionária — enviados por Deus, confirmados pela comunidade, não por iniciativa isolada.",
+      pergunta: "Tenho buscado confirmação da comunidade para os passos que sinto que Deus pede?"
+    },
+    "Atos 14": {
+      texto: "Em Listra, a multidão quer adorá-los como deuses; pouco depois, apedrejam Paulo e o deixam por morto. Ele se levanta e volta à cidade. E ensina: “é necessário que entremos no reino de Deus por muitas tribulações”.",
+      pergunta: "Tenho esperado uma vida de fé sem tribulação, contrariando o que os apóstolos ensinaram?"
+    },
+    "Atos 15": {
+      texto: "No concílio de Jerusalém, a igreja decide que os gentios não precisam se tornar judeus para serem salvos — “pela graça do Senhor Jesus Cristo cremos que seremos salvos, como eles também”. Conflito resolvido com Escritura, testemunho e diálogo.",
+      pergunta: "Tenho exigido de outros marcas culturais que Deus não exige?"
+    },
+    "Atos 16": {
+      texto: "Impedidos de ir a alguns lugares, são chamados à Macedônia. Lídia se converte, Paulo e Silas são presos — e às meia-noite cantam louvores. O terremoto abre as portas, e o carcereiro pergunta o que fazer para ser salvo.",
+      pergunta: "Consigo cantar no meio da minha “meia-noite”, antes de qualquer solução?"
+    },
+    "Atos 17": {
+      texto: "Em Atenas, Paulo observa a cidade, cita poetas gregos e parte do altar “ao Deus desconhecido” para anunciar o Deus vivo. Contextualiza sem diluir — alguns zombam, outros creem.",
+      pergunta: "Tenho sabido falar de Deus na linguagem de quem me ouve, sem mudar a mensagem?"
+    },
+    "Atos 18": {
+      texto: "Em Corinto, Paulo trabalha fazendo tendas com Áquila e Priscila, e Deus lhe diz numa visão: “não temas... porque tenho muito povo nesta cidade”. Encorajamento antes do resultado aparecer.",
+      pergunta: "Tenho persistido onde Deus me colocou, mesmo antes de ver fruto?"
+    },
+    "Atos 19": {
+      texto: "Em Éfeso, muitos que praticavam magia queimam publicamente seus livros caríssimos. E os ourives se revoltam porque o evangelho ameaçava o lucro deles com a idolatria — conversão que mexe no bolso da cidade.",
+      pergunta: "Existe algo que eu precisaria “queimar” para seguir Jesus de verdade?"
+    },
+    "Atos 20": {
+      texto: "Despedindo-se dos presbíteros de Éfeso, Paulo diz que não considera sua vida preciosa para si mesmo, e cita Jesus: “mais bem-aventurada coisa é dar do que receber”. Uma despedida com choro e oração na praia.",
+      pergunta: "Tenho vivido mais para dar ou para receber?"
+    },
+    "Atos 21": {
+      texto: "Avisado de que sofreria em Jerusalém, Paulo responde: “estou pronto não só a ser preso, mas ainda a morrer”. Os amigos desistem de convencê-lo dizendo: “faça-se a vontade do Senhor”.",
+      pergunta: "Consigo dizer “faça-se a vontade do Senhor” quando ela contraria o que eu queria?"
+    },
+    "Atos 22": {
+      texto: "Diante da multidão hostil, Paulo conta sua própria história de conversão em hebraico. Seu argumento mais forte não é teologia elaborada — é o testemunho pessoal do que aconteceu com ele.",
+      pergunta: "Tenho sabido contar de forma simples o que Deus fez comigo?"
+    },
+    "Atos 23": {
+      texto: "Depois de um dia terrível, o Senhor aparece a Paulo à noite: “tem ânimo, Paulo”. E um sobrinho dele descobre uma conspiração e a denuncia — Deus protege por meios extraordinários e por meios comuns.",
+      pergunta: "Tenho reconhecido as proteções “comuns” que Deus coloca no meu caminho?"
+    },
+    "Atos 24": {
+      texto: "Preso dois anos, Paulo raciocina com Félix sobre “justiça, temperança e juízo vindouro”, e o governador se assusta, adiando a decisão para “tempo oportuno” que nunca chega.",
+      pergunta: "Existe alguma decisão espiritual que venho adiando para um “tempo oportuno”?"
+    },
+    "Atos 25": {
+      texto: "Paulo apela a César, exercendo seu direito de cidadão romano. Fé não significou passividade — ele usou os meios legais disponíveis para levar o evangelho até a capital do império.",
+      pergunta: "Tenho usado com sabedoria os recursos legítimos que estão à minha disposição?"
+    },
+    "Atos 26": {
+      texto: "Diante do rei Agripa, Paulo conta de novo sua conversão e ouve a resposta: “por pouco me persuades a me fazer cristão”. E responde desejando que todos fossem como ele — “exceto estas cadeias”.",
+      pergunta: "Consigo desejar o bem espiritual até de quem me julga?"
+    },
+    "Atos 27": {
+      texto: "No naufrágio, Paulo, o prisioneiro, acaba se tornando a voz de calma no navio: “tende bom ânimo, porque não haverá perda da vida de nenhum de vós”. E ninguém morre, exatamente como fora dito.",
+      pergunta: "Tenho sido fonte de calma nas tempestades dos outros?"
+    },
+    "Atos 28": {
+      texto: "O livro termina em Roma, com Paulo preso em casa alugada, pregando “com toda a ousadia, sem impedimento algum”. Um final sem desfecho — porque a história da igreja continuaria depois dele.",
+      pergunta: "Tenho enxergado minha parte como capítulo de uma história que continua além de mim?"
+    },
+    "Romanos 1": {
+      texto: "Paulo declara não se envergonhar do evangelho, “porque é o poder de Deus para salvação de todo aquele que crê”. E descreve a espiral humana: conhecer a Deus pela criação, não O glorificar, e ser entregue às próprias escolhas.",
+      pergunta: "Tenho me envergonhado do evangelho em algum ambiente da minha vida?"
+    },
+    "Romanos 2": {
+      texto: "O capítulo vira a mira contra quem julga: “tu que julgas fazes o mesmo”. E lembra que a bondade de Deus é o que leva ao arrependimento — não a dureza, nem o medo.",
+      pergunta: "Tenho julgado nos outros algo que também existe em mim?"
+    },
+    "Romanos 3": {
+      texto: "“Não há um justo, nem um sequer.” Depois de nivelar todos, Paulo apresenta a solução: justificados gratuitamente pela graça, mediante a redenção em Cristo. A conclusão elimina qualquer motivo de orgulho.",
+      pergunta: "Tenho vivido a salvação como presente recebido, ou como algo que conquistei?"
+    },
+    "Romanos 4": {
+      texto: "Abraão é o exemplo: foi justificado pela fé antes da circuncisão e antes da Lei. “Creu Abraão a Deus, e isso lhe foi imputado como justiça” — o mesmo texto de Gênesis 15, agora explicado.",
+      pergunta: "Minha fé descansa na promessa de Deus, ou no meu desempenho religioso?"
+    },
+    "Romanos 5": {
+      texto: "“Sendo pois justificados pela fé, temos paz com Deus.” E o argumento que desarma a insegurança: Cristo morreu por nós quando ainda éramos pecadores — não depois que melhoramos.",
+      pergunta: "Tenho crido que Deus me amou antes de eu merecer, e não depois?"
+    },
+    "Romanos 6": {
+      texto: "Se a graça abunda, podemos pecar mais? “De modo nenhum.” Batizados na morte de Cristo, fomos libertos para uma vida nova — o pecado deixou de ser senhor, e essa liberdade precisa ser exercida.",
+      pergunta: "Tenho vivido como quem foi liberto, ou ainda obedecendo a um senhor destronado?"
+    },
+    "Romanos 7": {
+      texto: "A confissão mais honesta de Paulo: “o bem que quero, não faço; e o mal que não quero, esse faço”. E o grito: “miserável homem que eu sou! Quem me livrará?”. A resposta vem no nome de Jesus.",
+      pergunta: "Tenho sido honesto(a) sobre a luta interna que ainda enfrento?"
+    },
+    "Romanos 8": {
+      texto: "O capítulo mais alto da carta: nenhuma condenação, o Espírito que intercede com gemidos, todas as coisas cooperando para o bem — e a certeza de que nada, nem morte, nem vida, nem coisa alguma, pode nos separar do amor de Deus.",
+      pergunta: "O que tenho temido que possa me separar de Deus, quando Ele diz que nada pode?"
+    },
+    "Romanos 9": {
+      texto: "Paulo declara que preferiria ser amaldiçoado se isso salvasse seu povo. E trata da soberania de Deus com a imagem do oleiro e do barro — verdade difícil, apresentada com dor no coração, não com frieza.",
+      pergunta: "Tenho tratado verdades difíceis com o mesmo peso de amor que Paulo demonstra?"
+    },
+    "Romanos 10": {
+      texto: "“Se com a tua boca confessares ao Senhor Jesus, e em teu coração creres que Deus o ressuscitou dentre os mortos, serás salvo.” E a pergunta: como crerão se não ouvirem, e como ouvirão se não houver quem pregue?",
+      pergunta: "Existe alguém que só ouvirá se eu falar?"
+    },
+    "Romanos 11": {
+      texto: "Paulo alerta os gentios enxertados a não se ensoberbecerem contra os ramos naturais. E fecha em adoração: “ó profundidade das riquezas... quão insondáveis são os seus juízos”.",
+      pergunta: "Minha teologia termina em orgulho de saber, ou em adoração diante do que não entendo?"
+    },
+    "Romanos 12": {
+      texto: "A virada prática: apresentar o corpo como sacrifício vivo, não se conformar com este mundo, usar os dons com humildade, amar sem fingimento, vencer o mal com o bem.",
+      pergunta: "Tenho sido “sacrifício vivo”, ou entregue só o que é confortável?"
+    },
+    "Romanos 13": {
+      texto: "Sobre autoridades, impostos e dívidas, com um princípio que resume tudo: “a ninguém devais coisa alguma, senão o amor... porque o amor é o cumprimento da lei”.",
+      pergunta: "Tenho tratado o amor ao próximo como dívida permanente que nunca quito?"
+    },
+    "Romanos 14": {
+      texto: "Sobre comida e dias sagrados, Paulo pede que ninguém julgue nem despreze o irmão de convicção diferente — e que ninguém coloque tropeço no caminho de outro por causa da própria liberdade.",
+      pergunta: "Tenho exercido minha liberdade sem me importar com quem tropeça nela?"
+    },
+    "Romanos 15": {
+      texto: "“Nós, que somos fortes, devemos suportar as fraquezas dos fracos, e não agradar a nós mesmos.” Paulo cita o exemplo de Cristo, que também não agradou a si mesmo.",
+      pergunta: "Tenho suportado a fraqueza alheia, ou exigido que todos acompanhem meu ritmo?"
+    },
+    "Romanos 16": {
+      texto: "Uma lista de saudações com dezenas de nomes — muitos deles mulheres, escravos e pessoas comuns. Paulo, o gigante teológico, termina a carta mais profunda da Bíblia lembrando gente por nome.",
+      pergunta: "Tenho valorizado as pessoas comuns que sustentam o que faço?"
+    },
+    "1 Coríntios 1": {
+      texto: "Numa igreja dividida em partidos — “eu sou de Paulo”, “eu de Apolo” — Paulo aponta para a cruz, “loucura para os que perecem, mas poder de Deus para nós”. E lembra que Deus escolheu o fraco para envergonhar o forte.",
+      pergunta: "Tenho me identificado mais com um grupo ou líder do que com Cristo?"
+    },
+    "1 Coríntios 2": {
+      texto: "Paulo diz ter chegado “com fraqueza, temor e grande tremor”, decidido a nada saber senão Jesus Cristo e este crucificado — para que a fé deles não se apoiasse em eloquência humana.",
+      pergunta: "Minha fé se apoia em argumentos impressionantes ou em Cristo?"
+    },
+    "1 Coríntios 3": {
+      texto: "Sobre divisões: “eu plantei, Apolo regou, mas Deus deu o crescimento”. E o alerta de que a obra de cada um será provada pelo fogo — nem tudo que construímos sobrevive ao teste.",
+      pergunta: "O que tenho construído resistiria ao fogo, ou é palha bem arrumada?"
+    },
+    "1 Coríntios 4": {
+      texto: "“Que tens tu que não tenhas recebido?” Paulo desmonta o orgulho espiritual lembrando que tudo foi recebido. E se descreve como “o refugo do mundo”, sem se importar com julgamento humano.",
+      pergunta: "Tenho me orgulhado de algo que, na verdade, apenas recebi?"
+    },
+    "1 Coríntios 5": {
+      texto: "Diante de um pecado escandaloso tolerado pela igreja, Paulo confronta a permissividade: “um pouco de fermento leveda toda a massa”. Amor que não confunde graça com omissão.",
+      pergunta: "Tenho confundido tolerar o erro com amar a pessoa?"
+    },
+    "1 Coríntios 6": {
+      texto: "Contra processos entre irmãos e contra a imoralidade, Paulo apresenta o argumento decisivo: “fostes comprados por bom preço; glorificai, pois, a Deus no vosso corpo”. O corpo é templo, não propriedade autônoma.",
+      pergunta: "Tenho tratado meu corpo como templo, ou como assunto só meu?"
+    },
+    "1 Coríntios 7": {
+      texto: "Orientações sobre casamento e solteirice, com equilíbrio raro para a época: deveres mútuos entre marido e mulher, e o reconhecimento de que ambos os estados podem servir plenamente ao Senhor.",
+      pergunta: "Tenho vivido bem o estado em que estou, ou apenas esperando o próximo?"
+    },
+    "1 Coríntios 8": {
+      texto: "Sobre carnes oferecidas a ídolos: “a ciência incha, mas o amor edifica”. Paulo abre mão do próprio direito para não escandalizar o irmão mais fraco — conhecimento subordinado ao amor.",
+      pergunta: "Meu conhecimento tem edificado os outros ou inflado a mim?"
+    },
+    "1 Coríntios 9": {
+      texto: "Paulo abre mão de direitos legítimos para não colocar obstáculo ao evangelho, e se descreve correndo como atleta: “esmurro o meu corpo, e o reduzo à servidão”. Disciplina como parte da fidelidade.",
+      pergunta: "De que direito legítimo eu abriria mão por causa de alguém?"
+    },
+    "1 Coríntios 10": {
+      texto: "Usando o exemplo de Israel no deserto, Paulo adverte: “aquele que cuida estar em pé, olhe não caia”. E promete que com a tentação Deus dará também o escape.",
+      pergunta: "Tenho me achado seguro demais em alguma área onde já vi outros caírem?"
+    },
+    "1 Coríntios 11": {
+      texto: "Sobre a ceia do Senhor, Paulo repreende a igreja onde uns comem demais e outros passam fome. Participar “indignamente” ali não era falta de pureza pessoal, era desprezo pelo irmão à mesa.",
+      pergunta: "Tenho me aproximado da mesa do Senhor em paz com meus irmãos?"
+    },
+    "1 Coríntios 12": {
+      texto: "O corpo com muitos membros: o pé não é menos corpo que a mão, e os membros que parecem mais fracos são necessários. Diversidade de dons, mesmo Espírito, mesmo corpo.",
+      pergunta: "Tenho valorizado minha função no corpo, mesmo que ela pareça menor?"
+    },
+    "1 Coríntios 13": {
+      texto: "O capítulo do amor, colocado de propósito no meio da discussão sobre dons: sem amor, línguas viram metal que soa, profecia vira nada, sacrifício vira inútil. “O amor nunca falha.”",
+      pergunta: "Se eu trocar “o amor” por “eu” nesse capítulo, quantas frases continuariam verdadeiras?"
+    },
+    "1 Coríntios 14": {
+      texto: "Paulo ordena o culto: melhor cinco palavras compreensíveis que dez mil em língua estranha sem interpretação. “Faça-se tudo decentemente e com ordem”, para edificação de todos.",
+      pergunta: "Minha expressão de fé tem edificado os outros, ou apenas a mim?"
+    },
+    "1 Coríntios 15": {
+      texto: "O capítulo da ressurreição: se Cristo não ressuscitou, a fé é vã e somos os mais miseráveis dos homens. Mas Ele ressuscitou — e a morte perdeu o aguilhão. “O vosso trabalho não é vão no Senhor.”",
+      pergunta: "Tenho vivido como quem crê de verdade na ressurreição?"
+    },
+    "1 Coríntios 16": {
+      texto: "Instruções práticas sobre a coleta separada semanalmente, planos de viagem e saudações. E o resumo final: “fazei tudo com amor”. Teologia altíssima terminando em logística e afeto.",
+      pergunta: "Tenho organizado minha generosidade, ou dependo do impulso do momento?"
+    },
+    "2 Coríntios 1": {
+      texto: "Deus é chamado “o Pai das misericórdias e o Deus de toda a consolação”, que nos consola “para que possamos consolar os que estiverem em alguma tribulação”. O consolo recebido vira consolo repassado.",
+      pergunta: "Tenho usado o consolo que já recebi para consolar alguém?"
+    },
+    "2 Coríntios 2": {
+      texto: "Paulo pede que a igreja perdoe e console quem foi disciplinado, “para que não seja de modo algum devorado de demasiada tristeza”. Disciplina que não termina em restauração vira crueldade.",
+      pergunta: "Tenho ajudado alguém a se levantar depois de ter errado?"
+    },
+    "2 Coríntios 3": {
+      texto: "Os coríntios são chamados de “carta de Cristo”, escrita não com tinta, mas com o Espírito. E o véu que cobria o rosto de Moisés é removido em Cristo — “onde está o Espírito do Senhor, aí há liberdade”.",
+      pergunta: "Que tipo de carta minha vida tem sido para quem me lê?"
+    },
+    "2 Coríntios 4": {
+      texto: "“Temos este tesouro em vasos de barro, para que a excelência do poder seja de Deus.” Atribulados mas não angustiados, abatidos mas não destruídos — a fragilidade do vaso é o que evidencia de quem é o poder.",
+      pergunta: "Tenho me envergonhado da minha fragilidade, quando é justamente ela que revela Deus?"
+    },
+    "2 Coríntios 5": {
+      texto: "“Se alguém está em Cristo, nova criatura é.” E a missão: fomos reconciliados e recebemos o ministério da reconciliação, sendo “embaixadores da parte de Cristo”.",
+      pergunta: "Tenho agido como embaixador de Cristo nas minhas relações?"
+    },
+    "2 Coríntios 6": {
+      texto: "Paulo lista as marcas do ministério: tribulações, açoites, prisões, e ainda assim “como entristecidos, mas sempre alegres; como pobres, mas enriquecendo a muitos”. Contradições que só a fé explica.",
+      pergunta: "Consigo viver tristeza e alegria ao mesmo tempo, sem que uma anule a outra?"
+    },
+    "2 Coríntios 7": {
+      texto: "Paulo distingue duas tristezas: “a tristeza segundo Deus opera arrependimento para a salvação... mas a tristeza do mundo opera a morte”. Nem todo remorso leva a algum lugar bom.",
+      pergunta: "Minha tristeza pelo erro tem me levado à mudança, ou só à autopunição?"
+    },
+    "2 Coríntios 8": {
+      texto: "As igrejas da Macedônia, em extrema pobreza, pediram “com muitos rogos” para participar da coleta. E o exemplo maior: Cristo, “sendo rico, por amor de vós se fez pobre”.",
+      pergunta: "Minha generosidade depende de eu ter sobra, ou de eu ter coração?"
+    },
+    "2 Coríntios 9": {
+      texto: "“Cada um contribua segundo propôs no seu coração; não com tristeza, nem por necessidade; porque Deus ama ao que dá com alegria.” Generosidade medida pela alegria, não pelo valor.",
+      pergunta: "Tenho dado com alegria, ou por obrigação e constrangimento?"
+    },
+    "2 Coríntios 10": {
+      texto: "Paulo fala das armas da milícia que “não são carnais, mas poderosas em Deus”, destruindo raciocínios e levando “cativo todo o entendimento à obediência de Cristo”. A batalha começa nos pensamentos.",
+      pergunta: "Que pensamento recorrente eu preciso levar cativo à obediência de Cristo?"
+    },
+    "2 Coríntios 11": {
+      texto: "Forçado a se defender, Paulo lista o que sofreu: naufrágios, açoites, fome, frio, perigos por toda parte. E conclui que se gloriará “no que diz respeito à minha fraqueza”.",
+      pergunta: "De que eu costumo me gloriar — das minhas forças ou do que Deus fez apesar de mim?"
+    },
+    "2 Coríntios 12": {
+      texto: "O espinho na carne não é removido, e a resposta de Deus é outra: “a minha graça te basta, porque o meu poder se aperfeiçoa na fraqueza”. Paulo passa a se gloriar naquilo que queria eliminar.",
+      pergunta: "Existe um “espinho” que eu peço para tirar, e Deus está oferecendo graça em vez de remoção?"
+    },
+    "2 Coríntios 13": {
+      texto: "“Examinai-vos a vós mesmos, se permaneceis na fé.” Paulo encerra pedindo autoexame, e desejando a perfeição da igreja mais do que a própria vindicação.",
+      pergunta: "Quando foi a última vez que examinei minha própria fé com honestidade?"
+    },
+    "Gálatas 1": {
+      texto: "Paulo se espanta que estejam mudando para “outro evangelho, que não é outro”. E declara que se um anjo do céu anunciasse algo diferente, seria anátema. A mensagem não é negociável, nem por credencial celestial.",
+      pergunta: "Tenho aceitado versões do evangelho que suavizam ou acrescentam exigências?"
+    },
+    "Gálatas 2": {
+      texto: "Paulo confronta Pedro publicamente por se afastar dos gentios com medo dos judaizantes. E resume tudo: “já estou crucificado com Cristo; e vivo, não mais eu, mas Cristo vive em mim”.",
+      pergunta: "Tenho agido diferente conforme quem está olhando?"
+    },
+    "Gálatas 3": {
+      texto: "“Começando pelo Espírito, acabais agora pela carne?” Paulo argumenta que a promessa a Abraão precede a Lei, e que em Cristo “não há judeu nem grego, escravo nem livre, homem nem mulher”.",
+      pergunta: "Comecei pela graça e estou tentando continuar por esforço próprio?"
+    },
+    "Gálatas 4": {
+      texto: "Não somos mais servos, mas filhos — e por isso o Espírito clama em nós “Aba, Pai”. Paulo se angustia como quem sofre dores de parto até que Cristo seja formado neles.",
+      pergunta: "Tenho vivido como filho(a), ou ainda como empregado tentando agradar o patrão?"
+    },
+    "Gálatas 5": {
+      texto: "“Para a liberdade foi que Cristo nos libertou” — mas não para servir à carne. E o contraste entre as obras da carne e o fruto do Espírito: amor, gozo, paz, longanimidade, benignidade, bondade, fé, mansidão, temperança.",
+      pergunta: "Qual desses nove frutos está mais ausente em mim nesta fase?"
+    },
+    "Gálatas 6": {
+      texto: "“Levai as cargas uns dos outros.” E o princípio da semeadura: “o que o homem semear, isso também ceifará”. Paulo fecha gloriando-se apenas na cruz de Cristo.",
+      pergunta: "De quem eu tenho ajudado a carregar a carga ultimamente?"
+    },
+    "Efésios 1": {
+      texto: "Um único fôlego de louvor: escolhidos antes da fundação do mundo, adotados como filhos, remidos pelo sangue, selados com o Espírito. Tudo “para louvor da glória da sua graça”.",
+      pergunta: "Tenho consciência de quanto já recebi antes mesmo de fazer qualquer coisa?"
+    },
+    "Efésios 2": {
+      texto: "“Estando nós mortos em nossos delitos, nos vivificou juntamente com Cristo.” Salvos pela graça, por meio da fé, “não vem de vós, é dom de Deus... para que ninguém se glorie”.",
+      pergunta: "Tenho tentado acrescentar algo meu a uma salvação que já é completa?"
+    },
+    "Efésios 3": {
+      texto: "Paulo ora para que sejam fortalecidos no homem interior e conheçam “a largura, o comprimento, a altura e a profundidade” do amor de Cristo, que excede todo entendimento.",
+      pergunta: "Tenho buscado conhecer o amor de Cristo, ou apenas informações sobre Ele?"
+    },
+    "Efésios 4": {
+      texto: "Um chamado à unidade: um corpo, um Espírito, um Senhor, uma fé, um batismo. E o alvo dos dons: aperfeiçoar os santos “para a obra do ministério” — o povo todo servindo, não só os líderes.",
+      pergunta: "Tenho enxergado o ministério como tarefa de todos, incluindo a minha parte?"
+    },
+    "Efésios 5": {
+      texto: "“Sede, pois, imitadores de Deus, como filhos amados.” E as instruções ao casamento, com o marido chamado a amar “como também Cristo amou a igreja e a si mesmo se entregou por ela”.",
+      pergunta: "Meu amor tem sido do tipo que se entrega, ou do tipo que exige?"
+    },
+    "Efésios 6": {
+      texto: "A armadura de Deus, peça por peça, porque “não temos que lutar contra carne e sangue”. E o encerramento: orar em todo tempo, com toda oração e súplica.",
+      pergunta: "Tenho enfrentado batalhas espirituais com armas espirituais, ou com irritação e argumento?"
+    },
+    "Filipenses 1": {
+      texto: "Escrevendo da prisão, Paulo diz que suas cadeias serviram ao progresso do evangelho, e resume sua vida: “para mim o viver é Cristo, e o morrer é lucro”. Confiança de que Deus completa a obra que começou.",
+      pergunta: "Consigo ver como Deus tem usado até as minhas limitações atuais?"
+    },
+    "Filipenses 2": {
+      texto: "O hino a Cristo, que “sendo em forma de Deus... a si mesmo se esvaziou, tomando a forma de servo”, obediente até à morte de cruz. E o convite: tenham esse mesmo sentimento.",
+      pergunta: "Tenho me esvaziado por alguém, ou defendido meu lugar a todo custo?"
+    },
+    "Filipenses 3": {
+      texto: "Paulo lista suas credenciais impecáveis e as considera “esterco” diante de conhecer a Cristo. E declara: “esquecendo-me das coisas que atrás ficam, prossigo para o alvo”.",
+      pergunta: "Que conquistas minhas eu ainda seguro como se fossem meu valor diante de Deus?"
+    },
+    "Filipenses 4": {
+      texto: "“Alegrai-vos sempre no Senhor... não estejais inquietos por coisa alguma.” Paulo, preso, ensina que aprendeu a viver com pouco e com muito: “posso todas as coisas naquele que me fortalece”.",
+      pergunta: "Tenho aprendido a contentar-me, ou dependo das circunstâncias para ter paz?"
+    },
+    "Colossenses 1": {
+      texto: "Cristo é apresentado como “a imagem do Deus invisível”, criador de todas as coisas, cabeça da igreja, e aquele em quem “todas as coisas subsistem”. Reconciliação feita pelo sangue da cruz.",
+      pergunta: "Tenho colocado Cristo no centro, ou como parte de uma vida com muitos centros?"
+    },
+    "Colossenses 2": {
+      texto: "Alerta contra filosofias e regras humanas: “ninguém vos julgue pelo comer, ou pelo beber”. Cristo cancelou a cédula que era contra nós, cravando-a na cruz.",
+      pergunta: "Tenho vivido preso a regras que Cristo já cravou na cruz?"
+    },
+    "Colossenses 3": {
+      texto: "“Buscai as coisas que são de cima.” Segue a lista do que despir — ira, malícia, mentira — e do que vestir: misericórdia, benignidade, humildade, perdão. E fazer tudo “como ao Senhor, e não aos homens”.",
+      pergunta: "O que eu preciso despir hoje, e o que preciso vestir no lugar?"
+    },
+    "Colossenses 4": {
+      texto: "Instruções finais sobre oração perseverante e sabedoria com os de fora: “a vossa palavra seja sempre agradável, temperada com sal”. E uma lista de nomes de colaboradores comuns.",
+      pergunta: "Minha fala tem sido temperada com graça, ou com aspereza?"
+    },
+    "1 Tessalonicenses 1": {
+      texto: "Paulo elogia a “obra da fé, o trabalho do amor e a paciência da esperança”, e lembra que a palavra ecoou a partir deles por toda a região. Fé que se torna testemunho sem esforço de propaganda.",
+      pergunta: "Minha vida tem ecoado algo, mesmo quando não estou tentando pregar?"
+    },
+    "1 Tessalonicenses 2": {
+      texto: "Paulo descreve seu ministério: “como a ama que cria seus filhos”, trabalhando de noite e de dia para não ser pesado a ninguém. Serviço marcado por ternura e independência financeira.",
+      pergunta: "Tenho servido com ternura, ou com peso e cobrança?"
+    },
+    "1 Tessalonicenses 3": {
+      texto: "Preocupado com a fé deles sob perseguição, Paulo envia Timóteo e depois se alegra com as notícias: “agora vivemos, se estais firmes no Senhor”. A firmeza dos outros como alegria pessoal.",
+      pergunta: "Tenho me alegrado genuinamente com o crescimento espiritual de outros?"
+    },
+    "1 Tessalonicenses 4": {
+      texto: "Sobre santidade, trabalho honesto e a esperança na volta de Cristo: os que dormem em Jesus ressuscitarão primeiro. Paulo escreve “para que não vos entristeçais como os que não têm esperança”.",
+      pergunta: "Minha tristeza diante da perda tem tido esperança dentro dela?"
+    },
+    "1 Tessalonicenses 5": {
+      texto: "“Regozijai-vos sempre. Orai sem cessar. Em tudo dai graças.” Três ordens curtas que descrevem uma vida inteira, seguidas do pedido para não extinguir o Espírito e examinar tudo.",
+      pergunta: "Qual dessas três — alegria, oração, gratidão — tem faltado mais em mim?"
+    },
+    "2 Tessalonicenses 1": {
+      texto: "Paulo se gloria da perseverança deles nas perseguições e ora “para que o nome de nosso Senhor Jesus Cristo seja glorificado em vós, e vós nele”. Sofrimento suportado com propósito.",
+      pergunta: "Tenho enxergado propósito na perseverança, ou só o desgaste dela?"
+    },
+    "2 Tessalonicenses 2": {
+      texto: "Contra o pânico sobre o dia do Senhor, Paulo pede firmeza: “estai firmes, e retende as tradições que vos foram ensinadas”. Estabilidade em meio a rumores e ansiedade escatológica.",
+      pergunta: "Tenho me deixado abalar por notícias e teorias sobre o fim?"
+    },
+    "2 Tessalonicenses 3": {
+      texto: "Contra a ociosidade de quem parou de trabalhar esperando a volta de Cristo: “se alguém não quiser trabalhar, também não coma”. Esperança futura não dispensa responsabilidade presente.",
+      pergunta: "Minha expectativa do futuro tem me tornado mais responsável ou mais passivo?"
+    },
+    "1 Timóteo 1": {
+      texto: "Paulo se descreve como “o principal dos pecadores” e diz que alcançou misericórdia para servir de exemplo. Quem tinha mais motivo para se orgulhar escolhe se lembrar de onde veio.",
+      pergunta: "Tenho me lembrado de onde Deus me tirou, ou já me acho superior a outros?"
+    },
+    "1 Timóteo 2": {
+      texto: "Orações por todos, inclusive reis e autoridades, porque Deus “quer que todos os homens se salvem”. E o único mediador entre Deus e os homens: Jesus Cristo homem.",
+      pergunta: "Tenho orado por autoridades, mesmo por aquelas de quem discordo?"
+    },
+    "1 Timóteo 3": {
+      texto: "Requisitos para bispos e diáconos: irrepreensível, sóbrio, hospitaleiro, não dado ao vinho, que governe bem a própria casa. Caráter comprovado no cotidiano antes de qualquer púlpito.",
+      pergunta: "Meu caráter em casa corresponde à imagem que passo fora dela?"
+    },
+    "1 Timóteo 4": {
+      texto: "“Ninguém despreze a tua mocidade; mas sê o exemplo.” Timóteo é orientado a exercitar-se na piedade, que é útil “para tudo”, e a ter cuidado consigo mesmo e com a doutrina.",
+      pergunta: "Tenho me exercitado espiritualmente com a mesma disciplina que aplico a outras áreas?"
+    },
+    "1 Timóteo 5": {
+      texto: "Instruções sobre viúvas, presbíteros e relações na igreja como família — tratar os mais velhos como pais, as moças como irmãs, “com toda a pureza”. Comunidade organizada com respeito.",
+      pergunta: "Tenho tratado a igreja como família ou como instituição?"
+    },
+    "1 Timóteo 6": {
+      texto: "“A piedade com contentamento é grande lucro.” O amor ao dinheiro é raiz de todos os males — não o dinheiro em si, mas o apego. E aos ricos: que sejam ricos em boas obras.",
+      pergunta: "Meu contentamento depende de quanto tenho, ou de quem eu tenho?"
+    },
+    "2 Timóteo 1": {
+      texto: "Paulo lembra a fé sincera que habitou primeiro na avó Loide e na mãe Eunice. E encoraja: “Deus não nos deu o espírito de temor, mas de fortaleza, e de amor, e de moderação”.",
+      pergunta: "Que fé foi passada a mim, e a quem eu estou passando adiante?"
+    },
+    "2 Timóteo 2": {
+      texto: "Soldado, atleta, lavrador — três imagens de esforço com propósito. E o encargo: “o que de mim ouviste... confia-o a homens fiéis, que sejam idôneos para também ensinarem os outros”.",
+      pergunta: "Tenho investido em alguém que continuará depois de mim?"
+    },
+    "2 Timóteo 3": {
+      texto: "Descrição dos últimos dias, com pessoas “mais amigas dos deleites do que amigas de Deus”. E a âncora: “toda a Escritura é divinamente inspirada e proveitosa”.",
+      pergunta: "A Escritura tem sido proveitosa na prática, ou apenas respeitada de longe?"
+    },
+    "2 Timóteo 4": {
+      texto: "As últimas palavras conhecidas de Paulo: “combati o bom combate, acabei a carreira, guardei a fé”. Ele menciona quem o abandonou e quem ficou — e pede o manto e os livros.",
+      pergunta: "Se eu escrevesse hoje minha última carta, o que poderia dizer com honestidade?"
+    },
+    "Tito 1": {
+      texto: "Tito é deixado em Creta para ordenar presbíteros e corrigir o que faltava. E a advertência sobre os que “confessam que conhecem a Deus, mas negam-no com as obras”.",
+      pergunta: "Minhas obras têm confirmado ou negado o que confesso com a boca?"
+    },
+    "Tito 2": {
+      texto: "Instruções por faixa etária e o motivo de tudo: “para que em tudo sejam ornamento da doutrina de Deus”. A graça nos ensina a viver sóbria, justa e piamente neste presente século.",
+      pergunta: "Minha vida tem sido ornamento ou obstáculo à doutrina que professo?"
+    },
+    "Tito 3": {
+      texto: "“Não por obras de justiça que houvéssemos feito, mas segundo a sua misericórdia, nos salvou.” E daí decorre a mansidão com todos — quem foi salvo por misericórdia não pode ser duro com ninguém.",
+      pergunta: "Tenho tratado os outros com a mesma misericórdia que recebi?"
+    },
+    "Filemom 1": {
+      texto: "Paulo escreve pedindo que Filemom receba de volta Onésimo, escravo fugitivo, agora “não mais como servo, mas como irmão amado”. E se oferece para pagar qualquer prejuízo: “lança isso à minha conta”.",
+      pergunta: "Estaria disposto(a) a pagar o preço da reconciliação entre duas pessoas?"
+    },
+    "Hebreus 1": {
+      texto: "Deus, que falou pelos profetas, “nestes últimos dias nos falou pelo Filho” — resplendor da glória e expressão exata do Seu ser. Superior aos anjos, sustentando todas as coisas pela palavra do Seu poder.",
+      pergunta: "Tenho buscado a palavra final de Deus em Cristo, ou em outras fontes?"
+    },
+    "Hebreus 2": {
+      texto: "Jesus foi feito “um pouco menor que os anjos” para provar a morte por todos. E porque sofreu sendo tentado, “pode socorrer os que são tentados”. Ele não socorre de longe.",
+      pergunta: "Tenho crido que Ele entende minha tentação por dentro, e não só teoricamente?"
+    },
+    "Hebreus 3": {
+      texto: "Um alerta com o exemplo do deserto: “não endureçais os vossos corações”. E o remédio comunitário: “exortai-vos uns aos outros cada dia”, para que ninguém se endureça pelo engano do pecado.",
+      pergunta: "Tenho pessoas que me exortam de perto, ou caminho sozinho?"
+    },
+    "Hebreus 4": {
+      texto: "Resta um repouso para o povo de Deus. E a Palavra é descrita como “viva e eficaz, mais penetrante do que espada de dois gumes”. Temos um sumo sacerdote que se compadece das nossas fraquezas.",
+      pergunta: "Tenho me aproximado do trono da graça com confiança, ou com medo?"
+    },
+    "Hebreus 5": {
+      texto: "Cristo é sacerdote segundo a ordem de Melquisedeque, e “ainda que era Filho, aprendeu a obediência pelas coisas que padeceu”. O autor repreende quem já deveria ensinar e ainda precisa de leite.",
+      pergunta: "Tenho crescido na fé, ou parado no básico por comodismo?"
+    },
+    "Hebreus 6": {
+      texto: "Um dos textos mais severos do NT, seguido de uma âncora: a esperança é “âncora da alma, segura e firme”, ancorada em quem entrou no santuário por nós.",
+      pergunta: "Minha esperança está ancorada em circunstâncias, ou em Cristo dentro do véu?"
+    },
+    "Hebreus 7": {
+      texto: "Cristo é sacerdote para sempre, “porque permanece eternamente”, e “pode também salvar perfeitamente os que por ele se chegam a Deus, vivendo sempre para interceder por eles”.",
+      pergunta: "Consigo crer que Ele intercede por mim neste exato momento?"
+    },
+    "Hebreus 8": {
+      texto: "A nova aliança prometida em Jeremias 31 é aplicada a Cristo: leis escritas no coração, e “dos seus pecados não me lembrarei mais”. Deus escolhendo esquecer o que perdoou.",
+      pergunta: "Tenho relembrado pecados que Deus decidiu esquecer?"
+    },
+    "Hebreus 9": {
+      texto: "O sumo sacerdote entrava uma vez por ano com sangue alheio; Cristo entrou “uma vez por todas, tendo obtido eterna redenção” com o próprio sangue. O que Levítico 16 antecipava se cumpriu.",
+      pergunta: "Tenho vivido a redenção como algo definitivo, ou como algo a renovar sempre?"
+    },
+    "Hebreus 10": {
+      texto: "“Retenhamos firmes a confissão da nossa esperança.” E o convite comunitário: “não deixando a nossa congregação... antes admoestando-nos uns aos outros”, tanto mais quanto vemos o dia se aproximar.",
+      pergunta: "Tenho valorizado o encontro com outros cristãos, ou tratado como opcional?"
+    },
+    "Hebreus 11": {
+      texto: "A galeria da fé: Abel, Noé, Abraão, Moisés, Raabe — e muitos que “não alcançaram a promessa” nesta vida, mas creram assim mesmo. Fé como “certeza de coisas que se esperam”.",
+      pergunta: "Minha fé depende de ver o cumprimento, ou permanece mesmo sem ver?"
+    },
+    "Hebreus 12": {
+      texto: "“Corramos com paciência a carreira que nos está proposta, olhando para Jesus.” E a disciplina do Pai é apresentada como prova de filiação, não de rejeição.",
+      pergunta: "Tenho interpretado a correção de Deus como rejeição, quando é sinal de amor?"
+    },
+    "Hebreus 13": {
+      texto: "Instruções finais: hospitalidade, casamento honrado, contentamento — “não te deixarei, nem te desampararei”. E o resumo: “Jesus Cristo é o mesmo, ontem, e hoje, e eternamente”.",
+      pergunta: "Em que área eu preciso lembrar hoje que Ele não me deixará?"
+    },
+    "Tiago 1": {
+      texto: "“Tende grande gozo quando cairdes em várias tentações”, porque a prova produz paciência. E o alerta prático: “sede cumpridores da palavra, e não somente ouvintes, enganando-vos a vós mesmos”.",
+      pergunta: "Tenho sido cumpridor da Palavra, ou apenas ouvinte bem informado?"
+    },
+    "Tiago 2": {
+      texto: "Contra a acepção de pessoas na igreja — dar o melhor lugar ao rico e desprezar o pobre. E a tese central: “a fé sem obras é morta”. Fé genuína sempre produz evidência.",
+      pergunta: "Tenho tratado pessoas de forma diferente conforme o que elas aparentam ter?"
+    },
+    "Tiago 3": {
+      texto: "A língua é um fogo pequeno que incendeia grandes matas: com ela bendizemos a Deus e amaldiçoamos homens. “Não convém que isto se faça assim.”",
+      pergunta: "Que incêndio minhas palavras já causaram, mesmo sem intenção?"
+    },
+    "Tiago 4": {
+      texto: "“De onde vêm as guerras entre vós? Não vêm dos vossos deleites?” Tiago aponta que oramos mal e pedimos mal. E chama à humildade: “humilhai-vos perante o Senhor, e ele vos exaltará”.",
+      pergunta: "Meus conflitos têm nascido de desejos que eu não quero admitir?"
+    },
+    "Tiago 5": {
+      texto: "Advertência aos ricos que retêm o salário dos trabalhadores, e depois: “orai uns pelos outros para que sareis. A oração feita por um justo pode muito em seus efeitos”.",
+      pergunta: "Tenho orado pelos outros com a mesma intensidade que oro por mim?"
+    },
+    "1 Pedro 1": {
+      texto: "Escrevendo a exilados perseguidos, Pedro fala de uma herança “incorruptível, incontaminável, e que não se pode murchar”, guardada nos céus. E chama à santidade: “sede santos, porque eu sou santo”.",
+      pergunta: "Onde tenho guardado meu tesouro — em algo que murcha ou no que é guardado nos céus?"
+    },
+    "1 Pedro 2": {
+      texto: "O povo de Deus é descrito como “geração eleita, sacerdócio real, nação santa”, chamado das trevas para a luz maravilhosa. E Cristo é o exemplo no sofrimento injusto: não retribuía, entregava-se a quem julga justamente.",
+      pergunta: "Como tenho reagido ao sofrimento injusto — revidando ou entregando a Deus?"
+    },
+    "1 Pedro 3": {
+      texto: "Instruções ao casamento e o chamado a estar “sempre preparados para responder com mansidão e temor a todo aquele que vos pedir a razão da esperança que há em vós”.",
+      pergunta: "Saberia explicar minha esperança com mansidão, se alguém perguntasse hoje?"
+    },
+    "1 Pedro 4": {
+      texto: "“Sobretudo, tende ardente amor uns para com os outros; porque o amor cobrirá a multidão de pecados.” E o encorajamento a não estranhar o “fogo ardente” da provação.",
+      pergunta: "Tenho estranhado a provação como se fosse anormal para quem crê?"
+    },
+    "1 Pedro 5": {
+      texto: "Aos presbíteros: apascentem o rebanho “não por força, mas voluntariamente”. E a todos: “lançando sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós”.",
+      pergunta: "Que ansiedade específica eu preciso lançar sobre Ele agora?"
+    },
+    "2 Pedro 1": {
+      texto: "Deus nos deu “grandíssimas e preciosas promessas”, e Pedro lista o crescimento: à fé acrescentar virtude, ciência, temperança, paciência, piedade, amor fraternal e amor. Fé que não estaciona.",
+      pergunta: "Em qual desses degraus eu tenho estacionado?"
+    },
+    "2 Pedro 2": {
+      texto: "Advertência dura contra falsos mestres movidos por avareza, que prometem liberdade sendo “servos da corrupção”. Pedro os descreve como fontes sem água — promessa sem entrega.",
+      pergunta: "Tenho verificado o caráter de quem me ensina, e não só a eloquência?"
+    },
+    "2 Pedro 3": {
+      texto: "Contra os que zombam da demora da volta de Cristo, Pedro explica: “o Senhor não retarda a sua promessa... mas é longânimo, não querendo que alguns se percam”. A demora é misericórdia.",
+      pergunta: "Tenho lido a demora de Deus como descaso, quando é paciência com alguém?"
+    },
+    "1 João 1": {
+      texto: "“Deus é luz, e não há nele trevas nenhumas.” E a promessa que sustenta qualquer confissão: “se confessarmos os nossos pecados, ele é fiel e justo para nos perdoar e nos purificar de toda a injustiça”.",
+      pergunta: "Existe algo que eu ainda não confessei porque acho que não seria perdoado?"
+    },
+    "1 João 2": {
+      texto: "Temos um Advogado para com o Pai. E o alerta: “não ameis o mundo, nem o que no mundo há”, porque o mundo passa, mas quem faz a vontade de Deus permanece para sempre.",
+      pergunta: "O que eu tenho amado que, na verdade, está passando?"
+    },
+    "1 João 3": {
+      texto: "“Vede quão grande amor nos tem concedido o Pai, que fôssemos chamados filhos de Deus.” E o amor definido em ação: “não amemos de palavra, nem de língua, mas por obra e em verdade”.",
+      pergunta: "Meu amor tem sido de palavra ou de obra?"
+    },
+    "1 João 4": {
+      texto: "“Deus é amor.” Nós amamos porque Ele nos amou primeiro. E o teste prático: quem não ama o irmão que vê, não pode amar a Deus que não vê.",
+      pergunta: "Existe um irmão que eu não consigo amar, e o que isso revela sobre mim?"
+    },
+    "1 João 5": {
+      texto: "“Estas coisas vos escrevi... para que saibais que tendes a vida eterna.” João escreve para dar certeza, não dúvida — e lembra que a fé é a vitória que vence o mundo.",
+      pergunta: "Tenho vivido com a certeza que João queria me dar, ou na insegurança?"
+    },
+    "2 João 1": {
+      texto: "Uma carta curta à “senhora eleita”, pedindo que andem em amor e alertando contra enganadores. Amor e verdade caminham juntos — nenhum dos dois sozinho basta.",
+      pergunta: "Tenho separado amor e verdade, escolhendo só um deles?"
+    },
+    "3 João 1": {
+      texto: "João elogia Gaio pela hospitalidade aos irmãos viajantes e repreende Diótrefes, “que gosta de ter o primado entre eles”. Duas posturas opostas dentro da mesma igreja.",
+      pergunta: "Tenho buscado servir, ou ter o primeiro lugar?"
+    },
+    "Judas 1": {
+      texto: "Judas exorta a “batalhar pela fé que uma vez foi dada aos santos”, e fecha com uma das doxologias mais bonitas: “àquele que é poderoso para vos guardar de tropeçar, e apresentar-vos irrepreensíveis”.",
+      pergunta: "Tenho confiado que Ele é poderoso para me guardar de tropeçar?"
+    },
+    "Apocalipse 1": {
+      texto: "João, exilado em Patmos, vê o Cristo glorificado e cai como morto. Ele põe a mão sobre ele: “não temas; eu sou o primeiro e o último... e tenho as chaves da morte e do inferno”.",
+      pergunta: "Tenho visto Jesus em Sua glória, ou só na imagem doméstica que criei Dele?"
+    },
+    "Apocalipse 2": {
+      texto: "Cartas a quatro igrejas: Éfeso perdeu o primeiro amor, Esmirna sofre na pobreza mas é rica, Pérgamo tolera falsas doutrinas, Tiatira permite a sedução. Elogio e correção na mesma carta.",
+      pergunta: "Ainda tenho o primeiro amor, ou só a atividade que restou dele?"
+    },
+    "Apocalipse 3": {
+      texto: "Sardes tem nome de viva e está morta, Filadélfia tem pouca força mas guardou a palavra, e Laodiceia é morna e não percebe. “Eis que estou à porta e bato” — dito a uma igreja, não a incrédulos.",
+      pergunta: "Sou mais parecido com qual dessas três igrejas hoje?"
+    },
+    "Apocalipse 4": {
+      texto: "O trono no céu, com o arco-íris ao redor e os seres viventes clamando dia e noite: “santo, santo, santo”. Antes de qualquer juízo, o livro estabelece quem está sentado no trono.",
+      pergunta: "Tenho lembrado que existe um trono ocupado, mesmo quando tudo parece sem controle?"
+    },
+    "Apocalipse 5": {
+      texto: "Ninguém é digno de abrir o livro, e João chora muito — até ouvir que o Leão de Judá venceu. Mas quando olha, vê “um Cordeiro como havendo sido morto”. O Leão vence como Cordeiro.",
+      pergunta: "Tenho esperado que Deus vença pela força, quando Ele venceu pelo sacrifício?"
+    },
+    "Apocalipse 6": {
+      texto: "Os selos são abertos e vêm conquista, guerra, fome e morte. E os mártires clamam “até quando?” — a pergunta que atravessa a Bíblia inteira, agora feita diante do próprio trono.",
+      pergunta: "O que eu tenho perguntado a Deus com um “até quando”?"
+    },
+    "Apocalipse 7": {
+      texto: "Antes dos juízos seguintes, uma pausa: uma multidão que ninguém pode contar, de todas as nações, tribos e línguas, diante do trono. E a promessa: “Deus limpará de seus olhos toda a lágrima”.",
+      pergunta: "Tenho enxergado o povo de Deus como algo maior que meu grupo e minha cultura?"
+    },
+    "Apocalipse 8": {
+      texto: "O sétimo selo traz meia hora de silêncio no céu, e as orações dos santos sobem com o incenso diante de Deus. Antes das trombetas, as orações são apresentadas — nenhuma se perdeu.",
+      pergunta: "Consigo crer que nenhuma das minhas orações se perdeu?"
+    },
+    "Apocalipse 9": {
+      texto: "Trombetas trazem juízos terríveis, e o texto registra o mais triste: “nem ainda assim se arrependeram das obras das suas mãos”. Nem a catástrofe converte um coração que não quer.",
+      pergunta: "O que precisaria acontecer para eu mudar algo que já sei que devo mudar?"
+    },
+    "Apocalipse 10": {
+      texto: "João recebe a ordem de comer o livro, doce na boca e amargo no ventre. Anunciar a palavra de Deus tem sabor duplo — alegria da verdade e peso do que ela implica.",
+      pergunta: "Tenho aceitado tanto a doçura quanto o peso da verdade de Deus?"
+    },
+    "Apocalipse 11": {
+      texto: "As duas testemunhas profetizam, são mortas e ressuscitam. E o anúncio: “os reinos do mundo vieram a ser de nosso Senhor e do seu Cristo, e ele reinará para todo o sempre”.",
+      pergunta: "Tenho vivido sabendo quem terá a última palavra sobre a história?"
+    },
+    "Apocalipse 12": {
+      texto: "A mulher, o dragão e a criança. E a vitória descrita: “eles o venceram pelo sangue do Cordeiro e pela palavra do seu testemunho, e não amaram as suas vidas até à morte”.",
+      pergunta: "Minha vitória tem se apoiado no sangue do Cordeiro ou na minha própria força?"
+    },
+    "Apocalipse 13": {
+      texto: "As bestas exigem adoração e marcam quem se submete. No meio do terror, uma frase: “aqui está a paciência e a fé dos santos”. Resistência descrita como perseverança, não como revolta.",
+      pergunta: "Tenho resistido às pressões do meu tempo com paciência e fé?"
+    },
+    "Apocalipse 14": {
+      texto: "O Cordeiro no monte Sião com os que O seguem “por onde quer que vá”, e o evangelho eterno pregado a toda nação. E a bem-aventurança: “bem-aventurados os mortos que desde agora morrem no Senhor”.",
+      pergunta: "Tenho seguido o Cordeiro por onde quer que Ele vá, ou só onde é confortável?"
+    },
+    "Apocalipse 15": {
+      texto: "Os vencedores cantam o cântico de Moisés e do Cordeiro: “grandes e maravilhosas são as tuas obras, Senhor Deus Todo-Poderoso; justos e verdadeiros são os teus caminhos”.",
+      pergunta: "Consigo chamar os caminhos de Deus de justos, mesmo os que não entendo?"
+    },
+    "Apocalipse 16": {
+      texto: "As taças da ira são derramadas, e de novo o registro: blasfemaram e não se arrependeram. E a voz do altar: “verdadeiros e justos são os teus juízos”.",
+      pergunta: "Tenho endurecido diante de algo que deveria ter me levado ao arrependimento?"
+    },
+    "Apocalipse 17": {
+      texto: "A grande prostituta sobre a besta, embriagada do sangue dos santos. E o desfecho antecipado: “eles combaterão contra o Cordeiro, e o Cordeiro os vencerá, porque é o Senhor dos senhores”.",
+      pergunta: "Tenho me impressionado com sistemas que já têm derrota decretada?"
+    },
+    "Apocalipse 18": {
+      texto: "A queda da Babilônia, e o luto dos mercadores que choram não pelas pessoas, mas pelo comércio perdido. E o chamado: “sai dela, povo meu, para que não sejas participante dos seus pecados”.",
+      pergunta: "Existe algo de que Deus está me chamando a sair?"
+    },
+    "Apocalipse 19": {
+      texto: "O céu explode em “Aleluia”, e vem o Cavaleiro fiel e verdadeiro, cujo nome é a Palavra de Deus. E as bodas do Cordeiro, com a noiva vestida de linho fino — as justiças dos santos.",
+      pergunta: "Tenho me preparado como quem espera uma festa de casamento?"
+    },
+    "Apocalipse 20": {
+      texto: "O julgamento final diante do grande trono branco, com os livros abertos — e o livro da vida. Cada um julgado segundo suas obras, e a morte lançada no lago de fogo.",
+      pergunta: "Tenho vivido com a consciência de que existe um dia de prestação de contas?"
+    },
+    "Apocalipse 21": {
+      texto: "“E vi um novo céu e uma nova terra.” Deus habitará com os homens, e limpará toda lágrima: “não haverá mais morte, nem pranto, nem clamor, nem dor”. E Ele diz: “eis que faço novas todas as coisas”.",
+      pergunta: "O que eu mais espero que Deus faça novo, quando esse dia chegar?"
+    },
+    "Apocalipse 22": {
+      texto: "A Bíblia termina com o rio da água da vida, a árvore cujas folhas curam as nações, e o convite final: “quem quiser, tome de graça da água da vida”. As últimas palavras são “vem, Senhor Jesus”.",
+      pergunta: "Minha vida tem terminado cada dia com esse mesmo desejo: “vem, Senhor Jesus”?"
     }
   };
 
