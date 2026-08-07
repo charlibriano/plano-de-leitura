@@ -1048,10 +1048,35 @@
 
       /* o calendário mostrava 12 meses empilhados; no celular
          só o mês aberto ocupa espaço, os outros viram linha */
-      #months{display:flex;flex-direction:column;gap:6px}
+      /* meses fechados em duas colunas (aproveita a largura);
+         o mês aberto ocupa a linha inteira para caber o calendário */
+      #months{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:6px;
+        align-items:start;
+      }
       .month{margin:0}
+      .month:not([open]){
+        border:1px solid var(--line);
+        border-radius:var(--r2);
+        background:var(--surface);
+      }
       .month:not([open]) summary{padding:10px 12px}
-      .month[open]{border:1px solid var(--line);border-radius:var(--r2)}
+      .month:not([open]) .monthTitle{font-size:14px}
+      /* em duas colunas não cabe título e badge lado a lado */
+      .month:not([open]) summary{
+        display:flex;
+        flex-direction:column;
+        align-items:flex-start;
+        gap:4px;
+      }
+      .month:not([open]) .badge{font-size:11px;padding:2px 8px}
+      .month[open]{
+        grid-column:1 / -1;
+        border:1px solid var(--line);
+        border-radius:var(--r2);
+      }
 
       .stat{grid-template-columns:1fr 1fr;gap:8px;margin-top:0}
       .kpi{padding:12px 10px}
