@@ -1014,20 +1014,25 @@
       }
       .grid::-webkit-scrollbar{display:none}
 
+      .grid{align-items:flex-start}
       .grid > .card{
         flex:0 0 calc(100vw - 40px);
         scroll-snap-align:center;
+        align-self:flex-start;
         margin:0;
         padding:16px 14px;
-        max-height:none;
+        max-height:calc(100svh - 210px);
+        overflow-y:auto;
+        -webkit-overflow-scrolling:touch;
       }
       .card h2{font-size:17px;margin-bottom:14px}
 
       /* Hoje primeiro, Ajustes por último */
       .grid > [data-panel="Hoje"]{order:1}
       .grid > [data-panel="Progresso"]{order:2}
-      .grid > [data-panel="Devocionais"]{order:3}
-      .grid > [data-panel="Ajustes"]{order:4}
+      .grid > [data-panel="Calendario"]{order:3}
+      .grid > [data-panel="Devocionais"]{order:4}
+      .grid > [data-panel="Ajustes"]{order:5}
       .grid > .manualCard{display:none}
 
       /* indicador de que há mais cards ao lado */
@@ -1040,6 +1045,13 @@
         background:var(--line-strong);transition:all .25s ease;
       }
       .deckDot.on{width:18px;background:var(--accent)}
+
+      /* o calendário mostrava 12 meses empilhados; no celular
+         só o mês aberto ocupa espaço, os outros viram linha */
+      #months{display:flex;flex-direction:column;gap:6px}
+      .month{margin:0}
+      .month:not([open]) summary{padding:10px 12px}
+      .month[open]{border:1px solid var(--line);border-radius:var(--r2)}
 
       .stat{grid-template-columns:1fr 1fr;gap:8px;margin-top:0}
       .kpi{padding:12px 10px}
@@ -1304,10 +1316,12 @@
         </div>
       </div>
     </section>
+    <section class="card" data-panel="Calendario">
+      <h2>Calendário</h2>
+      <div id="months"></div>
+    </section>
   </div>
   <div class="deckDots" id="deckDots" aria-hidden="true"></div>
-
-  <div id="months"></div>
 </main>
 
 <button class="fabToday" id="fabToday" title="Ir para a leitura de hoje">Ir para hoje</button>
