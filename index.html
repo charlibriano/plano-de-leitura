@@ -3,9 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Plano de Leitura 2026</title>
-  <meta name="description" content="Plano de leitura bíblica de 2026: acompanhe o capítulo de hoje, marque o progresso e recupere os dias em atraso." />
+  <title>Ler Bíblia — plano de leitura</title>
+  <meta name="description" content="Seu plano de leitura bíblica, simples e organizado. Acompanhe o capítulo de hoje, marque o progresso e recupere os dias em atraso." />
   <meta name="theme-color" content="#FAF8F5" />
+
+  <!-- Identidade: livro aberto com marcador de página -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23FAF8F5'/%3E%3Cpath d='M10 16c7-3 14-3 21 1v33c-7-4-14-4-21-1z' fill='%23FFFFFF' stroke='%2317130F' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M54 16c-7-3-14-3-21 1v33c7-4 14-4 21-1z' fill='%23FFFFFF' stroke='%2317130F' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M32 17v33' stroke='%2317130F' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M42 12v22l-5-5-5 5V12z' fill='%23B8332C'/%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23FAF8F5'/%3E%3Cpath d='M10 16c7-3 14-3 21 1v33c-7-4-14-4-21-1z' fill='%23FFFFFF' stroke='%2317130F' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M54 16c-7-3-14-3-21 1v33c7-4 14-4 21-1z' fill='%23FFFFFF' stroke='%2317130F' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M32 17v33' stroke='%2317130F' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M42 12v22l-5-5-5 5V12z' fill='%23B8332C'/%3E%3C/svg%3E" />
+  <meta name="apple-mobile-web-app-title" content="Ler Bíblia" />
+  <meta name="application-name" content="Ler Bíblia" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta property="og:title" content="Ler Bíblia" />
+  <meta property="og:description" content="Seu plano de leitura bíblica, simples e organizado." />
+  <meta property="og:type" content="website" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600;7..72,700&amp;display=swap" rel="stylesheet" />
@@ -344,6 +354,47 @@
     /* ---------- Indicadores ---------- */
     .stat{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
     @media (max-width:520px){.stat{grid-template-columns:1fr}}
+
+    /* ── Lâmpada viva: cresce com o progresso do ano (nunca regride)
+       e pulsa conforme a sequência atual de dias. Salmos 119:105. ── */
+    .lampKpi{grid-column:1 / -1}
+    .lampWrap{display:grid;place-items:center;padding:6px 0 2px}
+    .lampSvg{width:104px;height:130px;overflow:visible}
+
+    .lampHalo{
+      fill:var(--gold);
+      opacity:0;
+      filter:blur(14px);
+      transform-box:fill-box;transform-origin:center;
+      transition:opacity 1.2s ease, transform 1.2s ease;
+    }
+    .lampFlame{
+      transform-box:fill-box;transform-origin:50% 100%;
+      transform:scale(0);
+      transition:transform 1.2s cubic-bezier(.2,.8,.2,1), opacity 1.2s ease;
+      opacity:0;
+    }
+    .lampFlameOuter{fill:var(--gold)}
+    .lampFlameInner{fill:var(--gold-soft);opacity:.85}
+    .lampBody{fill:var(--ink-3);opacity:.55}
+    .lampBase{fill:var(--ink-3);opacity:.4}
+
+    .lampKpi.acesa .lampFlame{opacity:1}
+    .lampKpi.acesa .lampHalo{opacity:.28}
+    .lampKpi.viva .lampFlame{animation:lampFlicker 2.6s ease-in-out infinite}
+    .lampKpi.viva .lampHalo{animation:lampPulse 2.6s ease-in-out infinite}
+
+    @keyframes lampFlicker{
+      0%,100%{transform:var(--lampScale) skewX(0deg)}
+      50%    {transform:var(--lampScale) skewX(-2deg)}
+    }
+    @keyframes lampPulse{
+      0%,100%{opacity:.22}
+      50%    {opacity:.40}
+    }
+    @media (prefers-reduced-motion: reduce){
+      .lampKpi.viva .lampFlame,.lampKpi.viva .lampHalo{animation:none}
+    }
 
     .kpi{
       position:relative;
@@ -935,6 +986,51 @@
     .unlockBody{font-size:15px;line-height:1.65;margin-bottom:24px;color:var(--ink-2)}
     .unlockBody b{color:var(--ink);font-weight:600}
     .unlockBox .readerBtn{padding:11px 24px;font-size:14px}
+    /* ══════════════════════════════════════════════════════════
+       MOBILE — o desktop respira, o celular precisa caber.
+       Nada é removido aqui: só encolhemos o que gastava altura
+       sem entregar informação (paddings, títulos gigantes,
+       cards em coluna que podiam ficar lado a lado).
+       ══════════════════════════════════════════════════════════ */
+    @media (max-width:520px){
+      main{padding:14px 12px 120px}
+      header .hero{padding:16px 14px}
+      h1{font-size:26px;line-height:1.15;margin-bottom:4px}
+      .brandTagline{font-size:13px;margin:0 0 8px}
+      .heroDetail{font-size:12px;line-height:1.45}
+      .chips{gap:6px}
+      .chip{font-size:11px;padding:4px 8px}
+
+      .card{padding:16px 14px;margin-bottom:12px}
+      .card h2{font-size:17px;margin-bottom:12px}
+
+      /* dois indicadores lado a lado em vez de empilhados */
+      .stat{grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+      .kpi{padding:12px 10px}
+      .kpi .v{font-size:22px}
+      .kpi .k{font-size:11px}
+      .kpi .sub{font-size:11px;line-height:1.4}
+      .kpiHead{margin-bottom:6px}
+
+      /* a lâmpada continua inteira, só mais enxuta */
+      .lampKpi{grid-column:1 / -1}
+      .lampSvg{width:64px;height:80px}
+      .lampWrap{padding:2px 0 0}
+
+      /* botões em duas colunas: menos rolagem, mesmo alcance */
+      .guidedControls{grid-template-columns:1fr 1fr;gap:8px}
+      .guidedControls button{padding:11px 10px;font-size:13px}
+
+      .guidedBox{padding:14px 12px}
+      .guidedNow{font-size:14px;line-height:1.4}
+      .devotionalCard{padding:14px 14px;margin-top:12px}
+      .devotionalTexto{font-size:14px;line-height:1.55}
+      .devotionalPergunta{font-size:13px}
+
+      .row{gap:8px}
+      label.small{font-size:12px}
+      .tiny{font-size:11px;line-height:1.45}
+    }
 </style>
 
 </head>
@@ -1009,8 +1105,9 @@
   <div class="hero">
     <div class="heroTop">
       <div>
-        <h1>Plano de Leitura 2026</h1>
-        <p class="subtitle">
+        <h1>Ler Bíblia</h1>
+        <p class="subtitle brandTagline">Seu plano de leitura bíblica, simples e organizado.</p>
+        <p class="subtitle heroDetail">
           O plano começa em <b>01/01/2026</b>. Se você entrou depois, o site calcula quantos dias faltam e monta o pacote para recuperar.
         </p>
       </div>
@@ -1074,6 +1171,25 @@
           </div>
           <div class="v" id="streakText">0</div>
           <div class="sub" id="streakSub">Marque a leitura de hoje para iniciar a sequência.</div>
+        </div>
+
+        <div class="kpi lampKpi" id="lampKpi">
+          <div class="kpiHead">
+            <div class="k">Lâmpada para os meus pés</div>
+            <div class="kbd" id="lampStage">apagada</div>
+          </div>
+          <div class="lampWrap">
+            <svg class="lampSvg" viewBox="0 0 120 150" aria-hidden="true">
+              <ellipse class="lampHalo" id="lampHalo" cx="60" cy="52" rx="46" ry="46"></ellipse>
+              <g class="lampFlame" id="lampFlame">
+                <path class="lampFlameOuter" d="M60 20 C 74 40, 80 52, 80 64 C 80 80, 71 90, 60 90 C 49 90, 40 80, 40 64 C 40 52, 46 40, 60 20 Z"></path>
+                <path class="lampFlameInner" d="M60 44 C 68 56, 70 62, 70 68 C 70 78, 65 84, 60 84 C 55 84, 50 78, 50 68 C 50 62, 52 56, 60 44 Z"></path>
+              </g>
+              <path class="lampBody" d="M34 96 L86 96 L78 128 L42 128 Z"></path>
+              <rect class="lampBase" x="36" y="128" width="48" height="8" rx="3"></rect>
+            </svg>
+          </div>
+          <div class="sub" id="lampSub">Sua lâmpada acende com a leitura.</div>
         </div>
       </div>
 
@@ -1930,6 +2046,7 @@ function updateLateUI(state){
     const streak = calcStreak(state, today);
     streakText.textContent = String(streak);
     streakSub.innerHTML = textoMarcoSequencia(streak);
+    atualizarLampada(pct, streak);
 
     const headers = getPlanStreams(state.planMode).map(s => s.label);
     const h1 = headers[0] || "Leitura 1";
@@ -2396,6 +2513,51 @@ b.addEventListener("click", ()=>{
     }
 
     return partes.join("<br>");
+  }
+
+  // ── Lâmpada viva ────────────────────────────────────────────
+  // Tamanho da chama: progresso do ano (só cresce, nunca regride).
+  // Vida da chama (brilho/tremulação): sequência atual de dias.
+  // Assim a jornada acumulada nunca é apagada por um dia perdido.
+  function atualizarLampada(pct, streak){
+    const card = document.getElementById("lampKpi");
+    if (!card) return;
+    const flame = document.getElementById("lampFlame");
+    const halo  = document.getElementById("lampHalo");
+    const stage = document.getElementById("lampStage");
+    const sub   = document.getElementById("lampSub");
+
+    // 0% → chama mínima; 100% → chama cheia
+    const escala = pct <= 0 ? 0 : 0.35 + (Math.min(pct, 100) / 100) * 0.65;
+    const acesa  = pct > 0;
+    const viva   = streak > 0;
+
+    card.classList.toggle("acesa", acesa);
+    card.classList.toggle("viva", viva);
+    if (flame){
+      flame.style.setProperty("--lampScale", `scale(${escala.toFixed(3)})`);
+      flame.style.transform = `scale(${escala.toFixed(3)})`;
+    }
+    if (halo){
+      const haloEscala = 0.6 + (Math.min(pct, 100) / 100) * 0.8;
+      halo.style.transform = `scale(${haloEscala.toFixed(3)})`;
+    }
+
+    let nome, frase;
+    if (!acesa){ nome = "apagada"; frase = "Sua lâmpada acende com a leitura."; }
+    else if (pct < 10){ nome = "faísca";   frase = "Uma faísca já é luz. Continue."; }
+    else if (pct < 25){ nome = "chama";    frase = "A chama pegou. Alimente-a todo dia."; }
+    else if (pct < 50){ nome = "acesa";    frase = "Luz firme o suficiente para enxergar o próximo passo."; }
+    else if (pct < 75){ nome = "forte";    frase = "Sua lâmpada já ilumina o caminho inteiro."; }
+    else if (pct < 100){ nome = "plena";   frase = "Quase um ano inteiro de luz acumulada."; }
+    else { nome = "completa"; frase = "Um ano de Palavra. A lâmpada não se apagou."; }
+
+    if (stage) stage.textContent = nome;
+    if (sub){
+      sub.textContent = viva
+        ? frase
+        : `${frase} (a chama está parada — retome a sequência para ela voltar a tremular)`;
+    }
   }
 
   const streakText = document.getElementById("streakText");
