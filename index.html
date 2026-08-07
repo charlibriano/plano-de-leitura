@@ -1106,6 +1106,7 @@
           <button class="secondary" id="guidedPrevBtn">Capítulo anterior</button>
           <button class="secondary" id="guidedNextBtn">Próximo capítulo</button>
           <button class="ok" id="guidedFinishBtn">Marcar hoje como lido</button>
+          <button class="secondary" id="mainDiaryBtn">Diário de hoje</button>
         </div>
 
         <div class="tiny" style="margin-top:10px">
@@ -1928,10 +1929,7 @@ function updateLateUI(state){
 
     const streak = calcStreak(state, today);
     streakText.textContent = String(streak);
-    if (streak === 0) streakSub.textContent = "Marque a leitura de hoje para iniciar a sequência.";
-    else if (streak < 7) streakSub.textContent = `Boa! ${streak} dia(s) seguidos.`;
-    else if (streak < 30) streakSub.textContent = `Muito bom! ${streak} dias seguidos.`;
-    else streakSub.textContent = `Excelente! ${streak} dias seguidos. Isso é disciplina.`;
+    streakSub.innerHTML = textoMarcoSequencia(streak);
 
     const headers = getPlanStreams(state.planMode).map(s => s.label);
     const h1 = headers[0] || "Leitura 1";
@@ -2358,6 +2356,47 @@ b.addEventListener("click", ()=>{
   const yearBar = document.getElementById("yearBar");
   const yearPct = document.getElementById("yearPct");
   const yearSub = document.getElementById("yearSub");
+
+  // ── Marcos da sequência: número frio vira jornada com nome.
+  // Cada faixa tem um nome que descreve o estágio do hábito, e o
+  // texto sempre mostra quanto falta para o próximo marco. ──
+  const MARCOS_SEQUENCIA = [
+    { dias: 3,   nome: "Primeiros passos",     frase: "Três dias seguidos. O começo já aconteceu." },
+    { dias: 7,   nome: "Uma semana buscando",  frase: "Sete dias. A leitura começou a virar rotina." },
+    { dias: 14,  nome: "Duas semanas firmes",  frase: "Duas semanas. A constância está se formando." },
+    { dias: 21,  nome: "Raízes lançadas",      frase: "Vinte e um dias. Suas raízes estão fundo." },
+    { dias: 30,  nome: "Um mês de comunhão",   frase: "Um mês inteiro caminhando com Deus." },
+    { dias: 60,  nome: "Dois meses fiéis",     frase: "Dois meses. Isso já é história com Ele." },
+    { dias: 100, nome: "Um hábito formado",    frase: "Cem dias. A Palavra virou parte do seu dia." },
+    { dias: 180, nome: "Meio ano na Palavra",  frase: "Meio ano de fidelidade diária." },
+    { dias: 365, nome: "Um ano inteiro",       frase: "Um ano completo. Você atravessou a Bíblia." }
+  ];
+
+  function textoMarcoSequencia(streak){
+    if (streak === 0){
+      return "Marque a leitura de hoje para iniciar a sequência.";
+    }
+
+    // marco já alcançado (o maior que cabe) e o próximo a perseguir
+    let atual = null, proximo = null;
+    for (const m of MARCOS_SEQUENCIA){
+      if (streak >= m.dias) atual = m;
+      else { proximo = m; break; }
+    }
+
+    const partes = [];
+    if (atual) partes.push(`<b>${atual.nome}</b> — ${atual.frase}`);
+    else partes.push(`${streak} dia${streak === 1 ? "" : "s"} seguido${streak === 1 ? "" : "s"}. Todo hábito começa assim.`);
+
+    if (proximo){
+      const faltam = proximo.dias - streak;
+      partes.push(`Faltam ${faltam} dia${faltam === 1 ? "" : "s"} para <b>${proximo.nome}</b>.`);
+    } else {
+      partes.push("Você passou de todos os marcos. Siga em frente.");
+    }
+
+    return partes.join("<br>");
+  }
 
   const streakText = document.getElementById("streakText");
   const streakSub = document.getElementById("streakSub");
@@ -2905,6 +2944,13 @@ function closeReader(){
     const st = ensureStateDefaults(loadState());
     const dayKey = currentReadingCtx?.dateKey || st.ui?.selectedDay || todayKeyNow();
     openDiaryForDay(dayKey);
+  });
+
+  // Mesmo diário, acessível direto da tela principal (antes só existia
+  // dentro do leitor bíblico, o que escondia a função)
+  document.getElementById("mainDiaryBtn")?.addEventListener("click", ()=>{
+    const st = ensureStateDefaults(loadState());
+    openDiaryForDay(st.ui?.selectedDay || todayKeyNow());
   });
 
   document.getElementById("diaryCloseBtn").addEventListener("click", closeDiary);
