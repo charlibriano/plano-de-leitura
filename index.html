@@ -987,43 +987,75 @@
     .unlockBody b{color:var(--ink);font-weight:600}
     .unlockBox .readerBtn{padding:11px 24px;font-size:14px}
     /* ══════════════════════════════════════════════════════════
-       MOBILE — o desktop respira, o celular precisa caber.
-       Nada é removido aqui: só encolhemos o que gastava altura
-       sem entregar informação (paddings, títulos gigantes,
-       cards em coluna que podiam ficar lado a lado).
+       MOBILE — cada seção vira um card que se arrasta para o lado.
+       Sem rolagem infinita: a pessoa desliza entre painéis.
+       Ordem: Hoje → Progresso → Devocionais → Ajustes.
        ══════════════════════════════════════════════════════════ */
     @media (max-width:520px){
-      main{padding:14px 12px 120px}
-      header .hero{padding:16px 14px}
-      h1{font-size:26px;line-height:1.15;margin-bottom:4px}
-      .brandTagline{font-size:13px;margin:0 0 8px}
-      .heroDetail{font-size:12px;line-height:1.45}
+      main{padding:12px 0 100px}
+      header .hero{padding:14px 12px}
+      h1{font-size:24px;line-height:1.15;margin-bottom:4px}
+      .brandTagline{font-size:13px;margin:0 0 6px}
+      .heroDetail{display:none}
       .chips{gap:6px}
       .chip{font-size:11px;padding:4px 8px}
 
-      .card{padding:16px 14px;margin-bottom:12px}
-      .card h2{font-size:17px;margin-bottom:12px}
+      /* o deck */
+      .grid{
+        display:flex;
+        gap:12px;
+        overflow-x:auto;
+        overflow-y:visible;
+        scroll-snap-type:x mandatory;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:none;
+        padding:0 12px 6px;
+        margin:0;
+      }
+      .grid::-webkit-scrollbar{display:none}
 
-      /* dois indicadores lado a lado em vez de empilhados */
-      .stat{grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+      .grid > .card{
+        flex:0 0 calc(100vw - 40px);
+        scroll-snap-align:center;
+        margin:0;
+        padding:16px 14px;
+        max-height:none;
+      }
+      .card h2{font-size:17px;margin-bottom:14px}
+
+      /* Hoje primeiro, Ajustes por último */
+      .grid > [data-panel="Hoje"]{order:1}
+      .grid > [data-panel="Progresso"]{order:2}
+      .grid > [data-panel="Devocionais"]{order:3}
+      .grid > [data-panel="Ajustes"]{order:4}
+      .grid > .manualCard{display:none}
+
+      /* indicador de que há mais cards ao lado */
+      .deckDots{
+        display:flex;justify-content:center;gap:6px;
+        padding:10px 0 2px;
+      }
+      .deckDot{
+        width:6px;height:6px;border-radius:999px;
+        background:var(--line-strong);transition:all .25s ease;
+      }
+      .deckDot.on{width:18px;background:var(--accent)}
+
+      .stat{grid-template-columns:1fr 1fr;gap:8px;margin-top:0}
       .kpi{padding:12px 10px}
       .kpi .v{font-size:22px}
       .kpi .k{font-size:11px}
       .kpi .sub{font-size:11px;line-height:1.4}
       .kpiHead{margin-bottom:6px}
-
-      /* a lâmpada continua inteira, só mais enxuta */
       .lampKpi{grid-column:1 / -1}
       .lampSvg{width:64px;height:80px}
       .lampWrap{padding:2px 0 0}
 
-      /* botões em duas colunas: menos rolagem, mesmo alcance */
       .guidedControls{grid-template-columns:1fr 1fr;gap:8px}
       .guidedControls button{padding:11px 10px;font-size:13px}
-
-      .guidedBox{padding:14px 12px}
-      .guidedNow{font-size:14px;line-height:1.4}
-      .devotionalCard{padding:14px 14px;margin-top:12px}
+      .guidedBox{padding:0;border:none;background:none}
+      .guidedNow{font-size:15px;line-height:1.4}
+      .devotionalCard{padding:14px;margin-top:12px}
       .devotionalTexto{font-size:14px;line-height:1.55}
       .devotionalPergunta{font-size:13px}
 
@@ -1031,6 +1063,7 @@
       label.small{font-size:12px}
       .tiny{font-size:11px;line-height:1.45}
     }
+    @media (min-width:521px){ .deckDots{display:none} }
 </style>
 
 </head>
@@ -1123,8 +1156,8 @@
 
 <main>
   <div class="grid">
-    <section class="card">
-      <h2>Configuração</h2>
+    <section class="card" data-panel="Ajustes">
+      <h2>Ajustes</h2>
 
       <div class="row">
         <div>
@@ -1152,7 +1185,10 @@
         <button class="secondary" id="openTodayBtn">Abrir mês de hoje</button>
         <button id="applyBtn">Aplicar</button>
       </div>
+    </section>
 
+    <section class="card" data-panel="Progresso">
+      <h2>Progresso</h2>
       <div class="stat">
         <div class="kpi">
           <div class="kpiHead">
@@ -1193,13 +1229,13 @@
         </div>
       </div>
 
+    </section>
+
+    <section class="card" data-panel="Hoje">
+      <h2>Leitura de hoje</h2>
       <div class="guidedBox">
         <div class="guidedTop">
           <div>
-            <p class="guidedTitle">Leitura guiada</p>
-            <div class="guidedMeta">
-              “Iniciar” abre 1 aba. “Colocar em dia” abre um pacote maior para recuperar atraso.
-            </div>
           </div>
           <div class="kbd" id="guidedStep">Capítulo 0/0</div>
         </div>
@@ -1225,13 +1261,10 @@
           <button class="secondary" id="mainDiaryBtn">Diário de hoje</button>
         </div>
 
-        <div class="tiny" style="margin-top:10px">
-          Dica: se o navegador bloquear pop-up, clique em “Iniciar” primeiro.
-        </div>
       </div>
     </section>
 
-    <section class="card">
+    <section class="card" data-panel="Devocionais">
       <h2>Devocionais</h2>
 
       <div class="row">
@@ -1259,7 +1292,7 @@
 
     </section>
 
-    <section class="card">
+    <section class="card manualCard">
       <h2>Como usar</h2>
       
       <div class="tiny" style="line-height:1.85">
@@ -1272,6 +1305,7 @@
       </div>
     </section>
   </div>
+  <div class="deckDots" id="deckDots" aria-hidden="true"></div>
 
   <div id="months"></div>
 </main>
@@ -2559,6 +2593,41 @@ b.addEventListener("click", ()=>{
         : `${frase} (a chama está parada — retome a sequência para ela voltar a tremular)`;
     }
   }
+
+  // ── Deck mobile: pontinhos que indicam em qual card você está ──
+  (function initDeckDots(){
+    const grid = document.querySelector("main .grid");
+    const dots = document.getElementById("deckDots");
+    if (!grid || !dots) return;
+
+    function visiveis(){
+      return [...grid.children].filter(c => c.offsetParent !== null);
+    }
+    function montar(){
+      if (window.innerWidth > 520){ dots.innerHTML = ""; return; }
+      const cards = visiveis();
+      if (dots.children.length !== cards.length){
+        dots.innerHTML = cards.map(() => '<span class="deckDot"></span>').join("");
+      }
+      marcar();
+    }
+    function marcar(){
+      const cards = visiveis();
+      if (!cards.length || !dots.children.length) return;
+      const centro = grid.scrollLeft + grid.clientWidth / 2;
+      let ativo = 0, menor = Infinity;
+      cards.forEach((c, i) => {
+        const meio = c.offsetLeft + c.offsetWidth / 2;
+        const d = Math.abs(meio - centro);
+        if (d < menor){ menor = d; ativo = i; }
+      });
+      [...dots.children].forEach((d, i) => d.classList.toggle("on", i === ativo));
+    }
+
+    grid.addEventListener("scroll", () => window.requestAnimationFrame(marcar), {passive:true});
+    window.addEventListener("resize", montar);
+    montar();
+  })();
 
   const streakText = document.getElementById("streakText");
   const streakSub = document.getElementById("streakSub");
