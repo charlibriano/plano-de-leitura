@@ -1113,12 +1113,100 @@
       .tiny{font-size:11px;line-height:1.45}
     }
     @media (min-width:521px){ .deckDots{display:none} }
+    /* ══════════════════════════════════════════════════════════
+       ABERTURA — antes dos selects e botões, só a Palavra.
+       Aparece uma vez por dia; some ao entrar.
+       ══════════════════════════════════════════════════════════ */
+    .opening{
+      position:fixed;inset:0;z-index:200;
+      display:none;align-items:center;justify-content:center;
+      padding:28px 22px;
+      background:var(--paper);
+    }
+    .opening.show{display:flex;animation:openingIn .5s ease both}
+    .opening.leaving{animation:openingOut .45s ease forwards}
+    @keyframes openingIn{from{opacity:0}to{opacity:1}}
+    @keyframes openingOut{to{opacity:0;visibility:hidden}}
+
+    .openingInner{
+      width:min(560px,100%);
+      text-align:center;
+      animation:openingRise .8s cubic-bezier(.2,.8,.2,1) both .15s;
+    }
+    @keyframes openingRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+    .openingMark{
+      font-family:var(--ui);font-size:11px;font-weight:700;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:var(--ink-3);margin-bottom:28px;
+    }
+    .openingRef{
+      font-family:var(--ui);font-size:11px;font-weight:700;
+      letter-spacing:.12em;text-transform:uppercase;
+      color:var(--gold);margin-bottom:14px;
+    }
+    .openingText{
+      margin:0 0 34px;
+      font-family:var(--serif);
+      font-size:clamp(19px,4.6vw,27px);
+      line-height:1.6;color:var(--ink);
+      text-wrap:pretty;
+    }
+    .openingBtn{
+      appearance:none;cursor:pointer;
+      border:1px solid var(--ink);
+      background:var(--ink);color:var(--paper);
+      border-radius:999px;
+      padding:13px 40px;
+      font-family:var(--ui);font-size:14px;font-weight:600;
+      transition:opacity .2s ease;
+    }
+    .openingBtn:hover{opacity:.85}
+
+    /* ══════════════════════════════════════════════════════════
+       MODO LEITURA — a leitura vira o único elemento na tela.
+       ══════════════════════════════════════════════════════════ */
+    .readerModal.zen .readerActions .readerBtn:not(#readerZenBtn):not(#readerCloseBtn){display:none}
+    .readerModal.zen .readerTools{display:none}
+    .readerModal.zen .readerTitle{opacity:.35;font-size:12px}
+    .readerModal.zen .readerTop{
+      border-bottom:none;
+      background:transparent;
+      opacity:.5;
+      transition:opacity .3s ease;
+    }
+    .readerModal.zen .readerTop:hover{opacity:1}
+    .readerModal.zen .readerSheet{background:var(--paper)}
+    .readerModal.zen .readerBody{padding-top:8px}
+    .readerModal.zen .readerRef{
+      text-align:center;
+      font-size:12px;letter-spacing:.14em;
+      opacity:.55;margin-bottom:34px;
+    }
+    .readerModal.zen .readerText{
+      max-width:34rem;
+      font-size:clamp(18px,2.4vw,21px);
+      line-height:1.95;
+    }
+    .readerModal.zen .readerText .v{margin-bottom:1.15em}
+    .readerModal.zen .verseNum{opacity:.32;font-size:.72em}
+    #readerZenBtn.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 </style>
 
 </head>
 <body>
 
   <!-- Leitor bíblico interno (texto via API) -->
+  <!-- Abertura: só o essencial antes da tela funcional -->
+  <div class="opening" id="opening" aria-hidden="true">
+    <div class="openingInner">
+      <div class="openingMark">Ler Bíblia</div>
+      <div class="openingRef" id="openingRef"></div>
+      <p class="openingText" id="openingText"></p>
+      <button class="openingBtn" id="openingBtn" type="button">Começar</button>
+    </div>
+  </div>
+
   <div class="readerModal" id="readerModal" aria-hidden="true">
     <div class="readerSheet" role="dialog" aria-modal="true" aria-label="Leitura bíblica">
       <div class="readerTop">
@@ -1128,6 +1216,7 @@
           <button class="readerBtn" id="readerPlanNextBtn" type="button" title="Avançar no plano">Próximo</button>
           <button class="readerBtn" id="readerDiaryBtn" type="button" title="Abrir o diário deste dia">Diário</button>
           <button class="readerBtn" id="readerDoneBtn" type="button" title="Marcar dia como concluído">Concluir dia</button>
+          <button class="readerBtn" id="readerZenBtn" type="button" title="Modo leitura sem distrações">Modo leitura</button>
           <button class="readerBtn" id="readerExternalBtn" type="button">Abrir externo</button>
           <button class="readerBtn danger" id="readerCloseBtn" type="button">Fechar</button>
         </div>
@@ -2679,6 +2768,89 @@ b.addEventListener("click", ()=>{
     window.addEventListener("resize", montar);
     montar();
   })();
+
+  // ── ABERTURA: uma vez por dia, só a Palavra antes da tela funcional ──
+  (function initOpening(){
+    const el = document.getElementById("opening");
+    if (!el) return;
+    const CHAVE = "lerbiblia_abertura_v1";
+
+    let jaVistaHoje = false;
+    try { jaVistaHoje = localStorage.getItem(CHAVE) === todayKeyNow(); } catch(_){}
+    if (jaVistaHoje) return;
+
+    // texto: devocional da 1ª leitura de hoje (o mesmo que o app já usa)
+    let ref = "", trecho = "";
+    try {
+      const st = ensureStateDefaults(loadState());
+      const plan = buildPlan(st);
+      const p = plan[todayKeyNow()];
+      const primeira = p?.guidedList?.[0];
+      if (primeira && typeof DEVOTIONALS !== "undefined"){
+        const d = DEVOTIONALS[`${primeira.book} ${primeira.chapter}`];
+        if (d){
+          ref = `${primeira.book} ${primeira.chapter}`;
+          trecho = primeiraFrase(d.texto);
+        }
+      }
+    } catch(_){}
+
+    if (!trecho){
+      ref = "Salmos 119:105";
+      trecho = "Lâmpada para os meus pés é a tua palavra, e luz para o meu caminho.";
+    }
+
+    document.getElementById("openingRef").textContent = ref;
+    document.getElementById("openingText").textContent = trecho;
+    el.classList.add("show");
+    el.setAttribute("aria-hidden","false");
+
+    function entrar(){
+      el.classList.add("leaving");
+      try { localStorage.setItem(CHAVE, todayKeyNow()); } catch(_){}
+      setTimeout(()=>{
+        el.classList.remove("show","leaving");
+        el.setAttribute("aria-hidden","true");
+      }, 450);
+    }
+    document.getElementById("openingBtn").addEventListener("click", entrar);
+    el.addEventListener("click", (e)=>{ if (e.target === el) entrar(); });
+  })();
+
+  // ── MODO LEITURA: esconde tudo que não é o texto bíblico ──
+  (function initZenMode(){
+    const btn = document.getElementById("readerZenBtn");
+    const modal = document.getElementById("readerModal");
+    if (!btn || !modal) return;
+    const CHAVE = "lerbiblia_zen_v1";
+
+    function aplicar(ligado){
+      modal.classList.toggle("zen", ligado);
+      btn.classList.toggle("on", ligado);
+      btn.textContent = ligado ? "Sair do modo leitura" : "Modo leitura";
+      try { localStorage.setItem(CHAVE, ligado ? "1" : "0"); } catch(_){}
+    }
+
+    let inicial = false;
+    try { inicial = localStorage.getItem(CHAVE) === "1"; } catch(_){}
+    aplicar(inicial);
+
+    btn.addEventListener("click", ()=> aplicar(!modal.classList.contains("zen")));
+  })();
+
+  // Primeira frase completa de um devocional, para a abertura.
+  // Ignora "..." (senão o corte cai no meio de uma citação) e junta
+  // frases enquanto o trecho estiver curto demais para dar o tom.
+  function primeiraFrase(texto){
+    const t = (texto || "").trim();
+    const partes = t.split(/(?<=[^.]\.)\s+(?=[A-ZÀ-Ú“])/);
+    let out = "";
+    for (const p of partes){
+      out = out ? `${out} ${p}` : p;
+      if (out.length >= 90) break;
+    }
+    return (out || t).trim();
+  }
 
   const streakText = document.getElementById("streakText");
   const streakSub = document.getElementById("streakSub");
