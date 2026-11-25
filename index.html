@@ -1150,6 +1150,18 @@
        ══════════════════════════════════════════════════════════ */
     .bibliaCredito{margin:22px 0 4px;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;line-height:1.5;color:var(--ink-3);font-family:var(--ui)}
     .bibliaCredito a{color:var(--ink-2)}
+    /* ── Escolha de como começar o plano (aparece uma vez) ── */
+    .inicioModal{position:fixed;inset:0;z-index:2600;display:none;align-items:flex-end;justify-content:center;background:rgba(23,19,15,.5);backdrop-filter:blur(3px);padding:0}
+    .inicioModal.open{display:flex}
+    .inicioBox{width:min(520px,100%);background:var(--paper);border-radius:24px 24px 0 0;padding:20px 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;max-height:100%;overflow-y:auto}
+    @media (min-width:521px){ .inicioModal{align-items:center;padding:16px} .inicioBox{border-radius:24px} }
+    .inicioBox h3{margin:0;font-family:var(--serif);font-size:21px;font-weight:700;color:var(--ink)}
+    .inicioBox > p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.5}
+    .inicioOpcao{display:flex;flex-direction:column;gap:6px;text-align:left;padding:14px;border-radius:18px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-family:var(--ui);cursor:pointer;width:100%}
+    .inicioOpcao:hover,.inicioOpcao:focus{background:var(--surface);color:var(--ink);border-color:var(--ink)}
+    .inicioOpcao b{font-size:16px;font-weight:700}
+    .inicioOpcao span{font-size:13px;color:var(--ink-2);line-height:1.45}
+    .inicioOpcao em{font-style:normal;font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);background:var(--surface-2);border-radius:10px;padding:7px 10px}
     .heroDate,.hojeM,.tabBar{display:none}
     #syncChip .curto{display:none}
     @media (max-width:520px){
@@ -1185,6 +1197,8 @@
       .hojeKicker{align-self:flex-start;font-size:12px;font-weight:600;color:#3B2219;background:rgba(255,246,222,.92);padding:5px 10px;border-radius:999px}
       .hojeFrase{margin:0;font-family:var(--serif);font-size:16.5px;line-height:1.36;color:#fff;font-weight:500}
       .hojePergunta{display:none;margin:0;font-size:14px;line-height:1.5;color:#F3E2CC;font-style:italic}
+      /* fechado: no máximo 3 linhas, para a tela Hoje caber sem rolar seja qual for o devocional */
+      .hojeHero:not(.aberto) .hojeFrase{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden}
       .hojeHero.aberto{background:#2A1A12}
       .hojeHero.aberto > svg{opacity:.25}
       .hojeHero.aberto .hojeFrase{font-size:16px}
@@ -1227,6 +1241,8 @@
       .hojeTxt{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
       .hojeRef{font-family:var(--serif);font-size:17px;font-weight:600}
       .hojeItem.lido .hojeRef{color:var(--ink-3);text-decoration:line-through}
+      .hojeItem.concluida{cursor:default}
+      .hojeItem.concluida .hojeRef{text-decoration:none}
       .hojeTrilha{font-size:12.5px;color:var(--ink-2)}
       .hojeCta{height:48px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font-family:var(--ui);font-size:15px;font-weight:600;cursor:pointer;width:100%}
       .hojeCta.feito{background:var(--green-soft);color:var(--green);border:1px solid var(--green)}
@@ -1752,6 +1768,24 @@
   </div>
 </div>
 
+<!-- Como começar o plano: aparece uma vez, até a pessoa escolher -->
+<div class="inicioModal" id="inicioModal" role="dialog" aria-modal="true" aria-labelledby="inicioTitulo">
+  <div class="inicioBox">
+    <h3 id="inicioTitulo">Como você quer começar?</h3>
+    <p>Seu plano dura 365 dias a partir de hoje. Escolha por onde a leitura começa.</p>
+    <button type="button" class="inicioOpcao" id="inicioCalendario">
+      <b>Acompanhar o calendário</b>
+      <span>Cada data do ano tem a sua leitura: 1º de janeiro é sempre Gênesis. Você entra no ponto de hoje, sem atraso.</span>
+      <em id="inicioCalendarioHoje">—</em>
+    </button>
+    <button type="button" class="inicioOpcao" id="inicioGenesis">
+      <b>Começar do Gênesis</b>
+      <span>Hoje é o seu dia 1. O plano segue no seu ritmo, a partir do começo.</span>
+      <em id="inicioGenesisHoje">—</em>
+    </button>
+  </div>
+</div>
+
 <!-- Barra de abas (celular): leva aos painéis do deck -->
 <nav class="tabBar" id="tabBar" aria-label="Navegação">
   <button type="button" class="tabBtn on" data-alvo="Hoje" aria-label="Hoje">
@@ -1982,20 +2016,19 @@
     return "Evangelho + História + Salmos";
   }
 
-  function buildPlanForYear(state){
-    const startDate = planStartDate(state);
-    const streams = getPlanStreams(state.planMode);
-
+  // ── Sequência do plano: os 365 dias de leitura de cada tipo de plano, montados
+  // sempre do dia 1 (Gênesis) em diante, com as mesmas regras de sempre.
+  // A DATA de cada dia é decidida depois, pela âncora escolhida pela pessoa.
+  const _cacheSequencia = {};
+  function sequenciaDoPlano(planMode){
+    if (_cacheSequencia[planMode]) return _cacheSequencia[planMode];
+    const streams = getPlanStreams(planMode);
     const pos = {};
     for (const s of streams) pos[s.key] = 0;
     let psPos = 0, pvPos = 0;
+    const seq = [];
 
-    const plan = {};
-    const endDate = planEndDate(state);
-
-    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate()+1)){
-      const key = ymd(d);
-      const offset = daysBetween(startDate, d);
+    for (let offset = 0; offset < 365; offset++){
       const blocks = [];
       let guidedList = [];
 
@@ -2012,20 +2045,46 @@
             pvPos = (pvPos + n) % totalChapters(PROVERBS);
           }
         } else {
-          list = nextNChaptersList(pos[s.key], n, s.listBooks);
-          pos[s.key] += n;
           const total = totalChapters(s.listBooks);
+          // trilha que não recomeça (ex.: História do AT): ao chegar ao fim, fica concluída —
+          // antes ela "dava a volta" e repetia Gênesis 1–2 todos os dias
+          const qtd = s.cycle ? n : Math.max(0, Math.min(n, total - pos[s.key]));
+          list = nextNChaptersList(pos[s.key], qtd, s.listBooks);
+          pos[s.key] += qtd;
           if (pos[s.key] >= total){
             if (!s.cycle) pos[s.key] = total;
             else pos[s.key] = pos[s.key] % total;
           }
         }
 
-        blocks.push({ label: s.label, text: list.length ? rangeTextForList(list) : "—", list });
+        const concluida = !list.length && !s.cycle;
+        blocks.push({ label: s.label, text: list.length ? rangeTextForList(list) : (concluida ? "Concluída" : "—"), list, concluida });
         guidedList = guidedList.concat(list);
       }
+      seq.push({ blocks, guidedList });
+    }
+    return (_cacheSequencia[planMode] = seq);
+  }
 
-      plan[key] = { active:true, blocks, guidedList };
+  // Qual dia da sequência (0–364) cai numa data:
+  //  • "calendario": 1º de janeiro = dia 1, igual para todo mundo (ano bissexto: 31/12 repete o dia 365)
+  //  • "genesis" (ou sem escolha): o dia de início da pessoa = dia 1
+  function diaDaSequencia(state, d){
+    if (state.planAncora === "calendario"){
+      const doAno = daysBetween(new Date(d.getFullYear(), 0, 1), d);
+      return Math.min(doAno, 364);
+    }
+    return daysBetween(planStartDate(state), d);
+  }
+
+  function buildPlanForYear(state){
+    const startDate = planStartDate(state);
+    const endDate = planEndDate(state);
+    const seq = sequenciaDoPlano(state.planMode);
+    const plan = {};
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate()+1)){
+      const dia = seq[diaDaSequencia(state, d)];
+      plan[ymd(d)] = { active:true, blocks: dia.blocks, guidedList: dia.guidedList };
     }
     return plan;
   }
@@ -2599,9 +2658,9 @@ function updateLateUI(state){
 
     // ── Leitura de hoje ──
     const planoDias = Object.keys(plan).length || 365;
-    const diaN = daysBetween(planStartDate(state), today) + 1;
+    const diaN = diaDaSequencia(state, today) + 1;
     const feitos = Object.keys(plan).filter(k => state.days?.[k]?.done).length;
-    document.getElementById("hojeDia").textContent = dentro ? `Dia ${diaN} de ${planoDias}` : "";
+    document.getElementById("hojeDia").textContent = dentro ? `Dia ${diaN} de 365` : "";
     document.getElementById("hojeBarra").style.width = `${Math.round((feitos / planoDias) * 100)}%`;
 
     const lista = document.getElementById("hojeLista");
@@ -2628,6 +2687,13 @@ function updateLateUI(state){
     // uma linha por trilha do dia (História, Evangelho, Salmos…)
     let html = "";
     (p.blocks || []).forEach((b) => {
+      if (b.concluida){
+        html += `<div class="hojeItem lido concluida" aria-label="${escapeHtml(b.label)}: trilha concluída">
+          <span class="hojeCheck">${SVG_CHECK}</span>
+          <span class="hojeTxt"><span class="hojeRef">${escapeHtml(b.label)}</span><span class="hojeTrilha">Trilha concluída</span></span>
+        </div>`;
+        return;
+      }
       if (!b.list?.length) return;
       const ini = (p.guidedList || []).findIndex(x => x.book === b.list[0].book && x.chapter === b.list[0].chapter);
       const fim = ini + b.list.length - 1;
@@ -2800,7 +2866,7 @@ function updateLateUI(state){
     const p = plan[sel] || { blocks:[] };
     const [sy, sm, sd] = sel.split("-").map(Number);
     document.getElementById("planoSelData").textContent = `${sd} de ${NOMES_MES_MIN[sm - 1]}${sel === todayKey ? " · hoje" : ""}`;
-    document.getElementById("planoSelLeit").textContent = (p.blocks || []).map(b => b.text).filter(t => t && t !== "—").join(" · ") || "—";
+    document.getElementById("planoSelLeit").textContent = (p.blocks || []).filter(b => !b.concluida).map(b => b.text).filter(t => t && t !== "—").join(" · ") || "—";
     const lidoSel = !!state.days?.[sel]?.done;
     const statusEl = document.getElementById("planoSelStatus");
     statusEl.textContent = lidoSel ? "Lido" : (sel < todayKey ? "Pendente" : (sel === todayKey ? "Para hoje" : "Em breve"));
@@ -2842,6 +2908,40 @@ function updateLateUI(state){
     st.days[k].note = e.target.value;
     saveState(st);
   });
+
+
+  // ── Como começar o plano ─────────────────────────────────────
+  // Pergunta uma vez (por conta). Espera a sincronização terminar, para não
+  // perguntar de novo a quem já escolheu em outro aparelho, e espera a tela de abertura sair.
+  function textoLeituraDoDia(blocks){ return (blocks || []).filter(b => !b.concluida).map(b => b.text).filter(t => t && t !== "—").join(" · "); }
+  function talvezPerguntarInicio(){
+    const modal = document.getElementById("inicioModal");
+    if (!modal || modal.classList.contains("open")) return;
+    const st = ensureStateDefaults(loadState());
+    if (st.planAncora) return;
+    if (!window.lerBibliaSyncPronto) return;                       // a nuvem ainda pode trazer a escolha
+    if (document.getElementById("opening")?.classList.contains("show")){ setTimeout(talvezPerguntarInicio, 800); return; }
+    const hoje = new Date();
+    const seq = sequenciaDoPlano(st.planMode);
+    const doAno = Math.min(daysBetween(new Date(hoje.getFullYear(), 0, 1), hoje), 364);
+    document.getElementById("inicioCalendarioHoje").textContent = `Hoje: ${textoLeituraDoDia(seq[doAno].blocks)}`;
+    document.getElementById("inicioGenesisHoje").textContent = `Hoje: ${textoLeituraDoDia(seq[0].blocks)}`;
+    modal.classList.add("open");
+  }
+  function escolherInicio(ancora){
+    const st = ensureStateDefaults(loadState());
+    // calendário muda a leitura de cada data: o "capítulo atual" guardado era da sequência antiga
+    if (ancora !== "genesis") st.guided = {};
+    st.planAncora = ancora;
+    saveState(st);
+    document.getElementById("inicioModal").classList.remove("open");
+    renderAll();
+  }
+  document.getElementById("inicioCalendario")?.addEventListener("click", () => escolherInicio("calendario"));
+  document.getElementById("inicioGenesis")?.addEventListener("click", () => escolherInicio("genesis"));
+  window.talvezPerguntarInicio = talvezPerguntarInicio;
+  // sem sincronização (módulo não carregou ou sem internet): pergunta assim mesmo depois de 4 s
+  setTimeout(() => { if (!window.lerBibliaSyncPronto){ window.lerBibliaSyncPronto = true; talvezPerguntarInicio(); } }, 4000);
 
   // ── Barra de abas (celular): leva ao painel e acompanha o deslize ──
   (function initTabBar(){
@@ -4289,6 +4389,7 @@ function closeReader(){
     out.guided = { ...(nuvem.guided || {}), ...(local.guided || {}) };
     // A data de início é da CONTA (dia do 1º login), nunca a do aparelho
     out.planStart = nuvem.planStart || local.planStart;
+    out.planAncora = nuvem.planAncora || local.planAncora;
 
     const lr = local.reader || {}, rr = nuvem.reader || {};
     const reader = { ...rr, ...lr };
@@ -4399,6 +4500,8 @@ function closeReader(){
       renderAll();
       limparErro();
       await enviar();   // só grava se o resultado for diferente do que está na nuvem
+      window.lerBibliaSyncPronto = true;
+      window.talvezPerguntarInicio?.();
     } catch (e) {
       estadoChip("danger", "⚠ Erro ao sincronizar");
       mostrarErro("Não consegui buscar o progresso da nuvem (" + (e.code || e.message) + "). O app segue com o que está salvo neste aparelho.");
@@ -4454,6 +4557,8 @@ function closeReader(){
     } else {
       ultimoEnviado = null;
       panel.classList.remove("open");
+      window.lerBibliaSyncPronto = true;
+      window.talvezPerguntarInicio?.();
       estadoChip("warn", "☁ Entrar para sincronizar", "Entre com o Google para ter o mesmo progresso no celular e no computador");
     }
   });
