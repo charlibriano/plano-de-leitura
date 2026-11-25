@@ -1200,7 +1200,7 @@
       .hojeHero > svg{position:absolute;inset:0;width:100%;height:100%}
       .hojeHeroIn{position:relative;flex:1;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;gap:10px}
       .hojeKicker{align-self:flex-start;font-size:12px;font-weight:600;color:#3B2219;background:rgba(255,246,222,.92);padding:5px 10px;border-radius:999px}
-      .hojeFrase{margin:0;font-family:var(--serif);font-size:16.5px;line-height:1.36;color:#fff;font-weight:500}
+      .hojeFrase{margin:0;font-family:var(--serif);font-size:16.5px;line-height:1.36;color:#fff;font-weight:500;text-shadow:0 1px 10px rgba(20,12,8,.55),0 1px 2px rgba(20,12,8,.4)}
       .hojePergunta{display:none;margin:0;font-size:14px;line-height:1.5;color:#F3E2CC;font-style:italic}
       /* fechado: no máximo 3 linhas, para a tela Hoje caber sem rolar seja qual for o devocional */
       .hojeHero:not(.aberto) .hojeFrase{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden}
@@ -1249,7 +1249,7 @@
       .hojeItem.concluida{cursor:default}
       .hojeItem.concluida .hojeRef{text-decoration:none}
       .hojeTrilha{font-size:12.5px;color:var(--ink-2)}
-      .hojeCta{height:48px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font-family:var(--ui);font-size:15px;font-weight:600;cursor:pointer;width:100%}
+      .hojeCta{height:48px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font-family:var(--ui);font-size:15px;font-weight:600;cursor:pointer;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 14px}
       .hojeCta.feito{background:var(--green-soft);color:var(--green);border:1px solid var(--green)}
       .hojeLinks{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 6px}
       .hojeLink{border:0;background:transparent;padding:6px 8px;min-height:34px;font-family:var(--ui);font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;border-radius:999px}
@@ -1788,7 +1788,7 @@
       <!-- Visual novo (celular). Os botões reaproveitam as funções de sempre. -->
       <div class="hojeM" id="hojeM">
         <section class="hojeHero" id="hojeHero" aria-label="Devocional de hoje">
-          <svg viewBox="0 0 358 236" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <svg id="hojeCena" viewBox="0 0 358 236" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <defs>
               <linearGradient id="hjCeu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3D3A0"/><stop offset=".55" stop-color="#E8996A"/><stop offset="1" stop-color="#B9583F"/></linearGradient>
               <radialGradient id="hjSol" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFF4D6"/><stop offset=".55" stop-color="#FFE2A8"/><stop offset="1" stop-color="#FFE2A8" stop-opacity="0"/></radialGradient>
@@ -2765,9 +2765,134 @@ function updateLateUI(state){
     return out;
   }
 
+
+  // ── Cenas do cartão do devocional: uma por dia, em ciclo de 7 ──
+  // Escolhida pela DATA (igual no celular e no computador, não muda ao recarregar).
+  // Todas terminam no mesmo véu escuro embaixo, para o texto branco ficar legível.
+  const VEU_CENA = `<linearGradient id="hjVeu" x1="0" y1="0" x2="0" y2="1"><stop offset=".05" stop-color="#1E120C" stop-opacity=".05"/><stop offset=".38" stop-color="#1E120C" stop-opacity=".42"/><stop offset=".7" stop-color="#1E120C" stop-opacity=".66"/><stop offset="1" stop-color="#1E120C" stop-opacity=".9"/></linearGradient>`;
+  const SOL = (id, a, b) => `<radialGradient id="${id}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${b}" stop-opacity="0"/></radialGradient>`;
+  const CEU = (id, c) => `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset=".55" stop-color="${c[1]}"/><stop offset="1" stop-color="${c[2]}"/></linearGradient>`;
+  const FUNDO = (p, cx, cy, r) => `<defs>${CEU("cc", p.ceu)}${SOL("cs", p.sol[0], p.sol[1])}${VEU_CENA}</defs>
+     <rect width="358" height="236" fill="url(#cc)"/>` + (r ? `<circle cx="${cx}" cy="${cy}" r="${r*3}" fill="url(#cs)"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="${p.sol[0]}"/>` : "");
+  const CHAO = (cor) => `<path d="M0 198 C90 188 170 202 250 192 C300 187 330 192 358 190 L358 236 L0 236 Z" fill="${cor}"/>`;
+
+  // Cada cena tem um desenho e duas luzes (dia claro e entardecer): 15 × 2 = 30 imagens.
+  const CENAS = [
+    { nome: "colinas", luz: [
+        { ceu:["#F3D3A0","#E8996A","#B9583F"], sol:["#FFF6DE","#FFE2A8"], t:["#A9573D","#7A3B29","#4F2719"] },
+        { ceu:["#F4E6C8","#E7C99B","#C99A6B"], sol:["#FFFBEE","#FFEFC8"], t:["#B98A5A","#8E6440","#5A3E26"] } ],
+      d: p => FUNDO(p,300,58,20) + `<path d="M0 150 C60 120 120 132 180 140 C240 148 300 118 358 126 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <path d="M0 172 C70 150 140 168 210 160 C270 153 320 164 358 158 L358 236 L0 236 Z" fill="${p.t[1]}"/>` + CHAO(p.t[2]) },
+    { nome: "mar", luz: [
+        { ceu:["#F6C9A8","#D98E8E","#7E6A9A"], sol:["#FFF3DA","#FFC98A"], t:["#4F5F8E","#6E79A6","#2E3557"], b:"#FFE2B0" },
+        { ceu:["#D8ECF5","#B4D6E8","#8EBFD8"], sol:["#FFFFFF","#FFF4D0"], t:["#3E7FA8","#62A0C4","#24506E"], b:"#FFFFFF" } ],
+      d: p => FUNDO(p,96,112,22) + `<rect y="122" width="358" height="114" fill="${p.t[0]}"/><rect y="122" width="358" height="10" fill="${p.t[1]}" opacity=".7"/>
+         <path d="M70 136h52M78 146h36M86 156h20M60 168h70" stroke="${p.b}" stroke-width="3" stroke-linecap="round" opacity=".7"/>` + CHAO(p.t[2]) },
+    { nome: "montanhas", luz: [
+        { ceu:["#DCE8F0","#B9CCDD","#8FA7C0"], sol:["#FFFDF5","#F4F1E6"], t:["#7F95B3","#5B7193","#34465F"] },
+        { ceu:["#F0D6C8","#D7AFA8","#9C8299"], sol:["#FFF2E0","#F8D3B0"], t:["#8D7590","#665472","#3A2F45"] } ],
+      d: p => FUNDO(p,250,70,16) + `<path d="M0 140 L60 86 L104 122 L160 70 L226 128 L282 92 L358 136 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <path d="M0 166 L74 124 L132 154 L198 112 L262 158 L318 130 L358 150 L358 236 L0 236 Z" fill="${p.t[1]}"/>
+         <rect y="150" width="358" height="22" fill="#F2F4F6" opacity=".3"/>` + CHAO(p.t[2]) },
+    { nome: "trigo", luz: [
+        { ceu:["#F7E3B5","#EFC88A","#D9A15E"], sol:["#FFF8E6","#FFE4A6"], t:["#D9A048","#BC8136","#7A4E1E"] },
+        { ceu:["#DDEBF2","#E9E3C8","#E8C98E"], sol:["#FFFFFF","#FFF0C4"], t:["#E2B65A","#C79642","#80592A"] } ],
+      d: p => FUNDO(p,182,96,24) + `<path d="M0 138 C80 126 150 134 220 128 C280 123 320 128 358 126 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <path d="M0 164 C90 152 170 166 250 156 C300 150 330 156 358 154 L358 236 L0 236 Z" fill="${p.t[1]}"/>
+         <g stroke="#8E5D22" stroke-width="2" stroke-linecap="round" opacity=".5"><path d="M30 180v-16M44 184v-20M58 178v-14M300 182v-18M314 186v-22M328 180v-16"/></g>` + CHAO(p.t[2]) },
+    { nome: "noite", luz: [
+        { ceu:["#1C2A4A","#2D3C63","#4B4A72"], sol:["#FFF3D6","#FFF3D6"], t:["#2A2F52","#171B33","#24335A"] },
+        { ceu:["#0F1F3A","#1E3558","#2F5378"], sol:["#F4F8FF","#F4F8FF"], t:["#1E3A52","#0F2134","#1E3558"] } ],
+      d: p => `<defs>${CEU("cc", p.ceu)}${VEU_CENA}</defs><rect width="358" height="236" fill="url(#cc)"/>
+         <g fill="#FFF6DE"><circle cx="40" cy="30" r="1.4"/><circle cx="92" cy="54" r="1"/><circle cx="140" cy="22" r="1.6"/><circle cx="188" cy="60" r="1"/><circle cx="214" cy="26" r="1.2"/><circle cx="66" cy="88" r="1"/><circle cx="160" cy="96" r="1.2"/><circle cx="330" cy="92" r="1"/><circle cx="20" cy="70" r="1.2"/><circle cx="118" cy="70" r="1"/><circle cx="250" cy="20" r="1.1"/></g>
+         <circle cx="286" cy="52" r="22" fill="${p.sol[0]}"/><circle cx="296" cy="46" r="20" fill="${p.t[2]}"/>
+         <path d="M0 160 C70 136 140 152 210 142 C270 134 320 148 358 140 L358 236 L0 236 Z" fill="${p.t[0]}"/>` + CHAO(p.t[1]) },
+    { nome: "lago", luz: [
+        { ceu:["#E9F0E6","#BFD8D2","#8FBFBE"], sol:["#FFFDF2","#F6F3DF"], t:["#7FA38E","#5E9A9C","#2F5355"], b:"#CDE6E1" },
+        { ceu:["#F6D9B8","#E3A98E","#9D7E92"], sol:["#FFF2DC","#FFCF9E"], t:["#7C6A63","#8A6F86","#3E3241"], b:"#FFD9B0" } ],
+      d: p => FUNDO(p,84,64,15) + `<path d="M0 118 C60 96 130 110 190 100 C250 90 310 104 358 98 L358 132 L0 132 Z" fill="${p.t[0]}"/>
+         <rect y="128" width="358" height="108" fill="${p.t[1]}"/>
+         <path d="M40 150h60M150 160h80M250 146h56M90 176h70" stroke="${p.b}" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>
+         <path d="M196 150 h40 l-8 10 h-24 z" fill="#3B2A22"/><path d="M216 150 V122 L234 146 Z" fill="#F4EBDD"/>` + CHAO(p.t[2]) },
+    { nome: "oliveiras", luz: [
+        { ceu:["#F1E9D2","#D9D8B4","#A9B58C"], sol:["#FFFBEE","#F7EBC4"], t:["#8E9C68","#6B7A4C","#3E4A2C"] },
+        { ceu:["#F5D9B0","#E2B285","#B98A6A"], sol:["#FFF4DC","#FFD8A0"], t:["#9A8A5A","#76693F","#463C22"] } ],
+      d: p => FUNDO(p,270,66,18) + `<path d="M0 140 C70 116 150 132 220 122 C280 114 320 126 358 120 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <g fill="#5E6E45"><ellipse cx="70" cy="142" rx="20" ry="14"/><ellipse cx="112" cy="138" rx="16" ry="12"/><ellipse cx="250" cy="134" rx="18" ry="13"/><ellipse cx="300" cy="140" rx="22" ry="15"/></g>
+         <g stroke="#4A3B2A" stroke-width="3"><path d="M70 154v12M112 148v12M250 145v12M300 153v12"/></g>
+         <path d="M0 176 C90 160 170 178 250 166 C300 159 330 168 358 164 L358 236 L0 236 Z" fill="${p.t[1]}"/>` + CHAO(p.t[2]) },
+    { nome: "dunas", luz: [
+        { ceu:["#F8E7C8","#F2CC94","#E3A866"], sol:["#FFF8E4","#FFE3A2"], t:["#E0A55E","#C9884A","#8C5A2C"] },
+        { ceu:["#F2C1A0","#D9877A","#8F5F7A"], sol:["#FFEBD2","#FFB98A"], t:["#C47A58","#A15E48","#5E3430"] } ],
+      d: p => FUNDO(p,110,80,20) + `<path d="M0 150 C50 130 110 120 170 138 C220 152 270 126 358 132 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <path d="M0 176 C60 160 120 150 200 168 C260 182 310 160 358 164 L358 236 L0 236 Z" fill="${p.t[1]}"/>
+         <path d="M170 138 C200 146 220 150 240 148" stroke="#FFF1D8" stroke-width="2" fill="none" opacity=".45"/>` + CHAO(p.t[2]) },
+    { nome: "pinheiros", luz: [
+        { ceu:["#E5EEE6","#C4D9CC","#97B8A6"], sol:["#FFFFF6","#F2F4E2"], t:["#6E8E78","#4C6B57","#2A3F32"] },
+        { ceu:["#F3D2B4","#DDA486","#8A7586"], sol:["#FFF0DA","#FFC994"], t:["#6F6A5E","#4E4A44","#2C2A28"] } ],
+      d: p => FUNDO(p,90,60,16) + `<path d="M0 150 C80 132 160 146 240 136 C290 130 330 138 358 134 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <g fill="${p.t[1]}">${[[200,150],[226,144],[252,152],[280,140],[306,150],[332,144],[40,158],[64,152]].map(([x,y]) => `<path d="M${x} ${y-44} L${x+14} ${y} L${x-14} ${y} Z"/>`).join("")}</g>` + CHAO(p.t[2]) },
+    { nome: "rio", luz: [
+        { ceu:["#E7F0E2","#C9DDB8","#A5C38E"], sol:["#FFFFF2","#F6F2D6"], t:["#8FB070","#6E9256","#3E5A30"], b:"#BFE1EA" },
+        { ceu:["#F6DDB9","#EBB98C","#C48D74"], sol:["#FFF4DE","#FFD9A4"], t:["#A79060","#857244","#4C3F24"], b:"#FFD9AE" } ],
+      d: p => FUNDO(p,280,60,18) + `<path d="M0 128 C70 112 150 126 230 116 C290 108 330 118 358 114 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <path d="M170 118 C150 140 210 150 180 170 C150 190 220 205 200 236 L240 236 C262 205 196 190 226 170 C256 150 196 140 212 118 Z" fill="${p.b}" opacity=".85"/>
+         <path d="M0 166 C60 156 120 170 168 164 L168 236 L0 236 Z" fill="${p.t[1]}"/><path d="M248 166 C290 158 330 166 358 162 L358 236 L248 236 Z" fill="${p.t[1]}"/>` + CHAO(p.t[2]) },
+    { nome: "arco-íris", luz: [
+        { ceu:["#DDE9F2","#C7D9E6","#A8C2D6"], sol:["#FFFFFF","#F5F3E6"], t:["#86A66E","#668A55","#3A532F"] },
+        { ceu:["#E9DCE6","#D6C2D2","#B2A1B8"], sol:["#FFF8F0","#F4E0D0"], t:["#8C9A6E","#6C7A52","#3E472E"] } ],
+      d: p => FUNDO(p,0,0,0) + `<g fill="none" stroke-width="7" opacity=".55">${["#E57373","#F2A65A","#F4D35E","#7FBF7F","#6FA8DC","#8E7CC3"].map((c,i) => `<path d="M40 ${170} A140 ${120 - i*0} 0 0 1 ${320} 170" stroke="${c}" transform="translate(0 ${i*7}) scale(1 ${1 - i*0.02})"/>`).join("")}</g>
+         <path d="M0 150 C70 132 150 146 230 136 C290 130 330 140 358 136 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <path d="M0 174 C90 160 170 176 250 166 C300 160 330 168 358 164 L358 236 L0 236 Z" fill="${p.t[1]}"/>` + CHAO(p.t[2]) },
+    { nome: "muralhas", luz: [
+        { ceu:["#F4E6CC","#EACB9E","#D7A675"], sol:["#FFF8E6","#FFE4B0"], t:["#C9A273","#A88356","#5F4630"] },
+        { ceu:["#F1C9A8","#D88F7E","#7C5E78"], sol:["#FFEAD4","#FFB892"], t:["#A97762","#875A4C","#43302E"] } ],
+      d: p => FUNDO(p,270,62,18) + `<path d="M0 146 C80 136 160 144 240 138 C290 134 330 140 358 138 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <path d="M40 150 V118 h10 v6 h8 v-6 h10 v6 h8 v-6 h10 v6 h8 v-6 h10 V102 h22 V118 h10 v6 h8 v-6 h10 v6 h8 v-6 h10 v6 h8 v-6 h10 V150 Z" fill="${p.t[1]}"/>
+         <path d="M150 102 a11 11 0 0 1 22 0" fill="${p.t[1]}"/><path d="M155 150 v-14 a6 6 0 0 1 12 0 v14 Z" fill="${p.t[2]}"/>` + CHAO(p.t[2]) },
+    { nome: "oásis", luz: [
+        { ceu:["#F7EBCF","#EED3A2","#E0B47A"], sol:["#FFFBEA","#FFE8B2"], t:["#E2B572","#5FA3A0","#7A5530"] },
+        { ceu:["#F4CDB0","#E19A82","#9A6D86"], sol:["#FFEEDA","#FFC398"], t:["#C9895E","#5E7F8C","#55352A"] } ],
+      d: p => FUNDO(p,90,70,18) + `<path d="M0 150 C80 140 160 148 240 142 C290 138 330 144 358 142 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <ellipse cx="236" cy="166" rx="70" ry="9" fill="${p.t[1]}" opacity=".85"/>
+         ${[[214,162,-6],[250,160,8]].map(([x,y,r]) => `<g transform="rotate(${r} ${x} ${y})"><path d="M${x} ${y} C${x-2} ${y-30} ${x+2} ${y-50} ${x} ${y-62}" stroke="#4A3524" stroke-width="4" fill="none"/>
+           <g fill="#3F6B4A"><path d="M${x} ${y-62} q-26 -4 -36 14 q18 -14 36 -10Z"/><path d="M${x} ${y-62} q26 -4 36 14 q-18 -14 -36 -10Z"/><path d="M${x} ${y-62} q-12 -22 -32 -22 q20 6 32 20Z"/><path d="M${x} ${y-62} q12 -22 32 -22 q-20 6 -32 20Z"/></g></g>`).join("")}` + CHAO(p.t[2]) },
+    { nome: "raios de luz", luz: [
+        { ceu:["#E3EAF2","#C8D5E4","#A9BACE"], sol:["#FFFFFF","#FFF8E2"], t:["#8C9DB0","#6B7D92","#3C4A5C"] },
+        { ceu:["#F2D7BE","#DDAE92","#A88A8E"], sol:["#FFF6E4","#FFDCAE"], t:["#9A8478","#7A665C","#433834"] } ],
+      d: p => FUNDO(p,0,0,0) + `<g fill="${p.sol[1]}" opacity=".55"><path d="M170 52 L110 236 H150 Z"/><path d="M180 52 L190 236 H230 Z"/><path d="M190 52 L270 236 H310 Z"/></g>
+         <g fill="#FFFFFF" opacity=".9"><ellipse cx="150" cy="54" rx="60" ry="18"/><ellipse cx="200" cy="46" rx="56" ry="20"/><ellipse cx="240" cy="58" rx="46" ry="14"/></g>
+         <path d="M0 160 C80 146 160 158 240 150 C290 145 330 152 358 150 L358 236 L0 236 Z" fill="${p.t[0]}"/>` + CHAO(p.t[2]) },
+    { nome: "tenda", luz: [
+        { ceu:["#F5E2C2","#EAC08E","#D39662"], sol:["#FFF6E0","#FFDCA0"], t:["#D2A066","#A8774A","#6A4628"] },
+        { ceu:["#2A2F55","#4A4A78","#8A6A88"], sol:["#FFF3D6","#FFF3D6"], t:["#5C4E62","#3E3448","#221C2C"] } ],
+      d: p => FUNDO(p,286,56,14) + `<path d="M0 150 C80 138 160 148 240 140 C290 135 330 142 358 140 L358 236 L0 236 Z" fill="${p.t[0]}"/>
+         <path d="M150 166 L186 120 L222 166 Z" fill="#E9DCC6"/><path d="M186 120 L222 166 L240 166 L200 120 Z" fill="#C9B89C"/><path d="M180 166 L186 146 L192 166 Z" fill="${p.t[2]}"/>
+         <path d="M0 178 C90 166 170 180 250 172 C300 167 330 174 358 172 L358 236 L0 236 Z" fill="${p.t[1]}"/>` + CHAO(p.t[2]) }
+  ];
+  // dia N do ciclo de 30: cenas se alternam (nunca a mesma paisagem em dias seguidos)
+  function cenaDoDiaIdx(d){
+    const dias = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+    const n = CENAS.length;
+    const k = ((dias % (n * 2)) + n * 2) % (n * 2);
+    return { cena: k % n, luz: Math.floor(k / n) };
+  }
+  function aplicarCena(d){
+    const svg = document.getElementById("hojeCena");
+    if (!svg) return;
+    const { cena, luz } = cenaDoDiaIdx(d);
+    const chave = `${cena}-${luz}`;
+    if (svg.dataset.cena === chave) return;
+    const c = CENAS[cena];
+    svg.innerHTML = c.d(c.luz[luz]) + `<rect width="358" height="236" fill="url(#hjVeu)"/>`;
+    svg.dataset.cena = chave;
+  }
+
+
   function renderHojeMobile(plan, state, today){
     const box = document.getElementById("hojeM");
     if (!box) return;
+    aplicarCena(today);
 
     atualizarSaudacao(today);
 
@@ -2872,7 +2997,7 @@ function updateLateUI(state){
     // botão único, que muda conforme o momento
     cta.classList.toggle("feito", done);
     if (done){
-      cta.textContent = "Leitura concluída · escrever no diário";
+      cta.textContent = "Concluída · escrever no diário";
       hojeAcaoCta = () => document.getElementById("mainDiaryBtn")?.click();
     } else if (temPacote){
       const cur = listaDia[idx];
