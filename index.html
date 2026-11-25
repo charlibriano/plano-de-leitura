@@ -1367,6 +1367,15 @@
     .temasTopo .temasTit{margin:0;padding:0}
     .temasVoltar{flex:none;height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer}
     .temasVoltar:hover,.temasVoltar:focus{background:var(--surface);color:var(--ink)}
+    .destaquesBtn{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;margin-bottom:14px;padding:8px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--ui);text-align:left;cursor:pointer}
+    .destaquesBtn > svg:first-child{flex:none;color:var(--gold)}
+    .destaquesBtn:hover,.destaquesBtn:focus{background:var(--surface);color:var(--ink);border-color:var(--ink-3)}
+    .destaquesTxt{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
+    .destaquesTxt b{font-size:15px;font-weight:600}
+    .destaquesTxt small{font-size:12px;font-weight:400;color:var(--ink-2)}
+    .temasGrupos[hidden]{display:none}
+    .temasVazio{padding:18px 16px;font-family:var(--ui);font-size:14px;line-height:1.5;color:var(--ink-2)}
+    .temasGrupos .pag{color:var(--ink-2);display:flex;align-items:center;justify-content:center;font-family:var(--ui);font-size:12.5px;font-weight:600}
     .temasGrupos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
     .temasGrupos button{min-height:40px;padding:3px 6px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-family:var(--ui);font-size:12px;font-weight:600;line-height:1.2;cursor:pointer}
     .temasGrupos button:hover,.temasGrupos button:focus{background:var(--surface);color:var(--ink-2)}
@@ -1687,6 +1696,11 @@
     <section class="card" data-panel="Temas">
       <div class="temasM" id="temasM">
         <div class="temasLista" id="temasLista">
+          <button type="button" class="destaquesBtn" id="destaquesBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>
+            <span class="destaquesTxt"><b>Meus destaques</b><small id="destaquesQtd">Nenhum versículo destacado ainda</small></span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--ink-3)"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
           <h3 class="temasTit">Versículos por tema</h3>
           <div class="temasGrade" id="temasGrade"></div>
         </div>
@@ -4768,6 +4782,14 @@ const keyRef = `${book}|${chapter}|${translationId}`;
 
 function closeReader(){
     pararAudio();
+    // um destaque novo ou removido no leitor já aparece em "Meus destaques"
+    try {
+      atualizarResumoDestaques();
+      if (document.getElementById("temasNome")?.textContent === "Meus destaques" && !document.getElementById("temasVersos").hidden){
+        const pag = document.querySelector("#temasGrupos .pag");
+        abrirDestaques(pag ? Number(pag.textContent.split(" ")[0]) - 1 : 0);
+      }
+    } catch(e){}
     const modal = document.getElementById("readerModal");
     modal.classList.remove("open");
     modal.setAttribute("aria-hidden","true");
@@ -4806,6 +4828,7 @@ function closeReader(){
     const grupo = t.grupos[g] || t.grupos[0];
     temaAberto = { i, g };
     document.getElementById("temasNome").textContent = t.nome;
+    document.getElementById("temasGrupos").hidden = false;
     // enfoques do tema (3 abas de 6 versículos): estudo mais fundo sem rolar a tela
     const grupos = document.getElementById("temasGrupos");
     grupos.innerHTML = t.grupos.map((gr, k) => `<button type="button" role="tab" aria-selected="${k === g}" class="${k === g ? "on" : ""}" data-g="${k}">${escapeHtml(gr.nome)}</button>`).join("");
@@ -4821,11 +4844,75 @@ function closeReader(){
     document.getElementById("temasVersos").hidden = false;
     document.querySelector('[data-panel="Temas"]')?.scrollTo({ top: 0 });
   }
+  // ── Meus destaques: os versículos marcados no leitor, em ordem bíblica ──
+  const ORDEM_LIVROS = ["GEN","EXO","LEV","NUM","DEU","JOS","JDG","RUT","1SA","2SA","1KI","2KI","1CH","2CH","EZR","NEH","EST","JOB","PSA","PRO","ECC","SNG","ISA","JER","LAM","EZK","DAN","HOS","JOL","AMO","OBA","JON","MIC","NAM","HAB","ZEP","HAG","ZEC","MAL","MAT","MRK","LUK","JHN","ACT","ROM","1CO","2CO","GAL","EPH","PHP","COL","1TH","2TH","1TI","2TI","TIT","PHM","HEB","JAS","1PE","2PE","1JN","2JN","3JN","JUD","REV"];
+  function listaDestaques(){
+    const st = ensureStateDefaults(loadState());
+    const hl = st.reader?.highlights || {};
+    const vistos = new Set(), lista = [];
+    Object.entries(hl).forEach(([chave, versos]) => {
+      const [livro, cap] = chave.split("|");
+      const id = getBookId(livro);
+      if (!id || !Array.isArray(versos)) return;
+      versos.forEach(v => {
+        const k = `${livro}|${cap}|${v}`;
+        if (vistos.has(k)) return;
+        vistos.add(k);
+        lista.push({ livro, cap: Number(cap), v: Number(v), id });
+      });
+    });
+    return lista.sort((a, b) => (ORDEM_LIVROS.indexOf(a.id) - ORDEM_LIVROS.indexOf(b.id)) || (a.cap - b.cap) || (a.v - b.v));
+  }
+  function atualizarResumoDestaques(){
+    const el = document.getElementById("destaquesQtd");
+    if (!el) return;
+    const n = listaDestaques().length;
+    el.textContent = n ? `${n} ${n === 1 ? "versículo destacado" : "versículos destacados"}` : "Nenhum versículo destacado ainda";
+  }
+  const POR_PAGINA = 6;
+  async function abrirDestaques(pagina = 0){
+    const lista = listaDestaques();
+    const paginas = Math.max(1, Math.ceil(lista.length / POR_PAGINA));
+    pagina = Math.max(0, Math.min(pagina, paginas - 1));
+    document.getElementById("temasNome").textContent = "Meus destaques";
+    document.getElementById("temasLista").hidden = true;
+    document.getElementById("temasVersos").hidden = false;
+    // mais de 6: páginas, para a tela não rolar
+    const grupos = document.getElementById("temasGrupos");
+    grupos.hidden = paginas <= 1;
+    grupos.innerHTML = `<button type="button" data-p="${pagina - 1}" ${pagina === 0 ? "disabled" : ""}>‹ Anteriores</button><span class="pag">${pagina + 1} de ${paginas}</span><button type="button" data-p="${pagina + 1}" ${pagina >= paginas - 1 ? "disabled" : ""}>Mais ›</button>`;
+    grupos.querySelectorAll("button").forEach(b => b.addEventListener("click", () => abrirDestaques(Number(b.dataset.p))));
+    const itens = document.getElementById("temasItens");
+    if (!lista.length){
+      itens.innerHTML = `<div class="temasVazio">Você ainda não destacou nenhum versículo. No leitor, toque num versículo para destacá-lo; ele aparece aqui.</div>`;
+      return;
+    }
+    const pag = lista.slice(pagina * POR_PAGINA, (pagina + 1) * POR_PAGINA);
+    itens.innerHTML = `<div class="temasVazio">Carregando…</div>`;
+    try {
+      const livros = {};
+      await Promise.all([...new Set(pag.map(d => d.id))].map(async id => { livros[id] = await carregarLivroBiblia(id); }));
+      itens.innerHTML = pag.map(d => {
+        const t = (livros[d.id]?.capitulos?.[String(d.cap)] || []).find(([n]) => n === d.v)?.[1] || "";
+        return `<button type="button" class="temaVerso" data-livro="${escapeHtml(d.livro)}" data-cap="${d.cap}" data-v="${d.v}"><span><b>${escapeHtml(d.livro)} ${d.cap}:${d.v}</b>${escapeHtml(limparVerso(t))}</span></button>`;
+      }).join("");
+      itens.querySelectorAll(".temaVerso").forEach(b => b.addEventListener("click", () => {
+        versoAlvoLeitor = Number(b.dataset.v);
+        openBibleReader(b.dataset.livro, Number(b.dataset.cap), null);
+      }));
+    } catch (e){
+      itens.innerHTML = `<div class="temasVazio">Não consegui carregar o texto dos destaques: ${escapeHtml(e?.message || String(e))}</div>`;
+    }
+  }
+  document.getElementById("destaquesBtn")?.addEventListener("click", () => abrirDestaques(0));
+  document.querySelector('.tabBtn[data-alvo="Temas"]')?.addEventListener("click", atualizarResumoDestaques);
+
   document.getElementById("temasVoltar")?.addEventListener("click", () => {
     document.getElementById("temasVersos").hidden = true;
     document.getElementById("temasLista").hidden = false;
   });
   renderTemas();
+  atualizarResumoDestaques();
 
   // ── Ouvir o capítulo (voz do próprio aparelho: Web Speech API) ──
   // Lê versículo por versículo: assim dá para marcar o que está sendo lido e
