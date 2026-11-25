@@ -197,6 +197,31 @@
     .chip.ok{border-color:var(--green);color:var(--green);background:var(--green-soft)}
     .chip.warn{border-color:var(--gold);color:var(--gold);background:var(--gold-soft)}
     .chip.danger{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+    /* ---------- Sincronização (login Google + Firestore) ---------- */
+    .syncWrap{position:relative;display:inline-flex}
+    button.chip{cursor:pointer;font-family:var(--ui)}
+    .syncPanel{
+      position:absolute;top:calc(100% + 8px);left:0;z-index:1500;
+      width:min(300px,86vw);padding:14px;
+      background:var(--surface);border:1px solid var(--line-strong);
+      border-radius:var(--r2);box-shadow:var(--shadow);
+      display:none;flex-direction:column;gap:10px;
+      font-size:13px;color:var(--ink-2);line-height:1.5;white-space:normal;
+    }
+    .syncPanel.open{display:flex}
+    .syncPanel b{color:var(--ink)}
+    .syncPanel .syncErr{
+      display:none;padding:9px 11px;border-radius:var(--r1);
+      background:var(--accent-soft);color:var(--accent);
+      font-size:12.5px;word-break:break-word;
+    }
+    .syncPanel .syncErr.show{display:block}
+    .syncPanel .syncBtns{display:flex;gap:8px;flex-wrap:wrap}
+    .syncPanel .syncBtns button{
+      flex:1;padding:9px 12px;border-radius:var(--r1);
+      border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);
+      font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer;
+    }
 
     /* botão de tema */
     .themeBtn{
@@ -273,6 +298,7 @@
     .devotionalPergunta:before{content:"✎ "; opacity:.7;}
 
     .row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+    .row>*{max-width:100%;min-width:0}
     label.small{
       display:block;
       margin-bottom:6px;
@@ -296,7 +322,7 @@
       border-radius:var(--r1);
       padding:11px 36px 11px 13px;
       outline:none;
-      min-width:238px;
+      min-width:238px;max-width:100%;
       font-family:var(--ui);
       font-size:14px;
       font-weight:500;
@@ -405,7 +431,7 @@
       overflow:hidden;
     }
     .kpi:before{content:none}
-    .kpiHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .kpiHead{display:flex;align-items:center;justify-content:space-between;gap:6px 10px;flex-wrap:wrap}
     .kpi .k{
       font-size:11px;color:var(--ink-3);font-weight:600;
       letter-spacing:.07em;text-transform:uppercase;
@@ -614,7 +640,7 @@
       overflow:hidden;
     }
     .monthCalHead{
-      display:grid;grid-template-columns:repeat(7,1fr);
+      display:grid;grid-template-columns:repeat(7,minmax(0,1fr));
       border-bottom:1px solid var(--line);
       background:var(--surface-2);
     }
@@ -623,12 +649,12 @@
       font-size:10.5px;color:var(--ink-3);font-weight:600;
       letter-spacing:.08em;text-transform:uppercase;
     }
-    .monthCalGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:10px}
+    .monthCalGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;padding:10px}
 
     .dayBlank{border:0;margin:0;background:transparent;min-height:52px}
 
     .dayBtn{
-      position:relative;min-height:52px;
+      position:relative;min-height:52px;min-width:0;
       border-radius:var(--r1);
       border:1px solid transparent;
       background:transparent;color:var(--ink);
@@ -673,7 +699,7 @@
       font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:-.01em;
       display:flex;align-items:center;gap:10px;flex-wrap:wrap;
     }
-    .dayPlanGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .dayPlanGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
     @media (max-width:980px){.dayPlanGrid{grid-template-columns:1fr}}
 
     .dayBlock{
@@ -701,7 +727,7 @@
     }
     .btnOpen:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
 
-    .dayMeta{margin-top:16px;display:grid;grid-template-columns:220px 1fr;gap:14px;align-items:start}
+    .dayMeta{margin-top:16px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
     @media (max-width:980px){.dayMeta{grid-template-columns:1fr}}
     .dayMeta textarea.note{min-height:86px}
 
@@ -1118,7 +1144,7 @@
        Aparece uma vez por dia; some ao entrar.
        ══════════════════════════════════════════════════════════ */
     .opening{
-      position:fixed;inset:0;z-index:200;
+      position:fixed;inset:0;z-index:2000;
       display:none;align-items:center;justify-content:center;
       padding:28px 22px;
       background:var(--paper);
@@ -1283,7 +1309,17 @@
         </p>
       </div>
       <div class="chips">
-        <span class="chip ok">Salva automático</span>
+        <span class="syncWrap">
+          <button class="chip" id="syncChip" type="button" title="Progresso salvo só neste aparelho">Salvo neste aparelho</button>
+          <span class="syncPanel" id="syncPanel" role="dialog" aria-label="Sincronização">
+            <span id="syncInfo">—</span>
+            <span class="syncErr" id="syncErr"></span>
+            <span class="syncBtns">
+              <button type="button" id="syncAgora">Sincronizar agora</button>
+              <button type="button" id="syncSair">Sair</button>
+            </span>
+          </span>
+        </span>
         <span class="chip" id="chipPlan">Plano: —</span>
         <span class="chip danger" id="chipLate" style="display:none;">Atraso: —</span>
         <button class="themeBtn" id="themeBtn" type="button" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">◐</button>
@@ -3486,6 +3522,238 @@ function closeReader(){
     _saveState(state);
     checkMonthUnlock(prev, state);
   };
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     SINCRONIZAÇÃO — login Google + Firestore (projeto "ler-biblia")
+     O app continua salvando no aparelho como sempre. Com a conta
+     Google conectada, cada mudança também vai para progresso/{uid},
+     e ao abrir (ou voltar para) o app a versão da nuvem é baixada.
+     Se este bloco não carregar, o app segue funcionando só local.
+     ══════════════════════════════════════════════════════════ -->
+<script type="module">
+  const chip  = document.getElementById("syncChip");
+  const panel = document.getElementById("syncPanel");
+  const info  = document.getElementById("syncInfo");
+  const errEl = document.getElementById("syncErr");
+
+  function mostrarErro(msg){
+    errEl.textContent = msg;
+    errEl.classList.add("show");
+    panel.classList.add("open");
+  }
+  function limparErro(){ errEl.textContent = ""; errEl.classList.remove("show"); }
+
+  let fb;
+  try {
+    const [appMod, authMod, fsMod] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"),
+    ]);
+    fb = { ...appMod, ...authMod, ...fsMod };
+  } catch (e) {
+    chip.title = "Sincronização indisponível: " + (e && e.message || e);
+    throw e; // sem Firebase o app segue só com o salvamento local
+  }
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyABCSNnIVGRqx6nrQw1N3Bz9Iox8ufJd0Y",
+    authDomain: "ler-biblia.firebaseapp.com",
+    projectId: "ler-biblia",
+    storageBucket: "ler-biblia.firebasestorage.app",
+    messagingSenderId: "108213408345",
+    appId: "1:108213408345:web:95df272f91b5d218add748"
+  };
+  const app  = fb.initializeApp(firebaseConfig);
+  const auth = fb.getAuth(app);
+  const db   = fb.getFirestore(app);
+  const provider = new fb.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+
+  // ── Memória da sincronização neste aparelho ──
+  // uid: de quem são os dados locais · pendente: há mudança local ainda não enviada
+  const META = "lerbiblia_sync_v1";
+  function lerMeta(){ try { return JSON.parse(localStorage.getItem(META)) || {}; } catch(_) { return {}; } }
+  function gravarMeta(m){ try { localStorage.setItem(META, JSON.stringify(m)); } catch(_){} }
+
+  // O que vai para a nuvem: tudo, menos "ui" (mês aberto / dia selecionado são do aparelho)
+  function paraNuvem(state){
+    const copia = JSON.parse(JSON.stringify(state));
+    delete copia.ui;
+    return JSON.stringify(copia);
+  }
+
+  // Grava no aparelho SEM disparar o envio (usado ao aplicar dados da nuvem)
+  function gravarLocalDireto(state){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+  // ── Junção de dois progressos (1ª vez neste aparelho, ou mudança local pendente) ──
+  // Regra: nada se perde. Dia lido em qualquer lado = lido. Textos: o deste aparelho,
+  // se existir; senão o da nuvem. Diário: o mais recente. Destaques: a soma dos dois.
+  function juntar(local, nuvem){
+    const out = { ...nuvem, ...local };
+    out.days = { ...(nuvem.days || {}) };
+    for (const [k, l] of Object.entries(local.days || {})){
+      const r = out.days[k] || {};
+      out.days[k] = { ...r, ...l, done: !!(l.done || r.done), note: (l.note || r.note || "") };
+    }
+    out.guided = { ...(nuvem.guided || {}), ...(local.guided || {}) };
+
+    const lr = local.reader || {}, rr = nuvem.reader || {};
+    const reader = { ...rr, ...lr };
+    reader.highlights = { ...(rr.highlights || {}) };
+    for (const [ref, arr] of Object.entries(lr.highlights || {})){
+      reader.highlights[ref] = Array.from(new Set([...(reader.highlights[ref] || []), ...arr]));
+    }
+    reader.hlText = { ...(rr.hlText || {}), ...(lr.hlText || {}) };
+    reader.diary = { ...(rr.diary || {}) };
+    for (const [d, e] of Object.entries(lr.diary || {})){
+      const r = reader.diary[d];
+      if (!r || String(e.updatedAt || "") >= String(r.updatedAt || "")) reader.diary[d] = e;
+    }
+    out.reader = reader;
+    return out;
+  }
+
+  let usuario = null;
+  let ultimoEnviado = null;   // texto do último progresso igual ao da nuvem
+  let timerEnvio = null;
+  let enviando = false;
+
+  function estadoChip(tipo, texto, titulo){
+    chip.className = "chip" + (tipo ? " " + tipo : "");
+    chip.textContent = texto;
+    chip.title = titulo || texto;
+  }
+
+  async function enviar(){
+    if (!usuario || enviando) return;
+    const state = ensureStateDefaults(loadState());
+    const dados = paraNuvem(state);
+    if (dados === ultimoEnviado){ const m = lerMeta(); m.pendente = false; gravarMeta(m); estadoChip("ok", "✓ Sincronizado", usuario.email); return; }
+    if (dados.length > 900000){ estadoChip("danger", "⚠ Não sincronizado"); mostrarErro("O progresso ficou grande demais para um documento do Firestore (" + Math.round(dados.length/1024) + " KB). Avise o Claude."); return; }
+    enviando = true;
+    estadoChip("", "Sincronizando…");
+    try {
+      await fb.setDoc(fb.doc(db, "progresso", usuario.uid), { dados, atualizadoEm: fb.serverTimestamp() });
+      ultimoEnviado = dados;
+      gravarMeta({ uid: usuario.uid, pendente: false });
+      limparErro();
+      estadoChip("ok", "✓ Sincronizado", usuario.email);
+    } catch (e) {
+      estadoChip("danger", "⚠ Erro ao sincronizar");
+      mostrarErro("Não consegui salvar na nuvem (" + (e.code || e.message) + "). O progresso continua salvo neste aparelho e será enviado na próxima vez.");
+    } finally {
+      enviando = false;
+    }
+  }
+
+  // Toda gravação do app passa por aqui; só agenda envio se o conteúdo mudou
+  const saveOriginal = saveState;
+  saveState = function(state){
+    saveOriginal(state);
+    if (!usuario){
+      // Mudou sem estar logado: na próxima entrada, soma com a nuvem em vez de substituir
+      const m = lerMeta();
+      if (m.uid && !m.pendente){ m.pendente = true; gravarMeta(m); }
+      return;
+    }
+    if (paraNuvem(state) === ultimoEnviado) return;
+    gravarMeta({ uid: usuario.uid, pendente: true });
+    estadoChip("", "Sincronizando…");
+    clearTimeout(timerEnvio);
+    timerEnvio = setTimeout(enviar, 1200);
+  };
+
+  async function baixar(){
+    if (!usuario) return;
+    // Não troca a tela enquanto a pessoa digita (diário, anotação)
+    const ativo = document.activeElement;
+    if (ativo && (ativo.tagName === "TEXTAREA" || ativo.tagName === "INPUT")) return;
+
+    estadoChip("", "Sincronizando…");
+    try {
+      const snap = await fb.getDoc(fb.doc(db, "progresso", usuario.uid));
+      const local = ensureStateDefaults(loadState());
+      const meta = lerMeta();
+      let final;
+
+      if (!snap.exists()){
+        // Conta nova na nuvem: o progresso deste aparelho vira o da conta
+        // (exceto se os dados locais forem de OUTRA conta Google)
+        final = (meta.uid && meta.uid !== usuario.uid)
+          ? ensureStateDefaults({ version: local.version, planMode: local.planMode, days:{}, guided:{} })
+          : local;
+      } else {
+        const nuvem = ensureStateDefaults(JSON.parse(snap.data().dados));
+        if (meta.uid === usuario.uid && !meta.pendente) final = nuvem;              // nuvem manda
+        else if (meta.uid && meta.uid !== usuario.uid) final = nuvem;               // dados locais eram de outra conta
+        else final = juntar(local, nuvem);                                          // 1ª vez aqui ou mudança pendente
+        ultimoEnviado = paraNuvem(nuvem);
+      }
+
+      final.ui = local.ui;
+      gravarLocalDireto(final);
+      gravarMeta({ uid: usuario.uid, pendente: paraNuvem(final) !== ultimoEnviado });
+      renderAll();
+      limparErro();
+      await enviar();   // só grava se o resultado for diferente do que está na nuvem
+    } catch (e) {
+      estadoChip("danger", "⚠ Erro ao sincronizar");
+      mostrarErro("Não consegui buscar o progresso da nuvem (" + (e.code || e.message) + "). O app segue com o que está salvo neste aparelho.");
+    }
+  }
+
+  async function entrar(){
+    limparErro();
+    estadoChip("", "Abrindo login…");
+    try {
+      await fb.signInWithPopup(auth, provider);
+    } catch (e) {
+      const codigo = e.code || "";
+      estadoChip("warn", "☁ Entrar para sincronizar");
+      if (codigo === "auth/popup-closed-by-user" || codigo === "auth/cancelled-popup-request") return;
+      let msg = "Não consegui entrar com o Google (" + (codigo || e.message) + ").";
+      if (codigo === "auth/popup-blocked") msg = "O navegador bloqueou a janela de login do Google. Libere pop-ups para " + location.hostname + " e tente de novo.";
+      if (codigo === "auth/unauthorized-domain") msg = "O endereço " + location.hostname + " não está na lista de domínios autorizados do Firebase (Authentication → Configurações → Domínios autorizados).";
+      mostrarErro(msg);
+    }
+  }
+
+  chip.addEventListener("click", () => {
+    if (!usuario){ entrar(); return; }
+    panel.classList.toggle("open");
+  });
+  document.getElementById("syncAgora").addEventListener("click", () => { panel.classList.remove("open"); baixar(); });
+  document.getElementById("syncSair").addEventListener("click", async () => {
+    clearTimeout(timerEnvio);
+    await enviar();                 // manda o que estiver pendente antes de sair
+    await fb.signOut(auth);
+    panel.classList.remove("open");
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".syncWrap")) panel.classList.remove("open");
+  });
+
+  // Ao voltar para o app (trocou de aba, desbloqueou o celular): pega o que mudou no outro aparelho
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && usuario && !lerMeta().pendente) baixar();
+  });
+
+  fb.onAuthStateChanged(auth, (u) => {
+    usuario = u;
+    if (u){
+      info.innerHTML = "";
+      info.append("Conectado como ");
+      const b = document.createElement("b"); b.textContent = u.email || u.displayName || "conta Google";
+      info.append(b, ". Seu progresso fica salvo na conta e aparece igual no celular e no computador.");
+      baixar();
+    } else {
+      ultimoEnviado = null;
+      panel.classList.remove("open");
+      estadoChip("warn", "☁ Entrar para sincronizar", "Entre com o Google para ter o mesmo progresso no celular e no computador");
+    }
+  });
 </script>
 
 
