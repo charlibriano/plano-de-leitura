@@ -1371,6 +1371,14 @@
     .planosBarra button.on,.planosBarra button.on:hover,.planosBarra button.on:focus{background:var(--ink);color:var(--paper);border-color:var(--ink)}
     .planosBarra button.novo,.planosBarra button.novo:hover{border-style:dashed;color:var(--ink)}
     .extraM{display:flex;flex-direction:column;gap:8px}
+    .hojePlanos{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1}
+    .hojePlanos[hidden]{display:none}
+    .hojePlanos::-webkit-scrollbar{display:none}
+    .hojePlanos button{flex:none;height:24px;padding:0 10px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);font-family:var(--ui);font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+    .hojePlanos button:hover,.hojePlanos button:focus{background:var(--surface);color:var(--ink-2)}
+    .hojePlanos button.on,.hojePlanos button.on:hover,.hojePlanos button.on:focus{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .hojeCardTop:has(.hojePlanos:not([hidden])){align-items:center}
+    .extraCard .hojeCta[hidden]{display:none}
     .extraM[hidden],.planoM[hidden]{display:none !important}
     .extraCard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
     .extraTopo{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
@@ -1910,6 +1918,7 @@
           <span class="extraRotulo" id="extraHojeRot">Leitura de hoje</span>
           <div class="extraHoje" id="extraHoje">—</div>
           <div class="extraNota" id="extraNota"></div>
+          <button type="button" class="hojeCta" id="extraAbrir" hidden>Abrir leitura</button>
         </section>
         <button type="button" class="extraApagar" id="extraApagar">Apagar este plano</button>
       </div>
@@ -1999,7 +2008,8 @@
 
         <section class="hojeCard" aria-label="Leitura de hoje">
           <div class="hojeCardTop">
-            <h3>Leitura de hoje</h3>
+            <h3 id="hojeTitulo">Leitura de hoje</h3>
+            <div class="hojePlanos" id="hojePlanos" role="tablist" aria-label="Plano" hidden></div>
             <span class="hojeDia" id="hojeDia">—</span>
           </div>
           <div class="hojeBarra"><div id="hojeBarra"></div></div>
@@ -3166,6 +3176,22 @@ function updateLateUI(state){
 
     const versBtn = document.getElementById("hojeVersBtn");
     if (versBtn) versBtn.hidden = !(dentro && p?.guidedList?.length);
+
+    // ── chave de planos (só aparece se a pessoa tem planos extras) ──
+    const ativosExtra = planosAtivos(state);
+    const vistoHoje = planoVisto(state);
+    const chave = document.getElementById("hojePlanos");
+    document.getElementById("hojeTitulo").hidden = ativosExtra.length > 0;
+    chave.hidden = ativosExtra.length === 0;
+    if (ativosExtra.length){
+      chave.innerHTML = `<button type="button" role="tab" data-id="anual" class="${vistoHoje === "anual" ? "on" : ""}">Plano anual</button>`
+        + ativosExtra.map(pl => `<button type="button" role="tab" data-id="${escapeHtml(pl.id)}" class="${vistoHoje === pl.id ? "on" : ""}">${escapeHtml(pl.curto || pl.nome)}</button>`).join("");
+      chave.querySelectorAll("button").forEach(b => b.addEventListener("click", () => verPlano(b.dataset.id)));
+    }
+    if (vistoHoje !== "anual"){
+      renderHojeExtra(ativosExtra.find(pl => pl.id === vistoHoje), today);
+      return;
+    }
 
     // ── Leitura de hoje ──
     const planoDias = Object.keys(plan).length || 365;
@@ -4577,6 +4603,14 @@ b.addEventListener("click", ()=>{
     // Concluir dia: marca o dia selecionado como concluído e fecha o leitor
     if (doneBtn){
       doneBtn.onclick = ()=>{
+        if (ctx?.extraId){
+          // plano extra: marca todos os capítulos deste dia do plano
+          const st3 = ensureStateDefaults(loadState());
+          const pl = st3.planosExtras.find(x => x.id === ctx.extraId);
+          if (pl){ pl.lidos = [...new Set([...(pl.lidos || []), ...(pl.dias[ctx.extraDia] || [])])]; saveState(st3); }
+          closeReader(); try{ renderAll(); }catch(e){}
+          return;
+        }
         const st2 = ensureStateDefaults(loadState());
         const dayKey = st2.ui?.selectedDay || todayKeyNow();
         st2.days = st2.days || {};
@@ -4794,6 +4828,14 @@ const keyRef = `${book}|${chapter}|${translationId}`;
   }
 
   function marcarCapituloLido(ctx, item){
+    if (ctx?.extraId){
+      const st = ensureStateDefaults(loadState());
+      const pl = st.planosExtras.find(x => x.id === ctx.extraId);
+      if (!pl) return;
+      pl.lidos = [...new Set([...(pl.lidos || []), refCap(item)])];
+      saveState(st);
+      return;
+    }
     const st = ensureStateDefaults(loadState());
     const plan = buildPlanForYear(st);
     const ref = refCap(item);
@@ -4818,8 +4860,10 @@ const keyRef = `${book}|${chapter}|${translationId}`;
     const i = Number(ctx.idx || 0);
     const prox = ctx.list[i + 1];
     const st = ensureStateDefaults(loadState());
-    const ehDia = !!diaDaLista(st, ctx);
-    const jaLido = ehDia && capsLidos(st, ctx.dateKey).has(`${book} ${chapter}`);
+    const plExtra = ctx.extraId ? st.planosExtras.find(x => x.id === ctx.extraId) : null;
+    const ehDia = !!diaDaLista(st, ctx) || !!plExtra;
+    const jaLido = plExtra ? (plExtra.lidos || []).includes(`${book} ${chapter}`)
+                           : (ehDia && capsLidos(st, ctx.dateKey).has(`${book} ${chapter}`));
     const principal = prox
       ? `✓ Lido · próximo: ${escapeHtml(prox.book)} ${prox.chapter}`
       : (ehDia ? "✓ Lido · concluir o dia" : "✓ Lido · fim do pacote");
@@ -4841,7 +4885,7 @@ const keyRef = `${book}|${chapter}|${translationId}`;
       if (ctx.list[i + 1]){ goPlanDelta(1); return; }
       // último capítulo: conclui o dia (como o "Concluir dia" de cima) e volta
       const st = ensureStateDefaults(loadState());
-      const k = diaDaLista(st, ctx);
+      const k = ctx.extraId ? null : diaDaLista(st, ctx);
       if (k){ st.days[k] = st.days[k] || {}; st.days[k].done = true; saveState(st); }
       closeReader(); renderAll();
     };
@@ -5032,6 +5076,7 @@ function closeReader(){
     st.ui.planoVisto = id;
     saveState(st);
     renderPlanosExtras(st, new Date());
+    redesenharHoje();   // a tela Hoje mostra o mesmo plano escolhido
   }
 
   function renderPlanosExtras(st, hoje){
@@ -5060,6 +5105,7 @@ function closeReader(){
     document.getElementById("extraBarra").style.width = `${Math.round(feitos / n * 100)}%`;
     document.getElementById("extraInfo").textContent = `${feitos} de ${n} dias lidos · de ${fmtBR(parseYMD(pl.inicio))} a ${fmtBR(fim)}`;
     const hojeEl = document.getElementById("extraHoje"), nota = document.getElementById("extraNota");
+    document.getElementById("extraAbrir").hidden = true;
     if (feitos === n){
       document.getElementById("extraHojeRot").textContent = "Plano concluído";
       hojeEl.textContent = "Você leu tudo deste plano. 🎉";
@@ -5071,12 +5117,109 @@ function closeReader(){
     } else {
       document.getElementById("extraHojeRot").textContent = `Leitura de hoje · ${pl.dias[d].length} ${pl.dias[d].length === 1 ? "capítulo" : "capítulos"}`;
       hojeEl.textContent = resumoRefs(pl.dias[d]);
+      const lidosP = new Set(pl.lidos || []);
+      const feitoD = pl.dias[d].every(r => lidosP.has(r));
+      const abrir = document.getElementById("extraAbrir");
+      abrir.hidden = false;
+      abrir.textContent = feitoD ? "Ler de novo" : (pl.dias[d].some(r => lidosP.has(r)) ? `Continuar: ${pl.dias[d].find(r => !lidosP.has(r))}` : "Abrir leitura");
+      abrir.classList.toggle("feito", feitoD);
       nota.textContent = pl.minDia ? `Cerca de ${pl.minDia} min por dia, em média.` : "";
     }
     const apagar = document.getElementById("extraApagar");
     apagar.classList.remove("confirmar");
     apagar.textContent = "Apagar este plano";
   }
+
+  // dia do plano que a pessoa deve ler agora: hoje (ou o último dia, se o período já acabou)
+  function diaParaLer(pl, hoje){ return Math.max(0, Math.min(diaDoExtra(pl, hoje), pl.dias.length - 1)); }
+  // abre no leitor o dia "dia" do plano, no 1º capítulo ainda não lido (ou no índice pedido)
+  function abrirLeituraExtra(id, dia, idx){
+    const st = ensureStateDefaults(loadState());
+    const pl = planosAtivos(st).find(x => x.id === id);
+    if (!pl || !pl.dias[dia]) return;
+    const lista = pl.dias[dia].map(r => { const m = r.match(/^(.+) (\d+)$/); return { book: m[1], chapter: Number(m[2]) }; });
+    const lidos = new Set(pl.lidos || []);
+    if (!Number.isInteger(idx)) idx = Math.max(0, lista.findIndex(it => !lidos.has(refCap(it))));
+    openBibleReader(lista[idx].book, lista[idx].chapter, { extraId: id, extraDia: dia, idx, list: lista });
+  }
+
+  function renderHojeExtra(pl, hoje){
+    const lista = document.getElementById("hojeLista");
+    const cta = document.getElementById("hojeCta");
+    const links = document.getElementById("hojeLinks");
+    const rodape = document.getElementById("hojeRodape");
+    links.innerHTML = "";
+    const n = pl.dias.length;
+    const d = diaDoExtra(pl, hoje);
+    const feitos = pl.dias.filter((_, i) => extraDiaFeito(pl, i)).length;
+    document.getElementById("hojeDia").textContent = d < 0 ? "" : (d >= n ? "Encerrado" : `Dia ${d + 1} de ${n}`);
+    document.getElementById("hojeBarra").style.width = `${Math.round(feitos / n * 100)}%`;
+    cta.style.display = "";
+    if (feitos === n){
+      lista.innerHTML = `<div class="hojeTrilha" style="padding:10px 2px">Plano concluído: você leu tudo de ${escapeHtml(pl.nome)}. 🎉</div>`;
+      cta.style.display = "none";
+      rodape.textContent = "";
+      return;
+    }
+    if (d < 0){
+      lista.innerHTML = `<div class="hojeTrilha" style="padding:10px 2px">Este plano começa em ${fmtBR(parseYMD(pl.inicio))}.</div>`;
+      cta.style.display = "none"; rodape.textContent = ""; return;
+    }
+    const dia = diaParaLer(pl, hoje);
+    const refs = pl.dias[dia];
+    const lidos = new Set(pl.lidos || []);
+    // uma linha por livro do dia (ex.: "Mateus 28" e "Marcos 1–2"), para o cartão não crescer
+    const grupos = [];
+    refs.forEach((r, i) => {
+      const m = r.match(/^(.+) (\d+)$/);
+      const g = grupos[grupos.length - 1];
+      if (g && g.livro === m[1]) { g.refs.push(r); g.fim = Number(m[2]); }
+      else grupos.push({ livro: m[1], ini: Number(m[2]), fim: Number(m[2]), refs: [r], idx0: i });
+    });
+    lista.innerHTML = grupos.map(g => {
+      const nLidos = g.refs.filter(r => lidos.has(r)).length;
+      const tudo = nLidos === g.refs.length;
+      const proxIdx = g.idx0 + Math.max(0, g.refs.findIndex(r => !lidos.has(r)));
+      const txt = g.ini === g.fim ? `${g.livro} ${g.ini}` : `${g.livro} ${g.ini}–${g.fim}`;
+      const sub = g.refs.length > 1 ? `${nLidos} de ${g.refs.length} capítulos lidos` : (tudo ? "Lido" : "1 capítulo");
+      return `<button type="button" class="hojeItem${tudo ? " lido" : ""}" data-idx="${tudo ? g.idx0 : proxIdx}">
+        <span class="hojeCheck">${SVG_CHECK}</span>
+        <span class="hojeTxt"><span class="hojeRef">${escapeHtml(txt)}</span><span class="hojeTrilha">${escapeHtml(sub)}</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--ink-3)"><path d="m9 6 6 6-6 6"/></svg>
+      </button>`;
+    }).join("");
+    lista.querySelectorAll(".hojeItem").forEach(el => el.addEventListener("click", () => abrirLeituraExtra(pl.id, dia, Number(el.dataset.idx) || 0)));
+
+    const feitoHoje = refs.every(r => lidos.has(r));
+    const comecou = refs.some(r => lidos.has(r));
+    cta.classList.toggle("feito", feitoHoje);
+    if (feitoHoje){
+      cta.textContent = "Leitura do dia concluída ✓";
+      hojeAcaoCta = null;
+    } else {
+      const prox = refs.find(r => !lidos.has(r));
+      cta.textContent = comecou ? `Continuar: ${prox}` : "Começar a leitura";
+      hojeAcaoCta = () => abrirLeituraExtra(pl.id, dia);
+    }
+    if (!feitoHoje){
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "hojeLink"; b.textContent = "Marcar como lido";
+      b.addEventListener("click", () => {
+        const st = ensureStateDefaults(loadState());
+        const alvo = st.planosExtras.find(x => x.id === pl.id);
+        if (alvo){ alvo.lidos = [...new Set([...(alvo.lidos || []), ...refs])]; saveState(st); }
+        redesenharHoje();
+      });
+      links.appendChild(b);
+    }
+    rodape.textContent = `${pl.nome} · ${feitos} de ${n} dias lidos`;
+  }
+
+  document.getElementById("extraAbrir")?.addEventListener("click", () => {
+    const st = ensureStateDefaults(loadState());
+    const pl = planosAtivos(st).find(x => x.id === planoVisto(st));
+    if (pl) abrirLeituraExtra(pl.id, diaParaLer(pl, new Date()));
+  });
 
   document.getElementById("extraApagar")?.addEventListener("click", (e) => {
     const b = e.currentTarget;
@@ -5094,6 +5237,7 @@ function closeReader(){
     st.ui = st.ui || {}; st.ui.planoVisto = "anual";
     saveState(st);
     renderPlanosExtras(st, new Date());
+    redesenharHoje();
   });
 
   // ── janela "Novo plano" ──
@@ -5186,6 +5330,7 @@ function closeReader(){
       saveState(st);
       fecharNovoPlano();
       renderPlanosExtras(st, new Date());
+      redesenharHoje();
     } catch (err){
       const erro = document.getElementById("npErro");
       erro.textContent = "Não consegui criar o plano: " + (err?.message || err);
