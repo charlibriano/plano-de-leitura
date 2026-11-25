@@ -1243,6 +1243,60 @@
       .tabBtn.on{color:var(--ink);font-weight:700}
       .tabBtn svg{width:22px;height:22px}
     }
+
+    /* ── Visual novo (celular) — etapa 2: aba Plano ── */
+    .planoM{display:none}
+    @media (max-width:520px){
+      .grid > [data-panel="Calendario"]{display:none}
+      .grid > [data-panel="Progresso"]{background:transparent;border:0;box-shadow:none;padding:0 2px}
+      [data-panel="Progresso"] > h2,
+      [data-panel="Progresso"] > .stat{display:none}
+      .planoM{display:flex;flex-direction:column;gap:6px}
+      .planoTopo{padding:0 4px 2px}
+      .planoTopo h3{margin:0;font-family:var(--serif);font-size:20px;font-weight:700;color:var(--ink)}
+      .planoTopo span{font-size:12.5px;color:var(--ink-2)}
+      .planoTiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+      .planoTile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:7px 10px;display:flex;flex-direction:column;gap:1px;min-width:0}
+      .planoTile b{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--ink);white-space:nowrap}
+      .planoTile b small{font-size:13px;color:var(--ink-3);font-weight:500}
+      .planoTile span{font-size:11px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .planoLamp{display:flex;align-items:center;gap:10px;background:#2A1A12;border-radius:16px;padding:6px 12px 6px 4px;color:#FFF6DE}
+      .planoLamp .lampSvg{width:40px;height:50px;flex:none}
+      .planoLamp .lampBody{fill:#B98A4E;opacity:1}
+      .planoLamp .lampBase{fill:#8C6434;opacity:1}
+      .planoLampTxt{display:flex;flex-direction:column;gap:2px;min-width:0}
+      .planoLampTxt .k{font-size:12px;color:#E9C892;font-weight:600}
+      .planoLampTxt .t{font-family:var(--serif);font-size:14px;line-height:1.3}
+      .planoLampTxt .m{font-size:12px;color:#CDB89A}
+      .planoCal{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:7px 8px 7px;display:flex;flex-direction:column;gap:4px}
+      .planoCalTopo{display:flex;align-items:center;justify-content:space-between;gap:6px}
+      .planoCalTopo h4{margin:0;font-family:var(--serif);font-size:17px;font-weight:700;color:var(--ink);text-align:center;flex:1}
+      .planoSeta{width:34px;height:34px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:18px;line-height:1;cursor:pointer;padding:0}
+      .planoSeta:hover,.planoSeta:focus{background:var(--surface);color:var(--ink)}
+      .planoSeta:disabled{opacity:.3;cursor:default}
+      .planoSemana,.planoDias{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;text-align:center}
+      .planoSemana span{font-size:10.5px;color:var(--ink-3);font-weight:600}
+      .planoDia{height:28px;border-radius:8px;border:1px solid transparent;background:var(--surface-2);color:var(--ink);font-family:var(--ui);font-size:13.5px;font-weight:500;cursor:pointer;padding:0;min-width:0}
+      .planoDia:hover,.planoDia:focus{background:var(--surface-2);color:var(--ink)}
+      .planoDia.vazio{background:transparent;cursor:default}
+      .planoDia.fora{background:transparent;opacity:.3;cursor:default}
+      .planoDia.lido,.planoDia.lido:hover{background:var(--green-soft);color:var(--green);font-weight:600}
+      .planoDia.atraso,.planoDia.atraso:hover{background:var(--gold-soft);color:var(--gold)}
+      .planoDia.hoje{border-color:var(--line-strong);font-weight:700}
+      .planoDia.sel{border:2px solid var(--ink);font-weight:700}
+      .planoSel{background:var(--surface-2);border-radius:12px;padding:7px 10px;display:flex;flex-direction:column;gap:5px;margin-top:3px}
+      .planoSelTopo{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+      .planoSelTopo span{font-size:12px;color:var(--ink-2);font-weight:600}
+      .planoSelTopo em{font-style:normal;font-size:12px;font-weight:600;color:var(--ink-2)}
+      .planoSelTopo em.ok{color:var(--green)} .planoSelTopo em.atr{color:var(--gold)}
+      .planoSelLeit{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.35}
+      .planoSelBtns{display:flex;gap:6px;flex-wrap:nowrap}
+      .planoSelBtns button{height:32px;padding:0 11px;white-space:nowrap;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:12.5px;font-weight:600;cursor:pointer}
+      .planoSelBtns button:hover,.planoSelBtns button:focus{background:var(--surface);color:var(--ink)}
+      .planoSelBtns button.principal,.planoSelBtns button.principal:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+      .planoNota{display:none;min-height:70px}
+      .planoSel.comNota .planoNota{display:block}
+    }
     /* ══════════════════════════════════════════════════════════
        ABERTURA — antes dos selects e botões, só a Palavra.
        Aparece uma vez por dia; some ao entrar.
@@ -1468,6 +1522,50 @@
 
     <section class="card" data-panel="Progresso">
       <h2>Progresso</h2>
+
+      <!-- Visual novo (celular): aba Plano. A lâmpada usa a mesma lógica de sempre. -->
+      <div class="planoM" id="planoM">
+        <div class="planoTiles">
+          <div class="planoTile"><b id="planoLidos">0<small>/365</small></b><span id="planoDatas">Dias lidos</span></div>
+          <div class="planoTile"><b id="planoSeq">0</b><span>Seguidos</span></div>
+          <div class="planoTile"><b id="planoAtraso">Em dia</b><span id="planoAtrasoSub">Atraso</span></div>
+        </div>
+        <section class="planoLamp lampKpi" id="mLamp" aria-label="Lâmpada para os meus pés">
+          <svg class="lampSvg" viewBox="0 0 120 150" aria-hidden="true">
+            <ellipse class="lampHalo" id="mLampHalo" cx="60" cy="52" rx="46" ry="46"></ellipse>
+            <g class="lampFlame" id="mLampFlame">
+              <path class="lampFlameOuter" d="M60 20 C 74 40, 80 52, 80 64 C 80 80, 71 90, 60 90 C 49 90, 40 80, 40 64 C 40 52, 46 40, 60 20 Z"></path>
+              <path class="lampFlameInner" d="M60 44 C 68 56, 70 62, 70 68 C 70 78, 65 84, 60 84 C 55 84, 50 78, 50 68 C 50 62, 52 56, 60 44 Z"></path>
+            </g>
+            <path class="lampBody" d="M34 96 L86 96 L78 128 L42 128 Z"></path>
+            <rect class="lampBase" x="36" y="128" width="48" height="8" rx="3"></rect>
+          </svg>
+          <div class="planoLampTxt">
+            <span class="k">Lâmpada para os meus pés · <span id="mLampStage">apagada</span></span>
+            <span class="t" id="mLampSub">Sua lâmpada acende com a leitura.</span>
+            <span class="m" id="mLampMarco"></span>
+          </div>
+        </section>
+        <section class="planoCal" aria-label="Calendário do plano">
+          <div class="planoCalTopo">
+            <button type="button" class="planoSeta" id="planoMesAnt" aria-label="Mês anterior">‹</button>
+            <h4 id="planoMes">—</h4>
+            <button type="button" class="planoSeta" id="planoMesProx" aria-label="Próximo mês">›</button>
+          </div>
+          <div class="planoSemana" aria-hidden="true"><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span></div>
+          <div class="planoDias" id="planoDias"></div>
+          <div class="planoSel" id="planoSel">
+            <div class="planoSelTopo"><span id="planoSelData">—</span><em id="planoSelStatus"></em></div>
+            <div class="planoSelLeit" id="planoSelLeit">—</div>
+            <div class="planoSelBtns">
+              <button type="button" class="principal" id="planoSelAbrir">Abrir leitura</button>
+              <button type="button" id="planoSelMarcar">Marcar lido</button>
+              <button type="button" id="planoSelNotaBtn">Anotação</button>
+            </div>
+            <textarea class="note planoNota" id="planoSelNota" placeholder="Ex.: um versículo, algo que aprendi..."></textarea>
+          </div>
+        </section>
+      </div>
       <div class="stat">
         <div class="kpi">
           <div class="kpiHead">
@@ -2577,7 +2675,7 @@ function updateLateUI(state){
 
     const streak = calcStreak(state, today);
     rodape.textContent = done
-      ? (streak > 1 ? `${streak} dias seguidos — a lâmpada está acesa` : "Leitura completa — a lâmpada acendeu")
+      ? (streak > 1 ? `Leitura de hoje feita · ${streak} dias seguidos` : "Leitura de hoje feita · bom começo")
       : (streak > 0 ? `${streak} ${streak === 1 ? "dia seguido" : "dias seguidos"} — leia hoje para manter a chama` : "Leia hoje para acender a lâmpada");
   }
 
@@ -2609,6 +2707,133 @@ function updateLateUI(state){
   document.getElementById("hojeDevoLer")?.addEventListener("click", () => {
     const m = refDoHero().match(/^(.+)\s+(\d+)$/);
     if (m) openBibleReader(m[1], Number(m[2]), null);
+  });
+
+
+  // ── VISUAL NOVO (celular): aba Plano ─────────────────────────
+  // Números, lâmpada (atualizada por atualizarLampada) e um calendário
+  // compacto do mês. Marcar/desmarcar/anotar gravam como o calendário antigo.
+  const NOMES_MES_MIN = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+
+  function renderPlanoMobile(plan, state, today){
+    const box = document.getElementById("planoM");
+    if (!box) return;
+    const todayKey = ymd(today);
+    const ini = planStartDate(state), fim = planEndDate(state);
+    document.getElementById("planoDatas").textContent = "Dias lidos";
+    document.getElementById("planoDatas").title = `Plano de ${fmtBR(ini)} a ${fmtBR(fim)} · ${modeLabel(state.planMode)}`;
+
+    const total = Object.keys(plan).length || 365;
+    const lidos = Object.keys(plan).filter(k => state.days?.[k]?.done).length;
+    document.getElementById("planoLidos").innerHTML = `${lidos}<small>/${total}</small>`;
+    const streak = calcStreak(state, today);
+    document.getElementById("planoSeq").innerHTML = `${streak} <small>${streak === 1 ? "dia" : "dias"}</small>`;
+    const late = getLateDays(state);
+    document.getElementById("planoAtraso").textContent = late > 0 ? `${late} ${late === 1 ? "dia" : "dias"}` : "Em dia";
+    document.getElementById("planoAtrasoSub").textContent = "Atraso";
+
+    // próximo marco da sequência
+    const prox = MARCOS_SEQUENCIA.find(m => streak < m.dias);
+    document.getElementById("mLampMarco").textContent = streak === 0
+      ? "Leia hoje para começar a sequência"
+      : (prox ? `Próximo marco: ${prox.nome} · faltam ${prox.dias - streak} ${prox.dias - streak === 1 ? "dia" : "dias"}` : "Você passou de todos os marcos");
+
+    // meses liberados: mesma regra do calendário antigo
+    const meses = planMonths(state);
+    const ultimo = meses.length - 1;
+    const completo = (mi) => { const ks = planMonthKeys(state, mi); return ks.length > 0 && ks.every(k => state.days?.[k]?.done); };
+    let liberado = 0;
+    while (liberado < ultimo && completo(liberado)) liberado++;
+    const idxHoje = planMonthIndexOf(todayKey, state);
+    const atual = idxHoje >= 0 ? idxHoje : (todayKey > ymd(fim) ? ultimo : 0);
+    const maxVisivel = Math.min(ultimo, Math.max(liberado, atual));
+    let mi = Number.isFinite(state.ui?.openMonth) ? state.ui.openMonth : atual;
+    if (mi < 0 || mi > maxVisivel) mi = atual;
+
+    const { y, m } = meses[mi];
+    document.getElementById("planoMes").textContent = planMonthLabel(state, mi);
+    document.getElementById("planoMesAnt").disabled = mi <= 0;
+    document.getElementById("planoMesProx").disabled = mi >= maxVisivel;
+    document.getElementById("planoMesAnt").onclick = () => irParaMes(mi - 1);
+    document.getElementById("planoMesProx").onclick = () => irParaMes(mi + 1);
+
+    // dia selecionado: o escolhido, se for deste mês e do plano; senão hoje ou o 1º dia do plano no mês
+    const diasDoMes = planMonthKeys(state, mi);
+    let sel = state.ui?.selectedDay;
+    if (!sel || !diasDoMes.includes(sel)) sel = diasDoMes.includes(todayKey) ? todayKey : diasDoMes[0];
+
+    const grade = document.getElementById("planoDias");
+    const primeiro = new Date(y, m, 1);
+    const vazios = (primeiro.getDay() + 6) % 7;
+    let html = "";
+    for (let i = 0; i < vazios; i++) html += `<span class="planoDia vazio" aria-hidden="true"></span>`;
+    const ultimoDia = new Date(y, m + 1, 0).getDate();
+    for (let d = 1; d <= ultimoDia; d++){
+      const k = ymd(new Date(y, m, d));
+      const noPlano = !!plan[k]?.active;
+      const lido = !!state.days?.[k]?.done;
+      const atrasado = noPlano && !lido && k < todayKey;
+      const cls = ["planoDia", !noPlano && "fora", lido && "lido", atrasado && "atraso", k === todayKey && "hoje", k === sel && "sel"].filter(Boolean).join(" ");
+      const rot = `${d} de ${NOMES_MES_MIN[m]}${lido ? ", lido" : (atrasado ? ", pendente" : "")}${noPlano ? "" : ", fora do plano"}`;
+      html += `<button type="button" class="${cls}" data-k="${k}" aria-label="${rot}"${noPlano ? "" : " disabled"}${k === sel ? ' aria-pressed="true"' : ""}>${d}</button>`;
+    }
+    grade.innerHTML = html;
+    grade.querySelectorAll("button.planoDia:not([disabled])").forEach(b => {
+      b.addEventListener("click", () => {
+        const st = ensureStateDefaults(loadState());
+        st.ui = st.ui || {};
+        st.ui.selectedDay = b.dataset.k;
+        st.ui.openMonth = mi;
+        saveState(st);
+        renderAll();
+      });
+    });
+
+    // painel do dia escolhido
+    const p = plan[sel] || { blocks:[] };
+    const [sy, sm, sd] = sel.split("-").map(Number);
+    document.getElementById("planoSelData").textContent = `${sd} de ${NOMES_MES_MIN[sm - 1]}${sel === todayKey ? " · hoje" : ""}`;
+    document.getElementById("planoSelLeit").textContent = (p.blocks || []).map(b => b.text).filter(t => t && t !== "—").join(" · ") || "—";
+    const lidoSel = !!state.days?.[sel]?.done;
+    const statusEl = document.getElementById("planoSelStatus");
+    statusEl.textContent = lidoSel ? "Lido" : (sel < todayKey ? "Pendente" : (sel === todayKey ? "Para hoje" : "Em breve"));
+    statusEl.className = lidoSel ? "ok" : (sel < todayKey ? "atr" : "");
+    const marcar = document.getElementById("planoSelMarcar");
+    marcar.textContent = lidoSel ? "Desmarcar" : "Marcar lido";
+    marcar.onclick = () => {
+      const st = ensureStateDefaults(loadState());
+      st.days[sel] = st.days[sel] || {};
+      st.days[sel].done = !lidoSel;
+      saveState(st);
+      renderAll();
+    };
+    document.getElementById("planoSelAbrir").onclick = () => openDayGuided(sel, 0);
+    const nota = document.getElementById("planoSelNota");
+    const notaBtn = document.getElementById("planoSelNotaBtn");
+    const selBox = document.getElementById("planoSel");
+    if (document.activeElement !== nota) nota.value = state.days?.[sel]?.note || "";
+    nota.dataset.k = sel;
+    notaBtn.textContent = state.days?.[sel]?.note ? "Anotação ✓" : "Anotação";
+    notaBtn.onclick = () => { selBox.classList.toggle("comNota"); if (selBox.classList.contains("comNota")) nota.focus(); };
+  }
+
+  function irParaMes(mi){
+    const st = ensureStateDefaults(loadState());
+    st.ui = st.ui || {};
+    st.ui.openMonth = mi;
+    st.ui.selectedDay = null;
+    saveState(st);
+    renderAll();
+  }
+
+  // anotação: grava a cada letra, como no calendário antigo
+  document.getElementById("planoSelNota")?.addEventListener("input", (e) => {
+    const k = e.target.dataset.k;
+    if (!k) return;
+    const st = ensureStateDefaults(loadState());
+    st.days[k] = st.days[k] || {};
+    st.days[k].note = e.target.value;
+    saveState(st);
   });
 
   // ── Barra de abas (celular): leva ao painel e acompanha o deslize ──
@@ -2695,6 +2920,7 @@ function updateLateUI(state){
     streakText.textContent = String(streak);
     streakSub.innerHTML = textoMarcoSequencia(streak);
     atualizarLampada(pct, streak);
+    renderPlanoMobile(plan, state, today);
 
     const headers = getPlanStreams(state.planMode).map(s => s.label);
     const h1 = headers[0] || "Leitura 1";
@@ -3205,6 +3431,22 @@ b.addEventListener("click", ()=>{
       sub.textContent = viva
         ? frase
         : `${frase} (a chama está parada — retome a sequência para ela voltar a tremular)`;
+    }
+
+    // lâmpada do celular (aba Plano): mesmo estágio, mesma chama
+    const mCard = document.getElementById("mLamp");
+    if (mCard){
+      mCard.classList.toggle("acesa", acesa);
+      mCard.classList.toggle("viva", viva);
+      const mFlame = document.getElementById("mLampFlame");
+      const mHalo = document.getElementById("mLampHalo");
+      if (mFlame){
+        mFlame.style.setProperty("--lampScale", `scale(${escala.toFixed(3)})`);
+        mFlame.style.transform = `scale(${escala.toFixed(3)})`;
+      }
+      if (mHalo) mHalo.style.transform = `scale(${(0.6 + (Math.min(pct, 100) / 100) * 0.8).toFixed(3)})`;
+      document.getElementById("mLampStage").textContent = nome;
+      document.getElementById("mLampSub").textContent = frase;
     }
   }
 
