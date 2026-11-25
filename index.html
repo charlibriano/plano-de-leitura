@@ -867,7 +867,8 @@
     }
 
     @media(max-width:980px){
-      .readerSheet{height:100vh;border-radius:0;border:0;width:100%}
+      /* 100% da camada de fundo (= área visível); 100vh no celular conta a tela sem a barra do navegador e cortava o topo */
+      .readerSheet{height:100%;border-radius:0;border:0;width:100%}
       .readerModal{padding:0}
       .readerBody{padding:24px 18px 80px}
       .verse{font-size:19px;line-height:1.8}
@@ -964,7 +965,7 @@
       color:var(--ink);margin-top:8px;white-space:pre-wrap;
     }
     @media(max-width:980px){
-      .diarySheet{height:100vh;border-radius:0;border:0;width:100%}
+      .diarySheet{height:100%;border-radius:0;border:0;width:100%}
       .diaryModal{padding:0}
     }
 
@@ -1362,6 +1363,8 @@
       transition:opacity .3s ease;
     }
     .readerModal.zen .readerTop:hover{opacity:1}
+    /* em tela de toque não existe "passar o mouse": a barra fica sempre nítida */
+    @media (hover:none){ .readerModal.zen .readerTop{opacity:1} }
     .readerModal.zen .readerSheet{background:var(--paper)}
     .readerModal.zen .readerBody{padding-top:8px}
     .readerModal.zen .readerRef{
