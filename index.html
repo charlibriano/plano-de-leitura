@@ -9,10 +9,13 @@
 
   <!-- Identidade: livro aberto com marcador de página -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23FAF8F5'/%3E%3Cpath d='M10 16c7-3 14-3 21 1v33c-7-4-14-4-21-1z' fill='%23FFFFFF' stroke='%2317130F' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M54 16c-7-3-14-3-21 1v33c7-4 14-4 21-1z' fill='%23FFFFFF' stroke='%2317130F' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M32 17v33' stroke='%2317130F' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M42 12v22l-5-5-5 5V12z' fill='%23B8332C'/%3E%3C/svg%3E" />
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23FAF8F5'/%3E%3Cpath d='M10 16c7-3 14-3 21 1v33c-7-4-14-4-21-1z' fill='%23FFFFFF' stroke='%2317130F' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M54 16c-7-3-14-3-21 1v33c7-4 14-4 21-1z' fill='%23FFFFFF' stroke='%2317130F' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M32 17v33' stroke='%2317130F' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M42 12v22l-5-5-5 5V12z' fill='%23B8332C'/%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.json" />
   <meta name="apple-mobile-web-app-title" content="Ler Bíblia" />
   <meta name="application-name" content="Ler Bíblia" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta property="og:title" content="Ler Bíblia" />
   <meta property="og:description" content="Seu plano de leitura bíblica, simples e organizado." />
   <meta property="og:type" content="website" />
@@ -1176,6 +1179,12 @@
     .hojeVersBtn .longo{display:none}
     .hojeHero.aberto .hojeVersBtn{display:none}
     @media (min-width:521px){ .hojeVersBtn{height:32px;font-size:13px;padding:0 14px} .hojeVersBtn .longo{display:inline} .hojeVersBtn .curto{display:none} }
+    .iosBox{width:min(100%,400px);background:var(--surface);color:var(--ink);border-radius:22px;padding:20px 20px 16px;display:flex;flex-direction:column;gap:12px;font-family:var(--ui)}
+    .iosBox h3{margin:0;font-family:var(--serif);font-size:20px}
+    .iosBox ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:14.5px;line-height:1.45;color:var(--ink-2)}
+    .iosBox ol b{color:var(--ink)}
+    .iosBox ol svg{vertical-align:-3px;color:var(--ink)}
+    .iosBox .versPri{height:46px;border-radius:999px;background:var(--ink);color:var(--paper);font-size:15px;font-weight:600;border:0;cursor:pointer}
     .versModal{position:fixed;inset:0;z-index:2700;display:none;align-items:center;justify-content:center;background:rgba(23,19,15,.72);backdrop-filter:blur(3px);padding:16px}
     .versModal.open{display:flex}
     .versBox{width:min(100%,440px);display:flex;flex-direction:column;gap:12px}
@@ -1408,6 +1417,7 @@
       [data-panel="Ajustes"] > .row{display:none}
       .ajM{display:flex;flex-direction:column;gap:10px}
       .ajGrupo{display:flex;flex-direction:column;gap:5px}
+      .ajGrupo[hidden],.ajLinha[hidden]{display:none}
       .ajTitulo{font-size:12px;font-weight:600;color:var(--ink-2);padding:0 6px}
       .ajCard{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
       .ajLinha{display:flex;align-items:center;gap:10px;min-height:52px;padding:7px 12px;border-top:1px solid var(--line);margin:0;cursor:default}
@@ -1758,8 +1768,12 @@
         <div class="ajGrupo">
           <span class="ajTitulo">Leitura</span>
           <div class="ajCard">
-            <div class="ajLinha">
+            <div class="ajLinha" id="ajTraducao">
               <span class="ajTxt"><b>Tradução</b><small>Bíblia Livre · atualização da Almeida de 1819</small></span>
+            </div>
+            <div class="ajLinha" id="ajAppGrupo" hidden>
+              <span class="ajTxt"><b>Instalar o app</b><small id="ajAppInfo">Ícone na tela inicial, abre em tela cheia</small></span>
+              <button type="button" class="ajBtn principal" id="ajAppBtn">Instalar</button>
             </div>
             <label class="ajLinha" for="ajTema">
               <span class="ajTxt"><b>Tema escuro</b><small>Mais confortável à noite</small></span>
@@ -2032,6 +2046,18 @@
 </div>
 
 <!-- Como começar o plano: aparece uma vez, até a pessoa escolher -->
+<div class="versModal" id="iosModal" role="dialog" aria-modal="true" aria-labelledby="iosTitulo">
+  <div class="iosBox">
+    <h3 id="iosTitulo">Instalar no iPhone</h3>
+    <ol>
+      <li>Toque no botão <b>Compartilhar</b> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="ícone Compartilhar"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg> do navegador (embaixo, no Safari).</li>
+      <li>Role as opções e toque em <b>Adicionar à Tela de Início</b>.</li>
+      <li>Toque em <b>Adicionar</b>. O ícone do Ler Bíblia aparece junto dos seus apps.</li>
+    </ol>
+    <button type="button" class="versPri" id="iosFechar">Entendi</button>
+  </div>
+</div>
+
 <div class="versModal" id="versModal" role="dialog" aria-modal="true" aria-label="Versículo do dia">
   <div class="versBox">
     <div class="versImgWrap">
@@ -4802,6 +4828,59 @@ function closeReader(){
   }
 
   document.getElementById("readerCloseBtn").addEventListener("click", closeReader);
+
+  // ── App instalável (PWA) ──
+  // O service worker guarda o app para abrir sem internet (só em https ou localhost).
+  // Só no endereço do app (e no teste local): em prévias hospedadas em outro lugar, não registra.
+  if ("serviceWorker" in navigator && (location.hostname === "lerbiblia.vercel.app" || location.hostname === "localhost")){
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch(e => console.warn("service worker não registrado:", e));
+    });
+  }
+  const jaInstalado = () => window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  const ehIphone = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let pedidoInstalacao = null;   // Android/Chrome: o aviso de instalação fica guardado até o toque no botão
+  function atualizarBotaoApp(){
+    const grupo = document.getElementById("ajAppGrupo");
+    if (!grupo) return;
+    // já instalado, ou navegador que não instala: o grupo some
+    grupo.hidden = jaInstalado() || !(pedidoInstalacao || ehIphone());
+    // enquanto o convite aparece, ele ocupa o lugar da linha "Tradução" (o crédito do texto continua no rodapé),
+    // para a tela de Ajustes não precisar rolar
+    const trad = document.getElementById("ajTraducao");
+    if (trad) trad.hidden = !grupo.hidden;
+    const info = document.getElementById("ajAppInfo");
+    if (info) info.textContent = ehIphone() ? "No iPhone: pelo botão Compartilhar" : "Ícone na tela inicial, abre em tela cheia";
+  }
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    pedidoInstalacao = e;
+    atualizarBotaoApp();
+  });
+  window.addEventListener("appinstalled", () => { pedidoInstalacao = null; atualizarBotaoApp(); });
+  document.getElementById("ajAppBtn")?.addEventListener("click", async () => {
+    if (pedidoInstalacao){
+      pedidoInstalacao.prompt();
+      try { await pedidoInstalacao.userChoice; } catch(e){}
+      pedidoInstalacao = null;
+      atualizarBotaoApp();
+      return;
+    }
+    if (ehIphone()) document.getElementById("iosModal").classList.add("open");
+  });
+  document.getElementById("iosFechar")?.addEventListener("click", () => document.getElementById("iosModal").classList.remove("open"));
+  document.getElementById("iosModal")?.addEventListener("click", (e) => { if (e.target.id === "iosModal") e.currentTarget.classList.remove("open"); });
+  atualizarBotaoApp();
+  // Deixa guardados os livros da leitura de hoje, para ler mesmo sem internet
+  // (o service worker guarda o que passa por ele; só roda onde ele está ativo).
+  setTimeout(() => {
+    try {
+      if (!navigator.serviceWorker?.controller) return;
+      const st = ensureStateDefaults(loadState());
+      const p = buildPlanForYear(st)[ymd(new Date())];
+      [...new Set((p?.guidedList || []).map(it => getBookId(it.book)).filter(Boolean))].forEach(id => carregarLivroBiblia(id).catch(() => {}));
+    } catch(e){}
+  }, 4000);
 
   // ── Versículos por tema ──
   // Textos da Bíblia Livre copiados dos arquivos ./biblia (conferidos um a um).
