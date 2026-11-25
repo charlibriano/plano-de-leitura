@@ -1321,6 +1321,41 @@
       .planoNota{display:none;min-height:70px}
       .planoSel.comNota .planoNota{display:block}
     }
+
+    /* ── Visual novo (celular) — etapa 3: aba Ajustes ── */
+    .ajM{display:none}
+    @media (max-width:520px){
+      .grid > [data-panel="Ajustes"]{background:transparent;border:0;box-shadow:none;padding:0 2px}
+      [data-panel="Ajustes"] > h2,
+      [data-panel="Ajustes"] > .row{display:none}
+      .ajM{display:flex;flex-direction:column;gap:10px}
+      .ajGrupo{display:flex;flex-direction:column;gap:5px}
+      .ajTitulo{font-size:12px;font-weight:600;color:var(--ink-2);padding:0 6px}
+      .ajCard{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+      .ajLinha{display:flex;align-items:center;gap:10px;min-height:52px;padding:7px 12px;border-top:1px solid var(--line);margin:0;cursor:default}
+      .ajLinha:first-child{border-top:0}
+      label.ajLinha{cursor:pointer}
+      .ajTxt{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
+      .ajTxt b{font-size:14.5px;font-weight:600;color:var(--ink)}
+      .ajTxt small{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      #ajContaInfo{white-space:normal}
+      .ajAvatar{flex:none;width:36px;height:36px;border-radius:999px;background:var(--surface-3);color:var(--ink-2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+      .ajAvatar.on{background:var(--green);color:#fff}
+      .ajBtn{flex:none;height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer}
+      .ajBtn:hover,.ajBtn:focus{background:var(--surface);color:var(--ink)}
+      .ajBtn.principal,.ajBtn.principal:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+      .ajEmpilha{flex-direction:column;align-items:stretch;gap:6px;padding-top:9px;padding-bottom:10px}
+      .ajSelect{flex:none;min-width:0 !important;max-width:100%;width:100%;padding:8px 30px 8px 10px;font-size:13px;border-radius:10px;background-position:calc(100% - 14px) 51%,calc(100% - 9px) 51%}
+      .ajSeg{flex:none;display:inline-flex;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px}
+      .ajSeg button{height:30px;padding:0 11px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font-family:var(--ui);font-size:12.5px;font-weight:600;cursor:pointer}
+      .ajSeg button:hover,.ajSeg button:focus{background:transparent;color:var(--ink-2)}
+      .ajSeg button.on,.ajSeg button.on:hover{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+      .ajSwitch{appearance:none;-webkit-appearance:none;flex:none;width:46px !important;height:28px !important;border-radius:999px;background:var(--line-strong);position:relative;cursor:pointer;transition:background .2s ease;margin:0}
+      .ajSwitch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .2s ease}
+      .ajSwitch:checked{background:var(--green)}
+      .ajSwitch:checked::after{transform:translateX(18px)}
+      .ajRodape{margin:2px 6px 0;font-size:11px;line-height:1.45;color:var(--ink-3)}
+    }
     /* ══════════════════════════════════════════════════════════
        ABERTURA — antes dos selects e botões, só a Palavra.
        Aparece uma vez por dia; some ao entrar.
@@ -1517,6 +1552,58 @@
   <div class="grid">
     <section class="card" data-panel="Ajustes">
       <h2>Ajustes</h2>
+
+      <!-- Visual novo (celular): Ajustes em lista. Os controles acionam os de sempre. -->
+      <div class="ajM" id="ajM">
+        <div class="ajGrupo">
+          <span class="ajTitulo">Conta</span>
+          <div class="ajCard">
+            <div class="ajLinha">
+              <span class="ajAvatar" id="ajAvatar" aria-hidden="true">?</span>
+              <span class="ajTxt"><b id="ajContaNome">Sem conta conectada</b><small id="ajContaInfo">O progresso fica só neste aparelho</small></span>
+              <button type="button" class="ajBtn" id="ajContaBtn">Entrar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ajGrupo">
+          <span class="ajTitulo">Plano</span>
+          <div class="ajCard">
+            <label class="ajLinha ajEmpilha" for="ajPlanMode">
+              <span class="ajTxt"><b>Tipo de plano</b><small id="ajPlanoDesc" hidden>—</small></span>
+              <select id="ajPlanMode" class="ajSelect" aria-label="Tipo de plano">
+                <option value="gospel_history_psalms">Evangelho + História + Salmos</option>
+                <option value="parallel">Paralelo (AT + NT)</option>
+                <option value="wisdom_letters_ot">Sabedoria + Cartas + AT</option>
+              </select>
+            </label>
+            <div class="ajLinha">
+              <span class="ajTxt"><b>Começo</b><small id="ajInicioDesc">—</small></span>
+              <span class="ajSeg" role="group" aria-label="Como o plano começa">
+                <button type="button" data-ancora="calendario">Calendário</button>
+                <button type="button" data-ancora="genesis">Gênesis</button>
+              </span>
+            </div>
+            <div class="ajLinha">
+              <span class="ajTxt"><b>Período</b><small id="ajPeriodo">—</small></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ajGrupo">
+          <span class="ajTitulo">Leitura</span>
+          <div class="ajCard">
+            <div class="ajLinha">
+              <span class="ajTxt"><b>Tradução</b><small>Bíblia Livre · atualização da Almeida de 1819</small></span>
+            </div>
+            <label class="ajLinha" for="ajTema">
+              <span class="ajTxt"><b>Tema escuro</b><small>Mais confortável à noite</small></span>
+              <input type="checkbox" id="ajTema" class="ajSwitch" role="switch" />
+            </label>
+          </div>
+        </div>
+        <p class="ajRodape">Texto bíblico: Bíblia Livre (BLIVRE), © Diego Santos, Mario Sérgio e Marco Teles · CC BY 4.0</p>
+      </div>
 
       <div class="row">
         <div>
@@ -2951,7 +3038,80 @@ function updateLateUI(state){
   document.getElementById("inicioGenesis")?.addEventListener("click", () => escolherInicio("genesis"));
   window.talvezPerguntarInicio = talvezPerguntarInicio;
   // sem sincronização (módulo não carregou ou sem internet): pergunta assim mesmo depois de 4 s
-  setTimeout(() => { if (!window.lerBibliaSyncPronto){ window.lerBibliaSyncPronto = true; talvezPerguntarInicio(); } }, 4000);
+  setTimeout(() => { if (!window.lerBibliaSyncPronto){ window.lerBibliaSyncPronto = true; talvezPerguntarInicio(); window.renderAjustesMobile?.(); } }, 4000);
+
+
+  // ── VISUAL NOVO (celular): aba Ajustes ───────────────────────
+  // Só apresentação: cada controle aciona o que já existe (seletor de plano,
+  // botão de tema, login do selo de sincronização).
+  const DESC_PLANO = {
+    gospel_history_psalms: "Evangelho/Atos, História do AT e Salmos/Provérbios",
+    parallel: "Antigo e Novo Testamento em ordem",
+    wisdom_letters_ot: "Sabedoria, Cartas e Antigo Testamento"
+  };
+  function renderAjustesMobile(state){
+    if (!document.getElementById("ajM")) return;
+    state = state || ensureStateDefaults(loadState());
+    // conta
+    const conta = window.lerBibliaConta;
+    const av = document.getElementById("ajAvatar");
+    const btn = document.getElementById("ajContaBtn");
+    if (conta && conta.logado){
+      av.textContent = (conta.nome || conta.email || "?").trim().charAt(0).toUpperCase();
+      av.classList.add("on");
+      document.getElementById("ajContaNome").textContent = conta.nome || "Conta Google";
+      document.getElementById("ajContaInfo").textContent = conta.email ? `${conta.email} · sincronizado` : "Sincronizado";
+      btn.textContent = "Sair"; btn.classList.remove("principal");
+    } else {
+      av.textContent = "?"; av.classList.remove("on");
+      document.getElementById("ajContaNome").textContent = "Sem conta conectada";
+      const semSync = conta === undefined && window.lerBibliaSyncPronto;   // o login não carregou (ex.: sem internet)
+      document.getElementById("ajContaInfo").textContent = conta === undefined
+        ? (semSync ? "Sincronização indisponível no momento" : "Carregando…")
+        : "O progresso fica só neste aparelho";
+      btn.textContent = "Entrar"; btn.setAttribute("aria-label", "Entrar com a conta Google"); btn.classList.add("principal");
+      btn.style.display = conta === undefined ? "none" : "";
+      return renderAjustesPlano(state);
+    }
+    btn.style.display = "";
+    renderAjustesPlano(state);
+  }
+  function renderAjustesPlano(state){
+    // plano
+    const sel = document.getElementById("ajPlanMode");
+    sel.value = state.planMode;
+    document.getElementById("ajPlanoDesc").textContent = DESC_PLANO[state.planMode] || "";
+    const anc = state.planAncora || "genesis";
+    document.querySelectorAll(".ajSeg button").forEach(b => b.classList.toggle("on", b.dataset.ancora === anc));
+    document.querySelectorAll(".ajSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.ancora === anc ? "true" : "false"));
+    document.getElementById("ajInicioDesc").textContent = anc === "calendario" ? "1º de janeiro é sempre Gênesis" : `Dia 1 em ${fmtBR(planStartDate(state))}`;
+    document.getElementById("ajPeriodo").textContent = `${fmtBR(planStartDate(state))} a ${fmtBR(planEndDate(state))}`;
+    // tema
+    document.getElementById("ajTema").checked = document.documentElement.getAttribute("data-theme") === "dark";
+  }
+  window.renderAjustesMobile = renderAjustesMobile;
+
+  document.getElementById("ajPlanMode")?.addEventListener("change", (e) => {
+    planModeEl.value = e.target.value;
+    planModeEl.dispatchEvent(new Event("change"));      // o mesmo caminho do seletor de sempre
+  });
+  document.querySelectorAll(".ajSeg button").forEach(b => b.addEventListener("click", () => {
+    const st = ensureStateDefaults(loadState());
+    const nova = b.dataset.ancora;
+    if ((st.planAncora || "genesis") === nova) return;
+    st.guided = {};          // a leitura de cada data muda: o "capítulo atual" guardado era da sequência anterior
+    st.planAncora = nova;
+    saveState(st);
+    renderAll();
+  }));
+  document.getElementById("ajTema")?.addEventListener("change", () => {
+    document.getElementById("themeBtn").click();          // o mesmo botão de tema do topo
+    renderAjustesMobile();
+  });
+  document.getElementById("ajContaBtn")?.addEventListener("click", () => {
+    if (window.lerBibliaConta?.logado) document.getElementById("syncSair").click();
+    else document.getElementById("syncChip").click();      // abre o login do Google
+  });
 
   // ── Barra de abas (celular): leva ao painel e acompanha o deslize ──
   (function initTabBar(){
@@ -3038,6 +3198,7 @@ function updateLateUI(state){
     streakSub.innerHTML = textoMarcoSequencia(streak);
     atualizarLampada(pct, streak);
     renderPlanoMobile(plan, state, today);
+    renderAjustesMobile(state);
 
     const headers = getPlanStreams(state.planMode).map(s => s.label);
     const h1 = headers[0] || "Leitura 1";
@@ -4630,6 +4791,9 @@ function closeReader(){
   fb.onAuthStateChanged(auth, (u) => {
     usuario = u;
     window.lerBibliaNome = u ? ((u.displayName || "").trim().split(/\s+/)[0] || null) : null;
+    window.lerBibliaSyncDisponivel = true;
+    window.lerBibliaConta = u ? { logado:true, nome:(u.displayName || "").trim(), email:u.email || "" } : { logado:false };
+    try { window.renderAjustesMobile?.(); } catch(_){}
     try { atualizarSaudacao(); } catch(_){}   // só o texto do topo; não grava progresso
     if (u){
       info.innerHTML = "";
