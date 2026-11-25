@@ -1158,6 +1158,28 @@
     /* ── Escolha de como começar o plano (aparece uma vez) ── */
     .inicioModal{position:fixed;inset:0;z-index:2600;display:none;align-items:flex-end;justify-content:center;background:rgba(23,19,15,.5);backdrop-filter:blur(3px);padding:0}
     .inicioModal.open{display:flex}
+    /* versículo do dia: botão ao lado do selo do devocional + janela com a imagem */
+    .hojeTopo{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+    .hojeTopo .hojeKicker{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+    .hojeVersBtn{flex:none;display:inline-flex;align-items:center;gap:5px;height:25px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,246,222,.55);background:rgba(30,18,12,.28);color:#FFF6DE;font-family:var(--ui);font-size:12px;font-weight:600;cursor:pointer;backdrop-filter:blur(2px)}
+    .hojeVersBtn:hover,.hojeVersBtn:focus{background:rgba(30,18,12,.45);color:#FFF6DE}
+    .hojeVersBtn .longo{display:none}
+    .hojeHero.aberto .hojeVersBtn{display:none}
+    @media (min-width:521px){ .hojeVersBtn{height:32px;font-size:13px;padding:0 14px} .hojeVersBtn .longo{display:inline} .hojeVersBtn .curto{display:none} }
+    .versModal{position:fixed;inset:0;z-index:2700;display:none;align-items:center;justify-content:center;background:rgba(23,19,15,.72);backdrop-filter:blur(3px);padding:16px}
+    .versModal.open{display:flex}
+    .versBox{width:min(100%,440px);display:flex;flex-direction:column;gap:12px}
+    .versImgWrap{position:relative;width:100%;aspect-ratio:1/1;border-radius:20px;overflow:hidden;background:#2A1A12}
+    .versImgWrap img{position:absolute;inset:0;width:100%;height:100%;display:block}
+    .versImgWrap img:not([src]){display:none}
+    .versStatus{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#F3E2CC;font-family:var(--ui);font-size:14px}
+    .versErro{display:none;margin:0;padding:10px 12px;border-radius:12px;background:#FCE8E4;color:#8A2A1A;font-family:var(--ui);font-size:13px;line-height:1.4}
+    .versErro.on{display:block}
+    .versAcoes{display:flex;gap:10px}
+    .versAcoes button{flex:1;height:48px;border-radius:999px;font-family:var(--ui);font-size:15px;font-weight:600;cursor:pointer}
+    .versSec,.versSec:hover,.versSec:focus{background:rgba(23,19,15,.6);color:#FFF6DE;border:1px solid rgba(255,246,222,.5)}
+    .versPri,.versPri:hover,.versPri:focus{background:#FFF6DE;color:#17130F;border:0}
+    .versPri:disabled{opacity:.45;cursor:default}
     .inicioBox{width:min(520px,100%);background:var(--paper);border-radius:24px 24px 0 0;padding:20px 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;max-height:100%;overflow-y:auto}
     @media (min-width:521px){ .inicioModal{align-items:center;padding:16px} .inicioBox{border-radius:24px} }
     .inicioBox h3{margin:0;font-family:var(--serif);font-size:21px;font-weight:700;color:var(--ink)}
@@ -1803,7 +1825,13 @@
             <rect width="358" height="236" fill="url(#hjVeu)"/>
           </svg>
           <div class="hojeHeroIn">
-            <span class="hojeKicker" id="hojeKicker">Devocional de hoje</span>
+            <div class="hojeTopo">
+              <span class="hojeKicker" id="hojeKicker">Devocional de hoje</span>
+              <button type="button" class="hojeVersBtn" id="hojeVersBtn" hidden aria-label="Versículo do dia">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h4v4c0 3-1.5 5-4 6l-.8-1.4C7.8 14.8 8.5 13.6 8.6 12H7zm8 0h4v4c0 3-1.5 5-4 6l-.8-1.4c1.6-.8 2.3-2 2.4-3.6H15z"/></svg>
+                <span class="longo">Versículo do dia</span><span class="curto">Versículo</span>
+              </button>
+            </div>
             <div style="display:flex;flex-direction:column;gap:10px">
               <p class="hojeFrase" id="hojeFrase"></p>
               <p class="hojePergunta" id="hojePergunta"></p>
@@ -1920,6 +1948,20 @@
 </div>
 
 <!-- Como começar o plano: aparece uma vez, até a pessoa escolher -->
+<div class="versModal" id="versModal" role="dialog" aria-modal="true" aria-label="Versículo do dia">
+  <div class="versBox">
+    <div class="versImgWrap">
+      <img id="versImg" alt="" />
+      <div class="versStatus" id="versStatus">Preparando a imagem…</div>
+    </div>
+    <p class="versErro" id="versErro" role="alert"></p>
+    <div class="versAcoes">
+      <button type="button" class="versSec" id="versFechar">Fechar</button>
+      <button type="button" class="versPri" id="versCompartilhar" disabled>Compartilhar</button>
+    </div>
+  </div>
+</div>
+
 <div class="inicioModal" id="inicioModal" role="dialog" aria-modal="true" aria-labelledby="inicioTitulo">
   <div class="inicioBox">
     <h3 id="inicioTitulo">Como você quer começar?</h3>
@@ -2932,6 +2974,9 @@ function updateLateUI(state){
       }
     }
 
+    const versBtn = document.getElementById("hojeVersBtn");
+    if (versBtn) versBtn.hidden = !(dentro && p?.guidedList?.length);
+
     // ── Leitura de hoje ──
     const planoDias = Object.keys(plan).length || 365;
     const diaN = diaDaSequencia(state, today) + 1;
@@ -3032,6 +3077,149 @@ function updateLateUI(state){
   }
 
   document.getElementById("hojeCta")?.addEventListener("click", () => { if (hojeAcaoCta) hojeAcaoCta(); });
+
+  // ── Versículo do dia ──
+  // Sai dos capítulos da leitura de hoje (Bíblia Livre já guardada no app).
+  // A escolha depende só da data: todo mundo vê o mesmo versículo no mesmo dia.
+  function hashTexto(t){ let h = 2166136261; for (const ch of t){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function limparVerso(t){
+    return String(t).replace(/[\[\]]/g, "").replace(/\s+([.,;:!?])/g, "$1").replace(/\s{2,}/g, " ").trim();
+  }
+  const VERSO_FRACO = /gerou|gerações|catorze|côvados?|siclos?|\d/i;   // genealogias e medidas não rendem uma boa imagem
+  async function versiculoDoDia(lista, chaveDia){
+    const caps = (lista || []).map(it => ({ book: it.book, chapter: it.chapter, id: getBookId(it.book) })).filter(c => c.id);
+    if (!caps.length) throw new Error("não encontrei os capítulos da leitura de hoje.");
+    const livros = await Promise.all(caps.map(c => carregarLivroBiblia(c.id)));
+    const todos = [];
+    caps.forEach((c, i) => {
+      const vs = livros[i]?.capitulos?.[String(c.chapter)] || [];
+      vs.forEach(([n, t]) => {
+        // o v.1 de muitos salmos começa com o título ("Salmo de Davi:…")
+        if (c.id === "PSA" && n === 1 && /^(Salmo|Cântico|Ao regente|Masquil|Mictã|Oração)/i.test(t)) return;
+        todos.push({ ref: `${c.book} ${c.chapter}:${n}`, texto: limparVerso(t) });
+      });
+    });
+    if (!todos.length) throw new Error("o texto dos capítulos de hoje veio vazio.");
+    const bom = v => v.texto.length >= 50 && v.texto.length <= 230 && /[.!?]["”’]?$/.test(v.texto)
+      && /^["“]?[A-ZÁÉÍÓÚÂÊÔÃÕÀÇ]/.test(v.texto) && !VERSO_FRACO.test(v.texto);
+    // prefere versículos que falam de Deus, fé, amor, esperança… (rendem melhor sozinhos, fora do contexto)
+    const FORTE = /\b(Deus|SENHOR|Senhor|Jesus|Cristo|Espírito|fé|amor|ama|graça|esperança|paz|salva|salvação|confia|alegr|misericórdia|bênção|aben[çc]o|vida|luz|força|coração)/;
+    let pool = todos.filter(v => bom(v) && FORTE.test(v.texto));
+    if (!pool.length) pool = todos.filter(bom);
+    if (!pool.length) pool = todos.filter(v => v.texto.length <= 260);
+    if (!pool.length) pool = todos;
+    return pool[hashTexto("versiculo-" + chaveDia) % pool.length];
+  }
+
+  function quebrarLinhas(g, texto, larg){
+    const linhas = []; let atual = "";
+    texto.split(" ").forEach(p => {
+      const teste = atual ? atual + " " + p : p;
+      if (g.measureText(teste).width > larg && atual){ linhas.push(atual); atual = p; } else atual = teste;
+    });
+    if (atual) linhas.push(atual);
+    return linhas;
+  }
+  async function desenharVersiculo(v, d){
+    try { await Promise.all([document.fonts.load('500 60px "Literata"'), document.fonts.load('600 30px "Inter"')]); } catch(e){}
+    const S = 1080;
+    const cv = document.createElement("canvas"); cv.width = cv.height = S;
+    const g = cv.getContext("2d");
+    // fundo: a mesma cena que está na tela hoje
+    const { cena, luz } = cenaDoDiaIdx(d);
+    const c = CENAS[cena];
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${S}" height="${S}" viewBox="0 0 358 236" preserveAspectRatio="xMidYMid slice">${c.d(c.luz[luz])}</svg>`;
+    const img = new Image();
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    await img.decode();
+    g.drawImage(img, 0, 0, S, S);
+    // véu escuro para o texto ler bem em qualquer cena
+    const veu = g.createLinearGradient(0, 0, 0, S);
+    veu.addColorStop(0, "rgba(30,18,12,.30)"); veu.addColorStop(.45, "rgba(30,18,12,.55)"); veu.addColorStop(1, "rgba(30,18,12,.85)");
+    g.fillStyle = veu; g.fillRect(0, 0, S, S);
+
+    // texto: começa grande e diminui até caber
+    const larg = S - 180;
+    let tam = 66, linhas, alt;
+    do {
+      g.font = `500 ${tam}px Literata, Georgia, serif`;
+      linhas = quebrarLinhas(g, `“${v.texto}”`, larg);
+      alt = linhas.length * tam * 1.38;
+      tam -= 2;
+    } while ((alt > 600 || linhas.length > 9) && tam > 34);
+    tam += 2;
+    const lh = tam * 1.38;
+    const refTam = 36, gap = 44;
+    let y = (S - (alt + gap + refTam)) / 2 - 20 + tam;
+    g.textAlign = "center"; g.fillStyle = "#FFFFFF";
+    g.shadowColor = "rgba(0,0,0,.45)"; g.shadowBlur = 18; g.shadowOffsetY = 2;
+    linhas.forEach(l => { g.fillText(l, S / 2, y); y += lh; });
+    g.font = `600 ${refTam}px Inter, system-ui, sans-serif`;
+    g.fillStyle = "#FFE3B0";
+    g.fillText(v.ref, S / 2, y - lh + tam * .38 + gap + refTam);
+    // rodapé
+    g.shadowBlur = 8;
+    g.font = "600 28px Inter, system-ui, sans-serif"; g.fillStyle = "rgba(255,246,222,.92)";
+    g.fillText("Ler Bíblia · lerbiblia.vercel.app", S / 2, S - 78);
+    g.font = "500 22px Inter, system-ui, sans-serif"; g.fillStyle = "rgba(255,246,222,.7)";
+    g.fillText("Texto: Bíblia Livre (CC BY 4.0)", S / 2, S - 42);
+    return await new Promise((ok, falha) => cv.toBlob(b => b ? ok(b) : falha(new Error("o navegador não gerou a imagem.")), "image/png"));
+  }
+
+  let versAtual = null;   // { blob, ref, texto, url }
+  const ehToque = () => window.matchMedia("(hover: none)").matches;
+  function versErro(msg){
+    const e = document.getElementById("versErro");
+    e.textContent = msg; e.classList.toggle("on", !!msg);
+  }
+  async function abrirVersiculo(){
+    const modal = document.getElementById("versModal");
+    const imgEl = document.getElementById("versImg");
+    const status = document.getElementById("versStatus");
+    const btn = document.getElementById("versCompartilhar");
+    if (versAtual?.url) URL.revokeObjectURL(versAtual.url);
+    versAtual = null;
+    imgEl.removeAttribute("src"); imgEl.alt = "";
+    status.style.display = ""; status.textContent = "Preparando a imagem…";
+    versErro(""); btn.disabled = true;
+    btn.textContent = ehToque() ? "Compartilhar" : "Baixar imagem";
+    modal.classList.add("open");
+    try {
+      const hoje = new Date();
+      const st = ensureStateDefaults(loadState());
+      const p = buildPlanForYear(st)[ymd(hoje)];
+      const v = await versiculoDoDia(p?.guidedList, ymd(hoje));
+      const blob = await desenharVersiculo(v, hoje);
+      const url = URL.createObjectURL(blob);
+      versAtual = { blob, url, ref: v.ref, texto: v.texto };
+      imgEl.src = url; imgEl.alt = `${v.texto} — ${v.ref}`;
+      status.style.display = "none";
+      btn.disabled = false;
+    } catch (e){
+      status.textContent = "";
+      versErro("Não consegui montar o versículo do dia: " + (e?.message || e));
+    }
+  }
+  async function compartilharVersiculo(){
+    if (!versAtual) return;
+    const nome = `versiculo-${versAtual.ref.replace(/[^\wÀ-ú]+/g, "-")}.png`;
+    const arquivo = new File([versAtual.blob], nome, { type: "image/png" });
+    const legenda = `“${versAtual.texto}” — ${versAtual.ref}`;
+    if (ehToque() && navigator.canShare && navigator.canShare({ files: [arquivo] })){
+      try { await navigator.share({ files: [arquivo], text: legenda }); }
+      catch (e){ if (e?.name !== "AbortError") versErro("Não consegui abrir o compartilhamento: " + (e?.message || e)); }
+      return;
+    }
+    // computador (ou aparelho sem compartilhamento de arquivo): baixa a imagem
+    const a = document.createElement("a");
+    a.href = versAtual.url; a.download = nome;
+    document.body.appendChild(a); a.click(); a.remove();
+    if (ehToque()) versErro("Este navegador não permite compartilhar a imagem direto. Ela foi baixada para você enviar pela galeria.");
+  }
+  document.getElementById("hojeVersBtn")?.addEventListener("click", abrirVersiculo);
+  document.getElementById("versCompartilhar")?.addEventListener("click", compartilharVersiculo);
+  document.getElementById("versFechar")?.addEventListener("click", () => document.getElementById("versModal").classList.remove("open"));
+  document.getElementById("versModal")?.addEventListener("click", (e) => { if (e.target.id === "versModal") e.currentTarget.classList.remove("open"); });
   function redesenharHoje(){
     const st = ensureStateDefaults(loadState());
     renderHojeMobile(buildPlanForYear(st), st, new Date());
