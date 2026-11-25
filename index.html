@@ -785,6 +785,15 @@
     .readerBtn.danger{color:var(--accent)}
     .readerBtn.danger:hover{background:var(--accent-soft);border-color:var(--accent)}
 
+    /* ouvir o capítulo: botão flutuante no canto do leitor */
+    .readerSheet{position:relative}
+    .ouvirBtn{position:absolute;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:3;display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 20px 0 16px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font-family:var(--ui);font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+    .ouvirBtn[hidden]{display:none}
+    .ouvirBtn:hover,.ouvirBtn:focus{background:var(--ink);color:var(--paper)}
+    .ouvirBtn .icPausa{display:none}
+    .ouvirBtn.tocando .icPausa{display:block}
+    .ouvirBtn.tocando .icPlay{display:none}
+    #readerText .verse.lendo{background:var(--green-soft);box-shadow:inset 3px 0 0 var(--green)}
     .readerBody{
       padding:32px 24px 80px;
       overflow-y:auto;
@@ -1559,6 +1568,11 @@
         <div class="readerError" id="readerError" style="display:none"></div>
         <div class="readerText" id="readerText"></div>
       </div>
+      <button type="button" class="ouvirBtn" id="ouvirBtn" hidden aria-label="Ouvir o capítulo">
+        <svg class="icPlay" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.7L9.5 4.6A1 1 0 0 0 8 5.5z"/></svg>
+        <svg class="icPausa" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+        <span id="ouvirTxt">Ouvir</span>
+      </button>
     </div>
   </div>
 
@@ -4351,6 +4365,7 @@ b.addEventListener("click", ()=>{
     const extBtn = document.getElementById("readerExternalBtn");
     const doneBtn = document.getElementById("readerDoneBtn");
 
+    pararAudio();
     textEl.innerHTML = "";
     errEl.style.display = "none";
     errEl.textContent = "";
@@ -4427,6 +4442,7 @@ b.addEventListener("click", ()=>{
               return `<p class="verse" data-verse="${n}"><b>${n}</b> ${escapeHtml(String(t))}</p>`;
             }).join("") + fimDoCapituloHtml(ctx, book, chapter) + `<p class="bibliaCredito">Texto: Bíblia Livre (BLIVRE), © Diego Santos, Mario Sérgio e Marco Teles · Licença Creative Commons Atribuição 4.0 Brasil · <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noopener">site da Bíblia Livre</a></p>`;
 ligarFimDoCapitulo(ctx, book, chapter);
+prepararAudio();
 const keyRef = `${book}|${chapter}|${translationId}`;
             const st2 = ensureStateDefaults(loadState());
             st2.reader = st2.reader || {};
@@ -4692,6 +4708,7 @@ const keyRef = `${book}|${chapter}|${translationId}`;
 
 
 function closeReader(){
+    pararAudio();
     const modal = document.getElementById("readerModal");
     modal.classList.remove("open");
     modal.setAttribute("aria-hidden","true");
@@ -4704,6 +4721,113 @@ function closeReader(){
   }
 
   document.getElementById("readerCloseBtn").addEventListener("click", closeReader);
+
+  // ── Ouvir o capítulo (voz do próprio aparelho: Web Speech API) ──
+  // Lê versículo por versículo: assim dá para marcar o que está sendo lido e
+  // evita o corte que o Chrome do computador faz em falas muito longas.
+  const temVoz = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  const audio = { partes: [], idx: 0, token: 0, tocando: false };
+  function vozPortugues(){
+    const vs = temVoz ? speechSynthesis.getVoices() : [];
+    return vs.find(v => /^pt[-_]BR/i.test(v.lang)) || vs.find(v => /^pt/i.test(v.lang)) || null;
+  }
+  if (temVoz) { speechSynthesis.getVoices(); speechSynthesis.addEventListener?.("voiceschanged", () => {}); }
+  function textoParaFala(t){
+    // "SENHOR" em maiúsculas pode ser soletrado por algumas vozes
+    return limparVerso(t).replace(/[A-ZÁÉÍÓÚÂÊÔÃÕÇ]{3,}/g, w => w[0] + w.slice(1).toLowerCase());
+  }
+  function partesDoVerso(t){
+    const frases = t.split(/(?<=[.;:!?])\s+/);
+    const out = []; let atual = "";
+    frases.forEach(f => {
+      if (atual && (atual + " " + f).length > 180){ out.push(atual); atual = f; }
+      else atual = atual ? atual + " " + f : f;
+    });
+    if (atual) out.push(atual);
+    return out;
+  }
+  function botaoOuvir(estado){
+    const b = document.getElementById("ouvirBtn");
+    if (!b) return;
+    b.classList.toggle("tocando", estado === "tocando");
+    document.getElementById("ouvirTxt").textContent = estado === "tocando" ? "Pausar" : (estado === "pausado" ? "Continuar" : "Ouvir");
+    b.setAttribute("aria-label", estado === "tocando" ? "Pausar a leitura em voz alta" : "Ouvir o capítulo");
+  }
+  function prepararAudio(){
+    const b = document.getElementById("ouvirBtn");
+    if (!b) return;
+    b.hidden = !temVoz;
+    audio.partes = [];
+    document.querySelectorAll("#readerText .verse").forEach(el => {
+      const bruto = (el.textContent || "").replace(/^\s*\d+\s*/, "");
+      partesDoVerso(textoParaFala(bruto)).forEach(txt => { if (txt) audio.partes.push({ el, txt }); });
+    });
+    audio.idx = 0;
+    botaoOuvir("parado");
+  }
+  function pararAudio(){
+    audio.token++;
+    audio.tocando = false;
+    audio.idx = 0;
+    if (temVoz) speechSynthesis.cancel();
+    document.querySelectorAll("#readerText .verse.lendo").forEach(e => e.classList.remove("lendo"));
+    const b = document.getElementById("ouvirBtn");
+    if (b) b.hidden = true;
+    botaoOuvir("parado");
+  }
+  function erroAudio(msg){
+    const e = document.getElementById("readerError");
+    e.style.display = "block";
+    e.textContent = msg;
+    e.scrollIntoView({ block: "nearest" });
+  }
+  function falarParte(token){
+    if (token !== audio.token) return;
+    if (audio.idx >= audio.partes.length){
+      // terminou o capítulo: volta ao início e leva até o botão "✓ Lido"
+      audio.tocando = false; audio.idx = 0;
+      document.querySelectorAll("#readerText .verse.lendo").forEach(e => e.classList.remove("lendo"));
+      botaoOuvir("parado");
+      document.getElementById("fimCapProx")?.scrollIntoView({ block: "center", behavior: "smooth" });
+      return;
+    }
+    const p = audio.partes[audio.idx];
+    if (!p.el.classList.contains("lendo")){
+      document.querySelectorAll("#readerText .verse.lendo").forEach(e => e.classList.remove("lendo"));
+      p.el.classList.add("lendo");
+      p.el.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+    const u = new SpeechSynthesisUtterance(p.txt);
+    u.lang = "pt-BR";
+    const v = vozPortugues();
+    if (v) u.voice = v;
+    u.rate = 1;
+    u.onend = () => { if (token !== audio.token) return; audio.idx++; falarParte(token); };
+    u.onerror = (e) => {
+      if (token !== audio.token) return;
+      if (e.error === "interrupted" || e.error === "canceled") return;
+      audio.token++; audio.tocando = false; botaoOuvir("pausado");
+      erroAudio("Não consegui ler em voz alta (" + (e.error || "erro desconhecido") + "). Verifique se o aparelho tem uma voz em português instalada nas configurações de texto para fala.");
+    };
+    speechSynthesis.speak(u);
+  }
+  document.getElementById("ouvirBtn")?.addEventListener("click", () => {
+    if (!temVoz) return;
+    if (audio.tocando){
+      // pausa = para e guarda o ponto (o pause() nativo não é confiável no Android)
+      audio.token++; audio.tocando = false;
+      speechSynthesis.cancel();
+      botaoOuvir("pausado");
+      return;
+    }
+    if (!audio.partes.length){ erroAudio("Não há texto carregado para ouvir."); return; }
+    const errEl = document.getElementById("readerError");
+    if (errEl.textContent.startsWith("Não consegui ler em voz alta")){ errEl.style.display = "none"; errEl.textContent = ""; }
+    speechSynthesis.cancel();
+    audio.tocando = true;
+    botaoOuvir("tocando");
+    falarParte(++audio.token);
+  });
   document.getElementById("readerPlanPrevBtn").addEventListener("click", ()=>goPlanDelta(-1));
   document.getElementById("readerPlanNextBtn").addEventListener("click", ()=>goPlanDelta(1));
 
