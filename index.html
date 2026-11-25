@@ -683,6 +683,8 @@
     .dayBtn.done .dDot{background:var(--green)}
     .dayBtn.late{background:var(--accent-soft)}
     .dayBtn.late .dDot{background:var(--accent)}
+    .dayBtn.off{opacity:.3;cursor:default}
+    .dayBtn.off:hover{background:transparent;border-color:transparent}
 
     /* ---------- Plano do dia ---------- */
     .dayPlan{
@@ -1305,7 +1307,7 @@
         <h1>Ler Bíblia</h1>
         <p class="subtitle brandTagline">Seu plano de leitura bíblica, simples e organizado.</p>
         <p class="subtitle heroDetail">
-          O plano começa em <b>01/01/2026</b>. Se você entrou depois, o site calcula quantos dias faltam e monta o pacote para recuperar.
+          Seu plano começou em <b id="heroStart">—</b> (dia do seu primeiro login) e vai até <b id="heroEnd">—</b>. Se ficar dias sem ler, o site calcula o atraso e monta o pacote para recuperar.
         </p>
       </div>
       <div class="chips">
@@ -1507,8 +1509,8 @@
 
 <script src="devocionais.js"></script>
 <script>
-  const YEAR = 2026;
-  const PLAN_START = "2026-01-01"; // FIXO
+  // O plano não é mais preso a 2026: são 365 dias a partir de state.planStart
+  // (a data do 1º login da pessoa, gravada na conta). Ver "Janela do plano".
   const DEFAULT_VERSION = "acf";
   const DEFAULT_MODE = "gospel_history_psalms";
   const OT_CHAPTERS_PATTERN = [3,3,2,3,3,2,2];
@@ -1636,7 +1638,57 @@
     if (!state.planMode) state.planMode = DEFAULT_MODE;
     if (!state.days) state.days = {};
     if (!state.guided) state.guided = {};
+    if (!state.planStart) state.planStart = todayKeyNow();
     return state;
+  }
+
+  // ── Janela do plano: 365 dias a partir do início da pessoa (1º login) ──
+  function planStartDate(state){ return parseYMD(ensureStateDefaults(state || loadState()).planStart); }
+  function planEndDate(state){ const s = planStartDate(state); return new Date(s.getFullYear(), s.getMonth(), s.getDate() + 364); }
+  function inPlan(date, state){
+    const k = ymd(date);
+    return k >= ymd(planStartDate(state)) && k <= ymd(planEndDate(state));
+  }
+  function fmtBR(d){ return `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}/${d.getFullYear()}`; }
+  function foraDoPlanoMsg(state){
+    const hoje = ymd(new Date());
+    if (hoje < ymd(planStartDate(state))) return `Seu plano começa em ${fmtBR(planStartDate(state))}.`;
+    return `Seu plano de 365 dias terminou em ${fmtBR(planEndDate(state))}.`;
+  }
+  // Meses que o plano atravessa (ex.: nov/2026 … nov/2027), em ordem
+  function planMonths(state){
+    const s = planStartDate(state), e = planEndDate(state);
+    const out = [];
+    let y = s.getFullYear(), m = s.getMonth();
+    while (y < e.getFullYear() || (y === e.getFullYear() && m <= e.getMonth())){
+      out.push({ y, m });
+      m++; if (m > 11){ m = 0; y++; }
+    }
+    return out;
+  }
+  function planMonthIndexOf(key, state){
+    const [Y, M] = key.split("-").map(Number);
+    return planMonths(state).findIndex(o => o.y === Y && o.m === M - 1);
+  }
+  // Dias do mês que estão dentro do plano (o 1º e o último mês podem ser parciais)
+  function planMonthKeys(state, mi){
+    const o = planMonths(state)[mi];
+    if (!o) return [];
+    const ini = ymd(planStartDate(state)), fim = ymd(planEndDate(state));
+    const keys = [];
+    const last = new Date(o.y, o.m + 1, 0).getDate();
+    for (let day = 1; day <= last; day++){
+      const k = ymd(new Date(o.y, o.m, day));
+      if (k >= ini && k <= fim) keys.push(k);
+    }
+    return keys;
+  }
+  function planMonthLabel(state, mi){
+    const ms = planMonths(state);
+    const o = ms[mi];
+    if (!o) return "";
+    const atravessaAno = ms[0].y !== ms[ms.length - 1].y;
+    return atravessaAno ? `${monthNames[o.m]} ${o.y}` : monthNames[o.m];
   }
 
   function getPlanStreams(planMode){
@@ -1667,7 +1719,7 @@
   }
 
   function buildPlanForYear(state){
-    const startDate = parseYMD(PLAN_START);
+    const startDate = planStartDate(state);
     const streams = getPlanStreams(state.planMode);
 
     const pos = {};
@@ -1675,15 +1727,10 @@
     let psPos = 0, pvPos = 0;
 
     const plan = {};
-    const yearStart = new Date(YEAR,0,1);
-    const yearEnd = new Date(YEAR,11,31);
+    const endDate = planEndDate(state);
 
-    for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate()+1)){
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate()+1)){
       const key = ymd(d);
-      if (d < startDate){
-        plan[key] = { active:false, blocks:[], guidedList:[] };
-        continue;
-      }
       const offset = daysBetween(startDate, d);
       const blocks = [];
       let guidedList = [];
@@ -1723,7 +1770,7 @@
     let streak = 0;
     let d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     while (true){
-      if (d.getFullYear() !== YEAR) break;
+      if (!inPlan(d, state)) break;
       const key = ymd(d);
       if (state.days?.[key]?.done){ streak++; d.setDate(d.getDate()-1); }
       else break;
@@ -1762,17 +1809,17 @@
 
   function goToToday(){
     const t = new Date();
-    if (t.getFullYear() !== YEAR){ return alert(`Checklist é de ${YEAR}.`); }
+    if (!inPlan(t)){ return alert(foraDoPlanoMsg()); }
     const key = ymd(t);
 
     const st = ensureStateDefaults(loadState());
     st.ui = st.ui || {};
     st.ui.selectedDay = key;
-          try{ st.ui.openMonth = (parseInt((key.split("-")[1]||"1"),10)-1); }catch(e){}
+    st.ui.openMonth = planMonthIndexOf(key, st);
     saveState(st);
     renderAll();
 
-    const el = document.getElementById(`m-${YEAR}-${pad2(t.getMonth()+1)}`);
+    const el = document.getElementById(`m-${t.getFullYear()}-${pad2(t.getMonth()+1)}`);
     if (el){ el.open = true; el.scrollIntoView({behavior:"smooth", block:"start"}); }
 
     setTimeout(()=>{
@@ -1783,13 +1830,12 @@
 
   function getLateDays(state){
     const today = new Date();
-    if (today.getFullYear() !== YEAR) return 0;
-
-    const planStart = parseYMD(PLAN_START);
+    const planStart = planStartDate(state);
+    const planEnd = planEndDate(state);
     const todayKey = ymd(today);
     let late = 0;
 
-    for (let d = new Date(planStart); d <= today; d.setDate(d.getDate()+1)){
+    for (let d = new Date(planStart); d <= today && d <= planEnd; d.setDate(d.getDate()+1)){
       const k = ymd(d);
       if (k === todayKey) break;
       if (!state.days?.[k]?.done) late++;
@@ -1802,7 +1848,7 @@
     const plan = buildPlanForYear(state);
     const today = new Date();
 
-    if (today.getFullYear() !== YEAR) return alert(`Checklist é de ${YEAR}.`);
+    if (!inPlan(today, state)) return alert(foraDoPlanoMsg(state));
     const key = ymd(today);
     const p = plan[key];
     if (!p?.active) return alert("Hoje está fora do período do plano.");
@@ -1827,7 +1873,7 @@
     const plan = buildPlanForYear(state);
     const today = new Date();
 
-    if (today.getFullYear() !== YEAR) return alert(`Checklist é de ${YEAR}.`);
+    if (!inPlan(today, state)) return alert(foraDoPlanoMsg(state));
 
     const late = getLateDays(state);
     if (late <= 0){
@@ -1835,7 +1881,7 @@
       return;
     }
 
-    const start = parseYMD(PLAN_START);
+    const start = planStartDate(state);
 
     let firstMissing = null;
     for (let d = new Date(start); d <= today; d.setDate(d.getDate()+1)){
@@ -1872,14 +1918,14 @@
   function finishTodayReading(){
     const state = ensureStateDefaults(loadState());
     const now = new Date();
-    if (now.getFullYear() !== YEAR) return alert(`Checklist é de ${YEAR}.`);
+    if (!inPlan(now, state)) return alert(foraDoPlanoMsg(state));
 
     const key = ymd(now);
     state.days[key] = state.days[key] || {};
     state.days[key].done = true;
 
     const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
-    if (tomorrow.getFullYear() === YEAR){
+    if (inPlan(tomorrow, state)){
       const tKey = ymd(tomorrow);
       state.guided[tKey] = state.guided[tKey] || {};
       state.guided[tKey].idx = 0;
@@ -1887,7 +1933,7 @@
     }
     saveState(state);
 
-    const el = document.getElementById(`m-${YEAR}-${pad2(now.getMonth()+1)}`);
+    const el = document.getElementById(`m-${now.getFullYear()}-${pad2(now.getMonth()+1)}`);
     if (el){ el.open = true; el.scrollIntoView({behavior:"smooth", block:"start"}); }
     renderAll();
   }
@@ -1903,7 +1949,7 @@
 
   function updateTodayHint(plan, state, today){
     const hint = document.getElementById("todayHint");
-    if (today.getFullYear() !== YEAR){ hint.textContent = `Checklist é de ${YEAR}.`; return; }
+    if (!inPlan(today, state)){ hint.textContent = foraDoPlanoMsg(state); return; }
     const key = ymd(today);
     const p = plan[key];
     if (!p?.active){ hint.textContent = "Hoje está fora do período do plano."; return; }
@@ -1959,7 +2005,7 @@
     if (!el) return;
 
     const today = new Date();
-    if (today.getFullYear() !== YEAR){
+    if (!inPlan(today, state)){
       el.classList.remove("show");
       return;
     }
@@ -1978,7 +2024,7 @@ function updateLateUI(state){
     const chipLate = document.getElementById("chipLate");
     const today = new Date();
 
-    if (today.getFullYear() !== YEAR){
+    if (!inPlan(today, state)){
       lateEl.classList.remove("show");
       catchUpBtn.disabled = true;
       chipLate.style.display = "none";
@@ -2148,7 +2194,7 @@ function updateLateUI(state){
     const nextBtn  = document.getElementById("guidedNextBtn");
     const finishBtn= document.getElementById("guidedFinishBtn");
 
-    if (today.getFullYear() !== YEAR){
+    if (!inPlan(today, state)){
       nowEl.textContent = "Hoje: —";
       stepEl.textContent = "Capítulo 0/0";
       noticeEl.classList.remove("show");
@@ -2235,11 +2281,14 @@ function updateLateUI(state){
     renderDevocionalHoje(plan, state, today);
     initDevoBrowser();
 
-    // progresso anual
-    const yearDays = [];
-    const yearStart = new Date(YEAR,0,1);
-    const yearEnd = new Date(YEAR,11,31);
-    for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate()+1)) yearDays.push(ymd(d));
+    // datas do plano no cabeçalho
+    const heroStartEl = document.getElementById("heroStart");
+    const heroEndEl = document.getElementById("heroEnd");
+    if (heroStartEl) heroStartEl.textContent = fmtBR(planStartDate(state));
+    if (heroEndEl) heroEndEl.textContent = fmtBR(planEndDate(state));
+
+    // progresso do plano (365 dias a partir do início)
+    const yearDays = Object.keys(plan);
     const doneCount = yearDays.filter(k => state.days?.[k]?.done).length;
     const pct = Math.round((doneCount/365)*100);
 
@@ -2269,13 +2318,9 @@ function updateLateUI(state){
     // - "Mês vigente" = primeiro mês ainda NÃO 100% concluído (desbloqueio por progresso)
     // - Mostra somente meses até o vigente (inclui anteriores), com o vigente aberto por padrão
     // - Meses futuros ficam ocultos/bloqueados até liberar
-    function monthDaysKeys(mIdx){
-      const keys = [];
-      const first = new Date(YEAR, mIdx, 1);
-      const last = new Date(YEAR, mIdx + 1, 0);
-      for (let d = new Date(first); d <= last; d.setDate(d.getDate()+1)) keys.push(ymd(d));
-      return keys;
-    }
+    const mesesPlano = planMonths(state);
+    const ultimoMes = mesesPlano.length - 1;
+    function monthDaysKeys(mIdx){ return planMonthKeys(state, mIdx); }
 
     function isMonthComplete(mIdx){
       const keys = monthDaysKeys(mIdx);
@@ -2284,19 +2329,19 @@ function updateLateUI(state){
 
     // unlockedMaxMonth = índice do primeiro mês NÃO completo (recurso de “liberar próximo”)
     let unlockedMaxMonth = 0;
-    while (unlockedMaxMonth < 11 && isMonthComplete(unlockedMaxMonth)) unlockedMaxMonth++;
+    while (unlockedMaxMonth < ultimoMes && isMonthComplete(unlockedMaxMonth)) unlockedMaxMonth++;
 
-    // Mês atual = mês do dia de hoje (se o ano do sistema for diferente do YEAR, cai para Janeiro)
-    const now = new Date();
-    const currentMonthIndex = (now.getFullYear() === YEAR) ? now.getMonth() : 0;
+    // Mês atual = mês do plano que contém hoje (depois do fim do plano, o último mês)
+    const idxHoje = planMonthIndexOf(todayKey, state);
+    const currentMonthIndex = idxHoje >= 0 ? idxHoje : (todayKey > ymd(planEndDate(state)) ? ultimoMes : 0);
 
     // Regra solicitada: mês atual fica “ativo”; meses anteriores podem ser consultados; meses futuros ficam ocultos.
     // Então o último mês exibido é, no mínimo, o mês atual (mesmo que o mês anterior não esteja 100% concluído).
-    const visibleMaxMonth = Math.min(11, Math.max(unlockedMaxMonth, currentMonthIndex));
+    const visibleMaxMonth = Math.min(ultimoMes, Math.max(unlockedMaxMonth, currentMonthIndex));
 
     // Controla qual mês está aberto no calendário (por padrão, o mês atual)
     state.ui = state.ui || {};
-    if (state.ui.openMonth === undefined || state.ui.openMonth === null) state.ui.openMonth = currentMonthIndex;
+    if (state.ui.openMonth === undefined || state.ui.openMonth === null || state.ui.openMonth < 0) state.ui.openMonth = currentMonthIndex;
 
     // Se o usuário estava com mês aberto no futuro (não exibido), volta para o mês atual
     if (state.ui.openMonth > visibleMaxMonth) state.ui.openMonth = currentMonthIndex;
@@ -2304,8 +2349,8 @@ function updateLateUI(state){
     // Se o usuário selecionou um dia de um mês futuro (não exibido), traz para hoje
     if (state.ui.selectedDay){
       const sel = state.ui.selectedDay;
-      const selMonth = parseInt(sel.split("-")[1] || "1", 10) - 1;
-      if (selMonth > visibleMaxMonth) state.ui.selectedDay = todayKey;
+      const selMonth = planMonthIndexOf(sel, state);
+      if (selMonth < 0 || selMonth > visibleMaxMonth) state.ui.selectedDay = todayKey;
     }
 
     saveState(state);
@@ -2314,10 +2359,10 @@ function updateLateUI(state){
     const controls = document.createElement("div");
     controls.className = "monthControls";
     controls.innerHTML = `
-      <div class="monthControlsLeft"><b>Mês atual:</b> <span class="muted">${monthNames[currentMonthIndex]}</span></div>
+      <div class="monthControlsLeft"><b>Mês atual:</b> <span class="muted">${planMonthLabel(state, currentMonthIndex)}</span></div>
       <div class="monthControlsRight">
         <button class="miniBtn" id="btnOpenCurrentMonth" type="button">Ir para mês atual</button>
-        <div class="monthUnlock">${unlockedMaxMonth>=11 && isMonthComplete(11) ? "Ano completo" : "Conclua o mês para liberar o próximo"}</div>
+        <div class="monthUnlock">${unlockedMaxMonth>=ultimoMes && isMonthComplete(ultimoMes) ? "Plano completo" : "Conclua o mês para liberar o próximo"}</div>
       </div>
     `;
     container.appendChild(controls);
@@ -2333,18 +2378,20 @@ function updateLateUI(state){
       };
     }, 0);
 
-for (let m = 0; m < 12; m++){
+for (let m = 0; m <= ultimoMes; m++){
       // Oculta meses futuros não liberados
       if (m > visibleMaxMonth) continue;
+      const mesY = mesesPlano[m].y, mesM = mesesPlano[m].m;   // ano e mês (0–11) de verdade
+      const diasDoPlano = new Set(planMonthKeys(state, m));
       const details = document.createElement("details");
       details.className = "month";
-      details.id = `m-${YEAR}-${pad2(m+1)}`;
+      details.id = `m-${mesY}-${pad2(mesM+1)}`;
       details.open = (m === state.ui.openMonth);
 
       const summary = document.createElement("summary");
       const left = document.createElement("div");
       left.className = "monthTitle";
-      left.textContent = `${monthNames[m]}`;
+      left.textContent = planMonthLabel(state, m);
 
       const monthStats = document.createElement("div");
       monthStats.className = "badge";
@@ -2373,7 +2420,7 @@ for (let m = 0; m < 12; m++){
       const calGrid = document.createElement("div");
       calGrid.className = "monthCalGrid";
 
-      const first = new Date(YEAR, m, 1);
+      const first = new Date(mesY, mesM, 1);
       const firstCol = (first.getDay() + 6) % 7; // Monday=0
       for (let i = 0; i < firstCol; i++){
         const blank = document.createElement("div");
@@ -2382,9 +2429,9 @@ for (let m = 0; m < 12; m++){
         calGrid.appendChild(blank);
       }
 
-      const lastDay = new Date(YEAR, m+1, 0).getDate();
+      const lastDay = new Date(mesY, mesM+1, 0).getDate();
       for (let day = 1; day <= lastDay; day++){
-        const date = new Date(YEAR, m, day);
+        const date = new Date(mesY, mesM, day);
         const key = ymd(date);
         const p = plan[key] || { active:false, blocks:[], guidedList:[] };
         const done = !!state.days?.[key]?.done;
@@ -2392,7 +2439,8 @@ for (let m = 0; m < 12; m++){
 
         const b = document.createElement("button");
         b.type = "button";
-        b.className = "dayBtn" + (done ? " done" : "") + (isLate ? " late" : "");
+        b.className = "dayBtn" + (done ? " done" : "") + (isLate ? " late" : "") + (p.active ? "" : " off");
+        if (!p.active){ b.disabled = true; b.title = "Fora do período do seu plano"; }
         b.dataset.datekey = key;
         if (key === todayKey) b.classList.add("today");
         b.innerHTML = `<div class="dNum">${day}</div><div class="dDot" aria-hidden="true"></div>`;
@@ -2400,7 +2448,7 @@ b.addEventListener("click", ()=>{
           const st = ensureStateDefaults(loadState());
           st.ui = st.ui || {};
           st.ui.selectedDay = key;
-          try{ st.ui.openMonth = (parseInt((key.split("-")[1]||"1"),10)-1); }catch(e){}
+          st.ui.openMonth = planMonthIndexOf(key, st);
           saveState(st);
           renderAll();
           setTimeout(()=>{
@@ -2422,8 +2470,8 @@ b.addEventListener("click", ()=>{
 
       // padrão: hoje se for deste mês, senão dia 1 do mês
       if (!selectedKey){
-        if (todayKey.startsWith(`${YEAR}-${pad2(m+1)}-`)) selectedKey = todayKey;
-        else selectedKey = `${YEAR}-${pad2(m+1)}-01`;
+        if (diasDoPlano.has(todayKey)) selectedKey = todayKey;
+        else selectedKey = [...diasDoPlano][0] || todayKey;
       }
       // (ajuste) mantém o dia selecionado globalmente — o painel de leitura sempre acompanha o dia escolhido
 
@@ -2551,8 +2599,9 @@ b.addEventListener("click", ()=>{
       let monthDone = 0;
 
       for (let day = 1; day <= lastDay; day++){
-        const date = new Date(YEAR, m, day);
+        const date = new Date(mesY, mesM, day);
         const key = ymd(date);
+        if (!diasDoPlano.has(key)) continue;   // dia fora do plano (antes do início / depois do fim)
 
         const p = plan[key] || { active:false, blocks:[], guidedList:[] };
         const blocks = p.blocks || [];
@@ -2669,7 +2718,7 @@ b.addEventListener("click", ()=>{
       details.appendChild(body);
       container.appendChild(details);
 
-      const monthTotal = lastDay;
+      const monthTotal = diasDoPlano.size || 1;
       const pctM = Math.round((monthDone/monthTotal)*100);
       document.getElementById(`badge-${m}`).textContent = `${monthDone}/${monthTotal} · ${pctM}%`;
     }
@@ -2902,8 +2951,7 @@ b.addEventListener("click", ()=>{
 
   document.getElementById("openTodayBtn").addEventListener("click", ()=>{
     const t = new Date();
-    const targetMonth = (t.getFullYear() === YEAR) ? (t.getMonth()+1) : 1;
-    const el = document.getElementById(`m-${YEAR}-${pad2(targetMonth)}`);
+    const el = document.getElementById(`m-${t.getFullYear()}-${pad2(t.getMonth()+1)}`);
     if (el){ el.open = true; el.scrollIntoView({behavior:"smooth", block:"start"}); }
   });
 
@@ -2936,7 +2984,7 @@ b.addEventListener("click", ()=>{
   document.getElementById("guidedPrevBtn").addEventListener("click", ()=>{
     const s = ensureStateDefaults(loadState());
     const today = new Date();
-    if (today.getFullYear() !== YEAR) return;
+    if (!inPlan(today, s)) return;
     const key = ymd(today);
     const idx = getGuidedIndex(s, key);
     openGuidedAtIndex(idx - 1);
@@ -2944,7 +2992,7 @@ b.addEventListener("click", ()=>{
   document.getElementById("guidedNextBtn").addEventListener("click", ()=>{
     const s = ensureStateDefaults(loadState());
     const today = new Date();
-    if (today.getFullYear() !== YEAR) return;
+    if (!inPlan(today, s)) return;
     const key = ymd(today);
     const idx = getGuidedIndex(s, key);
     openGuidedAtIndex(idx + 1);
@@ -3320,7 +3368,7 @@ function closeReader(){
     const entry = st.reader.diary[dateKey] || {};
     summaryEl.value = entry.summary || "";
 
-    const labelDay = (dateKey||"").replace("2026-","") || dateKey;
+    const labelDay = (dateKey||"").replace(/^\d{4}-/,"") || dateKey;
     refEl.textContent = `Dia ${labelDay} — Diário`;
 
     const planBlocks = (getPlanForDate(dateKey) || []);
@@ -3469,10 +3517,10 @@ function closeReader(){
 
 
   // === POPUP DE CONQUISTA DO MÊS ===
-  function showMonthUnlock(monthIdx, stats){
+  function showMonthUnlock(monthIdx, stats, state){
     const modal = document.getElementById("monthUnlockModal");
     const body = document.getElementById("unlockBody");
-    const name = monthNames[monthIdx];
+    const name = planMonthLabel(state, monthIdx);
     body.innerHTML = `<b>${name} liberado!</b><br><b>${stats.done}/${stats.total}</b> dias concluídos`;
     modal.classList.add("open");
     modal.setAttribute("aria-hidden","false");
@@ -3486,34 +3534,25 @@ function closeReader(){
 
   function checkMonthUnlock(prevState, newState){
     if (!prevState || !newState) return;
-    for (let m = 0; m < 12; m++){
+    const total = planMonths(newState).length;
+    for (let m = 0; m < total; m++){
       if (!isMonthCompleteFromState(prevState, m) && isMonthCompleteFromState(newState, m)){
-        showMonthUnlock(m, getMonthStats(m, newState));
+        showMonthUnlock(m, getMonthStats(m, newState), newState);
         break;
       }
     }
   }
 
   function isMonthCompleteFromState(state, mIdx){
-    const first = new Date(YEAR, mIdx, 1);
-    const last = new Date(YEAR, mIdx + 1, 0);
-    for (let d = new Date(first); d <= last; d.setDate(d.getDate()+1)){
-      const k = ymd(d);
-      if (!state.days?.[k]?.done) return false;
-    }
-    return true;
+    // mesma janela do novo estado: o plano é o mesmo antes e depois da mudança
+    const keys = planMonthKeys(state, mIdx);
+    return keys.length > 0 && keys.every(k => state.days?.[k]?.done);
   }
 
   function getMonthStats(mIdx, state){
-    let total = 0, done = 0;
-    const first = new Date(YEAR, mIdx, 1);
-    const last = new Date(YEAR, mIdx + 1, 0);
-    for (let d = new Date(first); d <= last; d.setDate(d.getDate()+1)){
-      total++;
-      const k = ymd(d);
-      if (state.days?.[k]?.done) done++;
-    }
-    return { total, done };
+    const keys = planMonthKeys(state, mIdx);
+    const done = keys.filter(k => state.days?.[k]?.done).length;
+    return { total: keys.length, done };
   }
 
   const _saveState = saveState;
@@ -3598,6 +3637,8 @@ function closeReader(){
       out.days[k] = { ...r, ...l, done: !!(l.done || r.done), note: (l.note || r.note || "") };
     }
     out.guided = { ...(nuvem.guided || {}), ...(local.guided || {}) };
+    // A data de início é da CONTA (dia do 1º login), nunca a do aparelho
+    out.planStart = nuvem.planStart || local.planStart;
 
     const lr = local.reader || {}, rr = nuvem.reader || {};
     const reader = { ...rr, ...lr };
@@ -3684,12 +3725,17 @@ function closeReader(){
         final = (meta.uid && meta.uid !== usuario.uid)
           ? ensureStateDefaults({ version: local.version, planMode: local.planMode, days:{}, guided:{} })
           : local;
+        // 1º login desta conta: o plano começa hoje
+        final.planStart = todayKeyNow();
       } else {
+        // Conta que já existia antes da data de início: ensureStateDefaults grava hoje como início
+        const nuvemBruta = JSON.parse(snap.data().dados);
         const nuvem = ensureStateDefaults(JSON.parse(snap.data().dados));
         if (meta.uid === usuario.uid && !meta.pendente) final = nuvem;              // nuvem manda
         else if (meta.uid && meta.uid !== usuario.uid) final = nuvem;               // dados locais eram de outra conta
         else final = juntar(local, nuvem);                                          // 1ª vez aqui ou mudança pendente
-        ultimoEnviado = paraNuvem(nuvem);
+        // compara com a nuvem como ela ESTÁ: se faltava a data de início, ela será enviada
+        ultimoEnviado = paraNuvem(nuvemBruta);
       }
 
       final.ui = local.ui;
