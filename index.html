@@ -1147,6 +1147,8 @@
        Inspirado no bible.com. Só vale até 520px; o computador
        continua com o layout anterior até a etapa 4.
        ══════════════════════════════════════════════════════════ */
+    .bibliaCredito{margin:22px 0 4px;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;line-height:1.5;color:var(--ink-3);font-family:var(--ui)}
+    .bibliaCredito a{color:var(--ink-2)}
     .heroDate,.hojeM,.tabBar{display:none}
     #syncChip .curto{display:none}
     @media (max-width:520px){
@@ -1494,8 +1496,10 @@
 
       <div class="row">
         <div>
-          <label class="small">Tradução (Bíblia Online)</label><br/>
-          <select id="versionSelect">
+          <label class="small">Tradução</label>
+          <p class="tiny" style="margin:4px 0 0;max-width:340px">O texto do app é a <b>Bíblia Livre</b>, atualização da tradução de João Ferreira de Almeida (1819). No leitor, “Abrir externo” mostra o capítulo na Bíblia Online.</p>
+          <!-- seletor antigo: fica escondido só para o código existente continuar funcionando -->
+          <select id="versionSelect" hidden aria-hidden="true" tabindex="-1">
             <option value="acf">ACF</option>
             <option value="ara">ARA</option>
             <option value="arc">ARC</option>
@@ -3665,6 +3669,18 @@ b.addEventListener("click", ()=>{
     return map[k] || null;
   }
 
+    // ── Texto bíblico: Bíblia Livre guardada em ./biblia/<LIVRO>.json ──
+    // Cada livro é baixado uma vez e fica na memória enquanto o app está aberto.
+    const cacheLivros = {};
+    function carregarLivroBiblia(bookId){
+      if (!cacheLivros[bookId]){
+        cacheLivros[bookId] = fetch(`./biblia/${bookId}.json`)
+          .then(r => { if (!r.ok) throw new Error(`arquivo ./biblia/${bookId}.json respondeu ${r.status}`); return r.json(); })
+          .catch(e => { delete cacheLivros[bookId]; throw e; });
+      }
+      return cacheLivros[bookId];
+    }
+
     // Contexto da leitura atual para navegação no plano
   let currentReadingCtx = null;
   let readerScrollHandler = null;
@@ -3684,8 +3700,10 @@ b.addEventListener("click", ()=>{
     loading.style.display = "block";
 
     const st = ensureStateDefaults(loadState());
-    const translationId = "almeida"; // sempre PT no leitor interno
-    refEl.textContent = `${book} ${chapter} — ${translationId.toUpperCase()}`;
+    // "almeida" continua sendo a CHAVE dos destaques já salvos (a numeração dos
+    // versículos é a mesma); o texto agora vem da Bíblia Livre guardada no projeto.
+    const translationId = "almeida";
+    refEl.textContent = `${book} ${chapter} — Bíblia Livre`;
 
     modal.classList.add("open");
 
@@ -3732,18 +3750,16 @@ b.addEventListener("click", ()=>{
       return;
     }
 
-    const url = `https://bible-api.com/data/${translationId}/${bookId}/${chapter}`;
+    const url = `./biblia/${bookId}.json`;
 
-    fetch(url)
-      .then(r => r.json())
-      .then(data => {
-        // Estrutura do /data geralmente traz "verses" com "verse" e "text"
-        const verses = data && (data.verses || data);
-        if (!Array.isArray(verses) || !verses.length){
+    carregarLivroBiblia(bookId)
+      .then(livro => {
+        const caps = livro?.capitulos || {};
+        const verses = (caps[String(chapter)] || []).map(([n, t]) => ({ verse: n, text: t }));
+        if (!verses.length){
           loading.style.display = "none";
           errEl.style.display = "block";
-          const msg = data?.error || data?.message || "Resposta sem versos.";
-          errEl.textContent = `Não foi possível carregar o texto.\n\nDetalhe: ${msg}\nURL: ${url}\n\nUse “Abrir externo”.`;
+          errEl.textContent = `Não foi possível carregar o texto.\n\nDetalhe: o capítulo ${chapter} não existe em ${book}.\nArquivo: ${url}\n\nUse “Abrir externo”.`;
           return;
         }
         loading.style.display = "none";
@@ -3752,7 +3768,7 @@ b.addEventListener("click", ()=>{
               const n = v.verse ?? v.verse_id ?? v.number ?? "";
               const t = v.text ?? v.t ?? "";
               return `<p class="verse" data-verse="${n}"><b>${n}</b> ${escapeHtml(String(t))}</p>`;
-            }).join("");
+            }).join("") + `<p class="bibliaCredito">Texto: Bíblia Livre (BLIVRE), © Diego Santos, Mario Sérgio e Marco Teles · Licença Creative Commons Atribuição 4.0 Brasil · <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noopener">site da Bíblia Livre</a></p>`;
 const keyRef = `${book}|${chapter}|${translationId}`;
             const st2 = ensureStateDefaults(loadState());
             st2.reader = st2.reader || {};
