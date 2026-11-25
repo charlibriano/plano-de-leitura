@@ -1072,6 +1072,7 @@
       .grid > [data-panel="Progresso"]{order:2}
       .grid > [data-panel="Calendario"]{order:3}
       .grid > [data-panel="Devocionais"]{order:4}
+      .grid > [data-panel="Temas"]{order:4}
       .grid > [data-panel="Ajustes"]{order:5}
       .grid > .manualCard{display:none}
 
@@ -1289,7 +1290,7 @@
 
       /* barra de abas */
       .tabBar{
-        display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+        display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
         position:fixed;left:0;right:0;bottom:0;z-index:999;
         background:var(--surface);border-top:1px solid var(--line);
         padding:6px 6px calc(8px + env(safe-area-inset-bottom));
@@ -1353,6 +1354,38 @@
       .planoSel.comNota .planoNota{display:block}
     }
 
+    /* ── aba Temas: versículos por tema ── */
+    .grid > [data-panel="Temas"]{background:transparent;border:0;box-shadow:none;padding:0 2px}
+    .temasM{display:flex;flex-direction:column}
+    .temasTit{margin:0 0 10px;padding:0 4px;font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink)}
+    .temasGrade{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .temaBtn{height:64px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--serif);font-size:15.5px;font-weight:600;cursor:pointer;padding:0 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+    .temaBtn small{font-family:var(--ui);font-size:11px;font-weight:500;color:var(--ink-3)}
+    .temaBtn:hover,.temaBtn:focus{background:var(--surface);color:var(--ink);border-color:var(--ink-3)}
+    .temaBtn:active{background:var(--surface-2)}
+    .temasTopo{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .temasTopo .temasTit{margin:0;padding:0}
+    .temasVoltar{flex:none;height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer}
+    .temasVoltar:hover,.temasVoltar:focus{background:var(--surface);color:var(--ink)}
+    .temasItens{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+    .temaVerso{display:flex;flex-direction:column;gap:1px;padding:7px 14px;border:0;border-top:1px solid var(--line);background:transparent;text-align:left;cursor:pointer;color:var(--ink);font-family:var(--ui);width:100%}
+    .temaVerso:first-child{border-top:0}
+    .temaVerso:hover,.temaVerso:focus{background:transparent;color:var(--ink);border-color:var(--line)}
+    .temaVerso:active{background:var(--surface-2)}
+    .temaVerso b{font-size:12.5px;font-weight:600;color:var(--accent)}
+    .temaVerso span{font-family:var(--serif);font-size:14.5px;font-weight:400;line-height:1.34;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+    #readerText .verse.alvo{background:var(--gold-soft);box-shadow:inset 3px 0 0 var(--gold)}
+    @media (min-width:521px){
+      .temasM{max-width:760px;margin:0 auto}
+      .temasGrade{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+      .temaBtn{height:76px;font-size:17px}
+      .temasItens{display:grid;grid-template-columns:1fr 1fr}
+      .temaVerso{border-top:1px solid var(--line);padding:12px 16px}
+      .temaVerso:nth-child(-n+2){border-top:0}
+      .temaVerso:nth-child(odd){border-right:1px solid var(--line)}
+      .temaVerso span{-webkit-line-clamp:3;line-clamp:3}
+    }
+
     /* ── Visual novo (celular) — etapa 3: aba Ajustes ── */
     .ajM{display:none}
     @media all{
@@ -1404,7 +1437,8 @@
       body:not([data-aba]) .grid > [data-panel="Hoje"],
       body[data-aba="Hoje"] .grid > [data-panel="Hoje"],
       body[data-aba="Progresso"] .grid > [data-panel="Progresso"],
-      body[data-aba="Ajustes"] .grid > [data-panel="Ajustes"]{display:block}
+      body[data-aba="Ajustes"] .grid > [data-panel="Ajustes"],
+      body[data-aba="Temas"] .grid > [data-panel="Temas"]{display:block}
       .grid > .manualCard,.grid > [data-panel="Calendario"],.grid > [data-panel="Devocionais"]{display:none !important}
 
       /* abas no topo, entre o nome e a conta */
@@ -1645,6 +1679,22 @@
 
 <main>
   <div class="grid">
+    <section class="card" data-panel="Temas">
+      <div class="temasM" id="temasM">
+        <div class="temasLista" id="temasLista">
+          <h3 class="temasTit">Versículos por tema</h3>
+          <div class="temasGrade" id="temasGrade"></div>
+        </div>
+        <div class="temasVersos" id="temasVersos" hidden>
+          <div class="temasTopo">
+            <button type="button" class="temasVoltar" id="temasVoltar" aria-label="Voltar aos temas">‹ Temas</button>
+            <h3 class="temasTit" id="temasNome">—</h3>
+          </div>
+          <div class="temasItens" id="temasItens"></div>
+        </div>
+      </div>
+    </section>
+
     <section class="card" data-panel="Ajustes">
       <h2>Ajustes</h2>
 
@@ -1999,6 +2049,8 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Hoje</button>
   <button type="button" class="tabBtn" data-alvo="Progresso" aria-label="Plano">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Plano</button>
+  <button type="button" class="tabBtn" data-alvo="Temas" aria-label="Temas">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M9 7h6M9 11h4"/></svg>Temas</button>
   <button type="button" class="tabBtn" data-alvo="Ajustes" aria-label="Ajustes">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Ajustes</button>
 </nav>
@@ -3504,7 +3556,7 @@ function updateLateUI(state){
     const grid = document.querySelector("main .grid");
     const bar = document.getElementById("tabBar");
     if (!grid || !bar) return;
-    const abaDoPainel = { Hoje:"Hoje", Progresso:"Progresso", Calendario:"Progresso", Devocionais:"Devocionais", Ajustes:"Ajustes" };
+    const abaDoPainel = { Hoje:"Hoje", Progresso:"Progresso", Calendario:"Progresso", Devocionais:"Devocionais", Temas:"Temas", Ajustes:"Ajustes" };
 
     bar.querySelectorAll(".tabBtn").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -4443,6 +4495,7 @@ b.addEventListener("click", ()=>{
             }).join("") + fimDoCapituloHtml(ctx, book, chapter) + `<p class="bibliaCredito">Texto: Bíblia Livre (BLIVRE), © Diego Santos, Mario Sérgio e Marco Teles · Licença Creative Commons Atribuição 4.0 Brasil · <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noopener">site da Bíblia Livre</a></p>`;
 ligarFimDoCapitulo(ctx, book, chapter);
 prepararAudio();
+focarVersoAlvo();
 const keyRef = `${book}|${chapter}|${translationId}`;
             const st2 = ensureStateDefaults(loadState());
             st2.reader = st2.reader || {};
@@ -4721,6 +4774,45 @@ function closeReader(){
   }
 
   document.getElementById("readerCloseBtn").addEventListener("click", closeReader);
+
+  // ── Versículos por tema ──
+  // Textos da Bíblia Livre copiados dos arquivos ./biblia (conferidos um a um).
+  const TEMAS = [{"nome": "Ansiedade","versos": [["Filipenses",4,6,"Não estejais ansiosos por coisa alguma; mas em tudo, por meio de orações e súplicas com ações de gratidão, sejam os vossos pedidos conhecidos por Deus;"],["Filipenses",4,7,"e a paz de Deus, que excede todo entendimento, guardará os vossos corações e as vossas mentes em Cristo Jesus."],["1 Pedro",5,7,"lançando sobre ele toda a vossa ansiedade; porque ele tem cuidado de vós."],["Mateus",6,34,"Não andeis, pois, ansiosos pelo dia de amanhã, porque o amanhã cuidará de si mesmo. Basta a cada dia o seu mal."],["Salmos",94,19,"Quando minhas preocupações se multiplicavam dentro de mim, teus consolos confortaram a minha alma."],["Mateus",11,28,"Vinde a mim todos vós que estais cansados e sobrecarregados, e eu vos farei descansar."]]},{"nome": "Medo","versos": [["Josué",1,9,"Olha que te mando que te esforces e sejas valente: não temas nem desmaies, porque o SENHOR teu Deus será contigo onde quer que fores."],["Isaías",41,10,"Não temas, porque eu estou contigo; não te assombres, porque eu sou teu Deus. Eu te fortaleço, te ajudo, e te sustento com a minha mão direita de justiça."],["Salmos",23,4,"Ainda que eu venha a andar pelo vale da sombra da morte, não temerei mal algum, porque tu estás comigo; tua vara e teu cajado me consolam."],["Salmos",27,1,"O SENHOR é minha luz e minha salvação; a quem temerei? O SENHOR é a força da minha vida; de quem terei medo?"],["2 Timóteo",1,7,"Pois Deus não nos deu espírito de medo; mas sim de força, de amor, e de moderação."],["Salmos",56,3,"No dia em que eu tiver medo, eu confiarei em ti."]]},{"nome": "Força","versos": [["Isaías",40,31,"Mas os que confiam no SENHOR renovarão as forças, subirão com asas como águias; correrão, e não se cansarão; caminharão, e não se fatigarão."],["Filipenses",4,13,"Posso todas as coisas em Cristo que me fortalece."],["Salmos",46,1,"Deus é nosso refúgio e força; socorro oportuno nas angústias."],["2 Coríntios",12,9,"Mas ele me disse: “Minha graça te basta, porque meu poder se aperfeiçoa na fraqueza”. Por isso, com muito prazer, eu me orgulharei nas minhas fraquezas, para que o poder de Cristo habite em mim."],["Neemias",8,10,"E disse-lhes mais: Ide, comei gorduras, e bebei doçuras, e enviai porções aos que não têm preparado; porque este é um dia consagrado ao nosso Senhor; portanto não vos entristeçais, porque a alegria do SENHOR é vossa força."],["Salmos",73,26,"Minha carne e meu coração desfalecem; porém Deus será a rocha do meu coração e minha porção para sempre."]]},{"nome": "Esperança","versos": [["Romanos",15,13,"O Deus da esperança vos encha de toda alegria e paz na fé, para que abundeis em esperança no poder do Espírito Santo."],["Jeremias",29,11,"Porque eu sei os pensamentos que penso quanto a vós, diz o SENHOR, pensamentos de paz, e não de mal, para vos dar um futuro com esperança."],["Lamentações",3,22,"É pelas bondades do SENHOR que não somos consumidos, porque suas misericórdias não têm fim."],["Romanos",5,5,"E a esperança não frustra, porque o amor de Deus está derramado em nossos corações pelo Espírito Santo que nos foi dado."],["Salmos",42,11,"Por que estás abatida, minha alma? E por que te inquietas em mim? Espera em Deus; porque eu ainda o louvarei; ele é a minha salvação e o meu Deus."],["Romanos",8,28,"E sabemos que todas as coisas juntamente contribuem para o bem daqueles que amam a Deus, dos que são chamados segundo o seu propósito."]]},{"nome": "Fé","versos": [["Hebreus",11,1,"Ora, a fé é a certeza das coisas que se esperam, e a prova das coisas que não se veem."],["Hebreus",11,6,"Ora, sem fé é impossível agradar a Deus. Pois é necessário que aquele que se aproxima de Deus creia que ele existe, e que ele é recompensador dos que o buscam."],["Romanos",10,17,"Portanto, a fé vem pelo ouvir, e o ouvir pela palavra de Deus."],["Marcos",11,24,"Portanto eu vos digo que tudo o que pedirdes orando, crede que recebereis, e vós o tereis."],["Efésios",2,8,"Porque pela graça sois salvos, por meio da fé; e isto não vem de vós; é dom de Deus;"],["Mateus",17,20,"E Jesus lhes respondeu: Por causa da vossa incredulidade; pois em verdade vos digo, que se tivésseis fé como um grão de mostarda, diríeis a este monte: “Passa-te daqui para lá”, E ele passaria. E nada vos seria impossível."]]},{"nome": "Amor","versos": [["João",3,16,"Porque Deus amou ao mundo de tal maneira, que deu o seu Filho unigênito; para que todo aquele que nele crê não pereça, mas tenha a vida eterna."],["1 Coríntios",13,4,"O amor é paciente, é bondoso; o amor não é invejoso; o amor não é orgulhoso, não é arrogante."],["1 Coríntios",13,13,"E agora continuam a fé, a esperança, e o amor, estes três; porém o maior destes é o amor."],["1 João",4,8,"Aquele que não ama não conhece a Deus, porque Deus é amor."],["Romanos",8,39,"nem altura, nem profundeza, nem qualquer outra criatura poderá nos separar do amor de Deus, que está em Cristo Jesus, nosso Senhor."],["João",15,13,"Ninguém tem maior amor que este: que alguém ponha sua vida por seus amigos."]]},{"nome": "Perdão","versos": [["Efésios",4,32,"Em vez disso, sede benignos uns com os outros, misericordiosos, perdoando-vos uns aos outros, como também Deus vos perdoou em Cristo."],["Colossenses",3,13,"Suportai-vos uns aos outros, e perdoai-vos uns aos outros, se alguém tiver queixa contra outro. Como Cristo vos perdoou, assim também fazei."],["1 João",1,9,"Se confessarmos nossos pecados, ele é fiel e justo para nos perdoar os pecados e nos purificar de toda injustiça."],["Mateus",6,14,"Porque se perdoardes às pessoas suas ofensas, vosso Pai celestial também vos perdoará;"],["Salmos",103,12,"Assim como o oriente está longe do ocidente, assim também ele tira para longe de nós nossas transgressões."],["Isaías",1,18,"Vinde, então, e façamos as contas, diz o SENHOR: ainda que vossos pecados sejam como a escarlate, eles ficarão brancos como a neve; ainda que sejam vermelhos como o carmesim, eles se tornarão como a lã."]]},{"nome": "Paz","versos": [["João",14,27,"A paz vos deixo, minha paz vos dou; vou dá-la a vós, não como o mundo a dá. Não se perturbe vosso coração, nem se atemorize."],["Isaías",26,3,"Tu guardarás em completa paz aquele que tem firme entendimento, pois ele confia em ti."],["Romanos",5,1,"Portanto, agora que somos justificados pela fé, temos paz com Deus por meio do nosso Senhor Jesus Cristo."],["Salmos",4,8,"Eu deitarei, e dormirei em paz; porque só tu, SENHOR, me fazes descansar seguro."],["Mateus",5,9,"Benditos são os pacíficos, porque eles serão chamados filhos de Deus."],["Números",6,26,"O SENHOR levante a ti seu rosto, e ponha em ti paz."]]},{"nome": "Gratidão","versos": [["1 Tessalonicenses",5,18,"Agradecei em tudo, pois essa é a vontade de Deus em Cristo Jesus para vós mesmos."],["Salmos",100,4,"Entrai pelas portas dele com agradecimento, por seus pátios com canto de louvor; agradecei a ele, e bendizei o seu nome."],["Salmos",107,1,"Agradecei ao SENHOR, porque ele é bom; porque sua bondade dura para sempre."],["Colossenses",3,17,"E tudo quanto fizerdes, por palavras ou por obras, fazei tudo no nome do Senhor Jesus, dando por meio dele graças ao Deus e Pai."],["Salmos",118,24,"Este é o dia em que o SENHOR agiu; alegremos e enchamos de alegria nele."],["Tiago",1,17,"Toda boa dádiva e todo dom perfeito vem do alto, e desce do Pai das luzes, em quem não há mudança nem sombra de variação."]]},{"nome": "Cura","versos": [["Jeremias",17,14,"Sara-me, ó SENHOR, e serei sarado; salva-me, e serei salvo; pois tu és meu louvor."],["Salmos",147,3,"Ele sara aos de coração partido, e os cura de suas dores."],["Isaías",53,5,"Porém ele foi ferido por nossas transgressões, e esmagado por nossas perversidades; o castigo que nos traz a paz estava sobre ele, e por suas feridas fomos curados."],["Tiago",5,15,"E a oração da fé sarará o doente, e o Senhor o levantará; e se houver cometido pecados, lhe serão perdoados."],["Êxodo",15,26,"E disse: Se ouvires atentamente a voz do SENHOR teu Deus, e fizeres o correto diante de seus olhos, e deres ouvido a seus mandamentos, e guardares todos os seus estatutos, nenhuma enfermidade das que enviei aos egípcios te enviarei a ti; porque eu sou o SENHOR que te sara."],["Salmos",103,3,"Que perdoa todas as tuas perversidades, e te sara de todas as tuas enfermidades."]]},{"nome": "Raiva","versos": [["Tiago",1,19,"Portanto, meus amados irmãos, toda pessoa seja pronta para ouvir, tardia para falar, tardia para se irar;"],["Efésios",4,26,"Quando irardes, não pequeis; o sol não se ponha sobre a vossa ira;"],["Provérbios",15,1,"A resposta suave desvia o furor, mas a palavra pesada faz a ira aumentar."],["Provérbios",16,32,"Melhor é o que demora para se irritar do que o valente; e melhor é aquele que domina seu espírito do que aquele que toma uma cidade."],["Colossenses",3,8,"Mas agora, abandonai, vós também, todas estas coisas: a ira, a fúria, a malícia, a maledicência, e as palavras vergonhosas da vossa boca."],["Salmos",37,8,"Detém a ira, abandona o furor; não te irrites de maneira alguma para fazer o mal."]]},{"nome": "Casamento","versos": [["Gênesis",2,24,"Portanto, deixará o homem a seu pai e a sua mãe, e se achegará à sua mulher, e serão uma só carne."],["Eclesiastes",4,12,"E se alguém prevalecer contra um, dois podem resistir contra ele; porque o cordão de três dobras não se rompe tão depressa."],["Efésios",5,25,"Maridos, amai as vossas próprias esposas, assim como também Cristo amou a Igreja, e se entregou por ela;"],["Colossenses",3,14,"E acima de tudo isto, revesti-vos do amor, que é o vínculo da perfeição."],["1 Pedro",4,8,"Mas, acima de tudo, tende fervoroso amor uns para com os outros; porque o amor cobrirá uma multidão de pecados."],["Marcos",10,9,"Portanto, o que Deus juntou, não separe o homem."]]}];
+  let versoAlvoLeitor = null;
+  function focarVersoAlvo(){
+    const n = versoAlvoLeitor; versoAlvoLeitor = null;
+    if (!n) return;
+    const el = document.querySelector(`#readerText .verse[data-verse="${n}"]`);
+    if (!el) return;
+    el.classList.add("alvo");
+    setTimeout(() => el.scrollIntoView({ block: "center" }), 60);
+  }
+  function renderTemas(){
+    const grade = document.getElementById("temasGrade");
+    if (!grade) return;
+    grade.innerHTML = TEMAS.map((t, i) => `<button type="button" class="temaBtn" data-tema="${i}">${escapeHtml(t.nome)}<small>${t.versos.length} versículos</small></button>`).join("");
+    grade.querySelectorAll(".temaBtn").forEach(b => b.addEventListener("click", () => abrirTema(Number(b.dataset.tema))));
+  }
+  function abrirTema(i){
+    const t = TEMAS[i];
+    if (!t) return;
+    document.getElementById("temasNome").textContent = t.nome;
+    const itens = document.getElementById("temasItens");
+    itens.innerHTML = t.versos.map(([livro, cap, v, txt]) =>
+      `<button type="button" class="temaVerso" data-livro="${escapeHtml(livro)}" data-cap="${cap}" data-v="${v}"><b>${escapeHtml(livro)} ${cap}:${v}</b><span>${escapeHtml(txt)}</span></button>`).join("");
+    itens.querySelectorAll(".temaVerso").forEach(b => b.addEventListener("click", () => {
+      versoAlvoLeitor = Number(b.dataset.v);
+      openBibleReader(b.dataset.livro, Number(b.dataset.cap), null);
+    }));
+    document.getElementById("temasLista").hidden = true;
+    document.getElementById("temasVersos").hidden = false;
+    document.querySelector('[data-panel="Temas"]')?.scrollTo({ top: 0 });
+  }
+  document.getElementById("temasVoltar")?.addEventListener("click", () => {
+    document.getElementById("temasVersos").hidden = true;
+    document.getElementById("temasLista").hidden = false;
+  });
+  renderTemas();
 
   // ── Ouvir o capítulo (voz do próprio aparelho: Web Speech API) ──
   // Lê versículo por versículo: assim dá para marcar o que está sendo lido e
