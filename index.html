@@ -5368,7 +5368,10 @@ function closeReader(){
 
   const firebaseConfig = {
     apiKey: "AIzaSyABCSNnIVGRqx6nrQw1N3Bz9Iox8ufJd0Y",
-    authDomain: "ler-biblia.firebaseapp.com",
+    // No endereço oficial, o login passa pelo próprio app (/__/auth/, repassado ao Firebase
+    // pelo vercel.json). É o que permite o login no app instalado no iPhone.
+    // Em qualquer outro endereço, segue o login de sempre pelo firebaseapp.com.
+    authDomain: location.hostname === "lerbiblia.vercel.app" ? "lerbiblia.vercel.app" : "ler-biblia.firebaseapp.com",
     projectId: "ler-biblia",
     storageBucket: "ler-biblia.firebasestorage.app",
     messagingSenderId: "108213408345",
@@ -5530,10 +5533,22 @@ function closeReader(){
     }
   }
 
+  // App instalado no iPhone: a janela de login não consegue devolver o resultado ao app,
+  // então lá o login vai e volta na mesma tela (redirecionamento).
+  const appIphone = window.navigator.standalone === true && location.hostname === "lerbiblia.vercel.app";
+  if (appIphone){
+    // volta do login: se o Google ou o Firebase recusaram, a mensagem aparece na tela
+    fb.getRedirectResult(auth).catch((e) => {
+      estadoChip("warn", "☁ Entrar para sincronizar");
+      mostrarErro("Não consegui concluir o login com o Google (" + (e.code || e.message) + ").");
+    });
+  }
+
   async function entrar(){
     limparErro();
     estadoChip("", "Abrindo login…");
     try {
+      if (appIphone){ await fb.signInWithRedirect(auth, provider); return; }
       await fb.signInWithPopup(auth, provider);
     } catch (e) {
       const codigo = e.code || "";
