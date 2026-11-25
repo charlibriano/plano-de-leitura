@@ -1148,6 +1148,11 @@
        Inspirado no bible.com. Só vale até 520px; o computador
        continua com o layout anterior até a etapa 4.
        ══════════════════════════════════════════════════════════ */
+    .fimCap{display:flex;flex-direction:column;gap:8px;margin:26px auto 0;max-width:34rem}
+    .fimCapInfo{font-size:12.5px;color:var(--green);font-family:var(--ui);text-align:center}
+    .fimCapBtn{height:48px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:14.5px;font-weight:600;cursor:pointer;padding:0 16px}
+    .fimCapBtn:hover,.fimCapBtn:focus{background:var(--surface-2);color:var(--ink);border-color:var(--ink-3)}
+    .fimCapBtn.principal,.fimCapBtn.principal:hover,.fimCapBtn.principal:focus{background:var(--ink);color:var(--paper);border-color:var(--ink)}
     .bibliaCredito{margin:22px 0 4px;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;line-height:1.5;color:var(--ink-3);font-family:var(--ui)}
     .bibliaCredito a{color:var(--ink-2)}
     /* ── Escolha de como começar o plano (aparece uma vez) ── */
@@ -2681,8 +2686,11 @@ function updateLateUI(state){
     const pack = state.guided?.[key]?.catchUpPack;
     const temPacote = Array.isArray(pack) && pack.length;
     const listaDia = temPacote ? pack : (p.guidedList || []);
-    const comecou = Number.isFinite(state.guided?.[key]?.idx);
+    const lidosHoje = capsLidos(state, key);
+    const comecou = Number.isFinite(state.guided?.[key]?.idx) || lidosHoje.size > 0;
     const idx = Math.max(0, Math.min(getGuidedIndex(state, key), Math.max(0, listaDia.length - 1)));
+    // próxima leitura: a 1ª ainda não marcada como lida (no pacote de atraso, segue o índice de sempre)
+    const proxNaoLida = temPacote ? idx : Math.max(0, listaDia.findIndex(it => !lidosHoje.has(refCap(it))));
 
     // uma linha por trilha do dia (História, Evangelho, Salmos…)
     let html = "";
@@ -2697,8 +2705,8 @@ function updateLateUI(state){
       if (!b.list?.length) return;
       const ini = (p.guidedList || []).findIndex(x => x.book === b.list[0].book && x.chapter === b.list[0].chapter);
       const fim = ini + b.list.length - 1;
-      const lido = done || (!temPacote && comecou && idx > fim);
-      const atual = !done && !temPacote && comecou && idx >= ini && idx <= fim;
+      const lido = done || b.list.every(it => lidosHoje.has(refCap(it)));
+      const atual = !done && !lido && !temPacote && comecou && proxNaoLida >= ini && proxNaoLida <= fim;
       const nCap = b.list.length > 1 ? ` · ${b.list.length} capítulos` : "";
       html += `<button type="button" class="hojeItem${lido ? " lido" : ""}${atual ? " atual" : ""}" data-idx="${Math.max(0, ini)}">
         <span class="hojeCheck">${SVG_CHECK}</span>
@@ -2728,9 +2736,9 @@ function updateLateUI(state){
       cta.textContent = "Começar a leitura";
       hojeAcaoCta = () => openGuidedAtIndex(0);
     } else {
-      const cur = listaDia[idx];
+      const cur = listaDia[proxNaoLida];
       cta.textContent = `Continuar: ${cur.book} ${cur.chapter}`;
-      hojeAcaoCta = () => openGuidedAtIndex(idx);
+      hojeAcaoCta = () => openGuidedAtIndex(proxNaoLida);
     }
 
     // ações secundárias, discretas
@@ -2869,7 +2877,8 @@ function updateLateUI(state){
     document.getElementById("planoSelLeit").textContent = (p.blocks || []).filter(b => !b.concluida).map(b => b.text).filter(t => t && t !== "—").join(" · ") || "—";
     const lidoSel = !!state.days?.[sel]?.done;
     const statusEl = document.getElementById("planoSelStatus");
-    statusEl.textContent = lidoSel ? "Lido" : (sel < todayKey ? "Pendente" : (sel === todayKey ? "Para hoje" : "Em breve"));
+    const nCaps = (p.guidedList || []).length, nLidos = (p.guidedList || []).filter(it => capsLidos(state, sel).has(refCap(it))).length;
+    statusEl.textContent = lidoSel ? "Lido" : (nLidos > 0 ? `${nLidos} de ${nCaps} lidos` : (sel < todayKey ? "Pendente" : (sel === todayKey ? "Para hoje" : "Em breve")));
     statusEl.className = lidoSel ? "ok" : (sel < todayKey ? "atr" : "");
     const marcar = document.getElementById("planoSelMarcar");
     marcar.textContent = lidoSel ? "Desmarcar" : "Marcar lido";
@@ -2877,6 +2886,7 @@ function updateLateUI(state){
       const st = ensureStateDefaults(loadState());
       st.days[sel] = st.days[sel] || {};
       st.days[sel].done = !lidoSel;
+      if (lidoSel) delete st.days[sel].lidos;   // desmarcar o dia desmarca os capítulos também
       saveState(st);
       renderAll();
     };
@@ -3871,7 +3881,8 @@ b.addEventListener("click", ()=>{
               const n = v.verse ?? v.verse_id ?? v.number ?? "";
               const t = v.text ?? v.t ?? "";
               return `<p class="verse" data-verse="${n}"><b>${n}</b> ${escapeHtml(String(t))}</p>`;
-            }).join("") + `<p class="bibliaCredito">Texto: Bíblia Livre (BLIVRE), © Diego Santos, Mario Sérgio e Marco Teles · Licença Creative Commons Atribuição 4.0 Brasil · <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noopener">site da Bíblia Livre</a></p>`;
+            }).join("") + fimDoCapituloHtml(ctx, book, chapter) + `<p class="bibliaCredito">Texto: Bíblia Livre (BLIVRE), © Diego Santos, Mario Sérgio e Marco Teles · Licença Creative Commons Atribuição 4.0 Brasil · <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noopener">site da Bíblia Livre</a></p>`;
+ligarFimDoCapitulo(ctx, book, chapter);
 const keyRef = `${book}|${chapter}|${translationId}`;
             const st2 = ensureStateDefaults(loadState());
             st2.reader = st2.reader || {};
@@ -4027,6 +4038,76 @@ const keyRef = `${book}|${chapter}|${translationId}`;
         errEl.style.display = "block";
         errEl.textContent = `Erro ao carregar o texto.\n\nDetalhe: ${String(e)}\nURL: ${url}\n\nUse “Abrir externo”.`;
       });
+  }
+
+
+  // ── Capítulos lidos, um a um ─────────────────────────────────
+  // Cada dia guarda os capítulos já lidos em state.days[data].lidos ("Atos 6", …).
+  // Quando todos os capítulos do dia estão lidos, o dia fica concluído sozinho.
+  function refCap(it){ return `${it.book} ${it.chapter}`; }
+  function capsLidos(st, k){ return new Set(st.days?.[k]?.lidos || []); }
+
+  // A lista aberta no leitor é a leitura de um dia ou o pacote de atraso?
+  function diaDaLista(st, ctx){
+    if (!ctx?.dateKey || !Array.isArray(ctx.list)) return null;
+    const p = buildPlanForYear(st)[ctx.dateKey];
+    const doDia = (p?.guidedList || []).map(refCap).join("|");
+    return ctx.list.map(refCap).join("|") === doDia ? ctx.dateKey : null;
+  }
+
+  function marcarCapituloLido(ctx, item){
+    const st = ensureStateDefaults(loadState());
+    const plan = buildPlanForYear(st);
+    const ref = refCap(item);
+    // leitura do dia: marca naquele dia. Pacote de atraso: no dia atrasado mais antigo que tem esse capítulo
+    let k = diaDaLista(st, ctx);
+    if (!k){
+      const hoje = todayKeyNow();
+      k = Object.keys(plan).sort().find(d => d <= hoje && !st.days?.[d]?.done
+            && (plan[d].guidedList || []).some(x => refCap(x) === ref) && !capsLidos(st, d).has(ref)) || null;
+    }
+    if (!k) return;
+    st.days[k] = st.days[k] || {};
+    const lidos = capsLidos(st, k); lidos.add(ref);
+    st.days[k].lidos = [...lidos];
+    const todos = (plan[k].guidedList || []).map(refCap);
+    if (todos.length && todos.every(r => lidos.has(r))) st.days[k].done = true;
+    saveState(st);
+  }
+
+  function fimDoCapituloHtml(ctx, book, chapter){
+    if (!ctx || !Array.isArray(ctx.list) || !ctx.list.length) return "";
+    const i = Number(ctx.idx || 0);
+    const prox = ctx.list[i + 1];
+    const st = ensureStateDefaults(loadState());
+    const ehDia = !!diaDaLista(st, ctx);
+    const jaLido = ehDia && capsLidos(st, ctx.dateKey).has(`${book} ${chapter}`);
+    const principal = prox
+      ? `✓ Lido · próximo: ${escapeHtml(prox.book)} ${prox.chapter}`
+      : (ehDia ? "✓ Lido · concluir o dia" : "✓ Lido · fim do pacote");
+    return `<div class="fimCap">
+      ${jaLido ? `<span class="fimCapInfo">Este capítulo já está marcado como lido.</span>` : ""}
+      <button type="button" class="fimCapBtn principal" id="fimCapProx">${principal}</button>
+      <button type="button" class="fimCapBtn" id="fimCapFechar">✓ Lido · fechar</button>
+    </div>`;
+  }
+
+  function ligarFimDoCapitulo(ctx, book, chapter){
+    const bProx = document.getElementById("fimCapProx");
+    const bFechar = document.getElementById("fimCapFechar");
+    if (!bProx || !ctx) return;
+    const i = Number(ctx.idx || 0);
+    const item = ctx.list[i] || { book, chapter };
+    bProx.onclick = () => {
+      marcarCapituloLido(ctx, item);
+      if (ctx.list[i + 1]){ goPlanDelta(1); return; }
+      // último capítulo: conclui o dia (como o "Concluir dia" de cima) e volta
+      const st = ensureStateDefaults(loadState());
+      const k = diaDaLista(st, ctx);
+      if (k){ st.days[k] = st.days[k] || {}; st.days[k].done = true; saveState(st); }
+      closeReader(); renderAll();
+    };
+    bFechar.onclick = () => { marcarCapituloLido(ctx, item); closeReader(); renderAll(); };
   }
 
   function updatePlanNavButtons(){
@@ -4385,6 +4466,8 @@ function closeReader(){
     for (const [k, l] of Object.entries(local.days || {})){
       const r = out.days[k] || {};
       out.days[k] = { ...r, ...l, done: !!(l.done || r.done), note: (l.note || r.note || "") };
+      const lidos = [...new Set([...(r.lidos || []), ...(l.lidos || [])])];
+      if (lidos.length) out.days[k].lidos = lidos;
     }
     out.guided = { ...(nuvem.guided || {}), ...(local.guided || {}) };
     // A data de início é da CONTA (dia do 1º login), nunca a do aparelho
