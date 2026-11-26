@@ -1319,6 +1319,11 @@
       .hojeLink{border:0;background:transparent;padding:6px 8px;min-height:34px;font-family:var(--ui);font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;border-radius:999px}
       .hojeLink.atraso{color:var(--gold);background:var(--gold-soft)}
       .hojeRodape{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;color:var(--ink-2);text-align:center}
+      .semana{display:inline-flex;gap:3px;flex:none;margin-right:4px}
+      .semana i{width:7px;height:7px;border-radius:999px;background:var(--line-strong);display:block}
+      .semana i.lido{background:var(--green)}
+      .semana i.hoje{box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--ink-3)}
+      .semana i.hoje.lido{box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--green)}
 
       /* barra de abas */
       .tabBar{
@@ -1449,7 +1454,8 @@
     .bibBuscaMsg{position:absolute;left:8px;right:8px;top:38px;z-index:5;padding:6px 10px;border-radius:10px;background:#B8452F;color:#fff;font-family:var(--ui);font-size:12.5px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
     .bibBuscaMsg[hidden]{display:none}
     .bibSeg{display:grid;grid-template-columns:1fr 1fr;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px;margin-bottom:8px}
-    .bibSeg button{height:32px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer}
+    .bibSeg button{min-height:32px;padding:3px 2px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.15}
+    .bibSeg button u{font-size:10.5px;font-weight:600;text-decoration:none;opacity:.72;font-variant-numeric:tabular-nums}
     .bibSeg button:hover,.bibSeg button:focus{background:transparent;color:var(--ink-2)}
     .bibSeg button.on,.bibSeg button.on:hover{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
     /* livros como "tabela periódica": cor por grupo, sigla grande, nome pequeno e nº de capítulos */
@@ -1462,6 +1468,9 @@
     .bibLivro b{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1}
     .bibLivro small{font-size:8.5px;font-weight:500;opacity:.92;max-width:96%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .bibLivro em{position:absolute;top:3px;right:5px;font-style:normal;font-size:8.5px;font-weight:600;opacity:.8}
+    .bibLivro em.ok{opacity:1;font-size:10px;line-height:1}
+    /* barra de progresso do livro: quanto dele já foi lido */
+    .bibLivro i{position:absolute;left:0;right:0;bottom:0;height:4px;border-radius:0 0 9px 9px;background:linear-gradient(to right,rgba(255,255,255,.95) var(--p),rgba(0,0,0,.26) var(--p))}
     .bibLivro.atual{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ink)}
     .bibInteiro{width:100%;height:40px;margin-bottom:8px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font-family:var(--ui);font-size:14px;font-weight:600;cursor:pointer}
     .bibInteiro:hover,.bibInteiro:focus{background:var(--ink);color:var(--paper)}
@@ -1473,6 +1482,9 @@
     .bibCap{height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:14px;font-weight:600;cursor:pointer;padding:0;min-width:0}
     .bibCap:hover,.bibCap:focus{background:var(--surface);color:var(--ink);border-color:var(--ink-3)}
     .bibCap.atual{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    /* capítulo já lido */
+    .bibCap.lido{background:var(--green-soft);border-color:var(--green);color:var(--ink)}
+    .bibCap.lido.atual{background:var(--ink);color:var(--paper);border-color:var(--ink)}
     @media (min-width:521px){
       .bibM{max-width:760px;margin:0 auto}
       .bibGrade{grid-template-columns:repeat(9,minmax(0,1fr));gap:6px}
@@ -2024,7 +2036,7 @@
       <div class="planoM" id="planoM">
         <div class="planoTiles">
           <div class="planoTile"><b id="planoLidos">0<small>/365</small></b><span id="planoDatas">Dias lidos</span></div>
-          <div class="planoTile"><b id="planoSeq">0</b><span>Seguidos</span></div>
+          <div class="planoTile"><b id="planoSeq">0</b><span id="planoSeqSub">Seguidos</span></div>
           <div class="planoTile"><b id="planoAtraso">Em dia</b><span id="planoAtrasoSub">Atraso</span></div>
         </div>
         <section class="planoLamp lampKpi" id="mLamp" aria-label="Lâmpada para os meus pés">
@@ -2640,6 +2652,31 @@
       plan[ymd(d)] = { active:true, blocks: dia.blocks, guidedList: dia.guidedList };
     }
     return plan;
+  }
+
+  // Melhor sequência já feita (recorde) e os últimos 7 dias, para a faixa do Hoje.
+  function melhorSequencia(state){
+    const chaves = Object.keys(state.days || {}).filter(k => state.days[k]?.done).sort();
+    let melhor = 0, atual = 0, ant = null;
+    for (const k of chaves){
+      const d = parseYMD(k);
+      if (!d) continue;
+      if (ant && Math.round((d - ant) / 86400000) === 1) atual++; else atual = 1;
+      if (atual > melhor) melhor = atual;
+      ant = d;
+    }
+    return melhor;
+  }
+  function ultimos7(state, today){
+    const out = [];
+    for (let i = 6; i >= 0; i--){
+      const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+      out.push({ lido: !!state.days?.[ymd(d)]?.done, hoje: i === 0 });
+    }
+    return out;
+  }
+  function semanaHtml(state, today){
+    return `<span class="semana" aria-hidden="true">${ultimos7(state, today).map(d => `<i class="${d.lido ? "lido" : ""}${d.hoje ? " hoje" : ""}"></i>`).join("")}</span>`;
   }
 
   function calcStreak(state, today){
@@ -3447,9 +3484,14 @@ function updateLateUI(state){
     });
 
     const streak = calcStreak(state, today);
-    rodape.textContent = done
-      ? (streak > 1 ? `Leitura de hoje feita · ${streak} dias seguidos` : "Leitura de hoje feita · bom começo")
+    const recorde = melhorSequencia(state);
+    const texto = done
+      ? (streak > 1 ? `${streak} dias seguidos` : "Leitura de hoje feita · bom começo")
       : (streak > 0 ? `${streak} ${streak === 1 ? "dia seguido" : "dias seguidos"} — leia hoje para manter a chama` : "Leia hoje para acender a lâmpada");
+    // recorde só aparece quando já houve uma sequência melhor que a de agora
+    // o recorde só entra quando há sequência viva: sem ela o texto é o convite, que já é longo
+    const extra = streak > 0 && recorde > streak && recorde > 1 ? ` · recorde ${recorde}` : "";
+    rodape.innerHTML = `${semanaHtml(state, today)}<span>${escapeHtml(texto + extra)}</span>`;
   }
 
   document.getElementById("hojeCta")?.addEventListener("click", () => { if (hojeAcaoCta) hojeAcaoCta(); });
@@ -3644,6 +3686,8 @@ function updateLateUI(state){
     document.getElementById("planoLidos").innerHTML = `${lidos}<small>/${total}</small>`;
     const streak = calcStreak(state, today);
     document.getElementById("planoSeq").innerHTML = `${streak} <small>${streak === 1 ? "dia" : "dias"}</small>`;
+    const recordeP = melhorSequencia(state);
+    document.getElementById("planoSeqSub").textContent = recordeP > streak && recordeP > 1 ? `Recorde: ${recordeP}` : "Seguidos";
     const late = getLateDays(state);
     document.getElementById("planoAtraso").textContent = late > 0 ? `${late} ${late === 1 ? "dia" : "dias"}` : "Em dia";
     document.getElementById("planoAtrasoSub").textContent = "Atraso";
@@ -5550,6 +5594,48 @@ function closeReader(){
     if (idx < 0) return;
     openBibleReader(book, chapter, { livre: true, idx, list: TODOS_CAPS });
   }
+  // ── Mapa de leitura: quais capítulos já foram lidos, livro a livro ──
+  // Vem do plano do ano (dias concluídos e capítulos marcados um a um) e dos planos extras.
+  function partirRef(ref){
+    const i = String(ref).lastIndexOf(" ");
+    if (i < 0) return null;
+    return { book: ref.slice(0, i), chapter: Number(ref.slice(i + 1)) };
+  }
+  let mapaCache = null;
+  function mapaLeitura(st){
+    const assin = JSON.stringify([Object.entries(st.days || {}).map(([k, d]) => [k, !!d.done, (d.lidos || []).length]), (st.planosExtras || []).map(p => [p.id, (p.lidos || []).length, !!p.apagado]), st.planMode, st.version, st.planStart, st.planAncora]);
+    if (mapaCache && mapaCache.assin === assin) return mapaCache;
+    const porLivro = new Map();
+    const juntarRef = ref => {
+      const r = partirRef(ref);
+      if (!r || !r.chapter) return;
+      if (!porLivro.has(r.book)) porLivro.set(r.book, new Set());
+      porLivro.get(r.book).add(r.chapter);
+    };
+    try {
+      const plano = buildPlanForYear(st);
+      for (const [k, d] of Object.entries(st.days || {})){
+        if (d?.done) for (const it of (plano[k]?.guidedList || [])) juntarRef(refCap(it));
+        for (const ref of (d?.lidos || [])) juntarRef(ref);
+      }
+    } catch(e){}
+    for (const pl of (st.planosExtras || [])) if (!pl?.apagado) for (const ref of (pl.lidos || [])) juntarRef(ref);
+    mapaCache = { assin, porLivro };
+    return mapaCache;
+  }
+  function contarTestamento(mapa, lista){
+    let lidos = 0, total = 0, completos = 0;
+    for (const [b, n] of lista){
+      total += n;
+      const s = mapa.porLivro.get(b);
+      let q = 0;
+      if (s) for (const c of s) if (c >= 1 && c <= n) q++;
+      lidos += q;
+      if (q >= n) completos++;
+    }
+    return { lidos, total, completos, pct: total ? Math.round(lidos * 100 / total) : 0 };
+  }
+
   function renderBiblia(){
     const st = ensureStateDefaults(loadState());
     const ult = st.reader?.ultimoLivre;
@@ -5558,10 +5644,24 @@ function closeReader(){
     cont.hidden = !ult || document.getElementById("bibLivrosView").hidden;
     if (ult) document.getElementById("bibContinuarRef").textContent = `${ult.book} ${ult.chapter}`;
     document.querySelectorAll(".bibSeg button").forEach(b => b.classList.toggle("on", b.dataset.t === bibTestamento));
+    const mapa = mapaLeitura(st);
+    document.querySelectorAll(".bibSeg button").forEach(b => {
+      const c = contarTestamento(mapa, b.dataset.t === "at" ? OT_ALL : NT_ALL);
+      const u = b.querySelector("u") || b.appendChild(document.createElement("u"));
+      u.textContent = c.lidos ? `${c.lidos} de ${c.total} lidos · ${c.pct}%` : `${c.total} capítulos`;
+      b.title = c.lidos ? `${c.completos} livro(s) completo(s)` : "";
+    });
     const livros = bibTestamento === "at" ? OT_ALL : NT_ALL;
     document.getElementById("bibLegenda").innerHTML = GRUPOS[bibTestamento].map(([nome, cor]) => `<span><i style="background:${cor}"></i>${escapeHtml(nome)}</span>`).join("");
     const grade = document.getElementById("bibGrade");
-    grade.innerHTML = livros.map(([b, n]) => `<button type="button" class="bibLivro${ult?.book === b ? " atual" : ""}" data-livro="${escapeHtml(b)}" title="${escapeHtml(b)} · ${n} ${n === 1 ? "capítulo" : "capítulos"}" style="background:${grupoDoLivro(b)[1]}"><em>${n}</em><b>${escapeHtml(SIGLAS[b] || b)}</b><small>${escapeHtml(b)}</small></button>`).join("");
+    grade.innerHTML = livros.map(([b, n]) => {
+      const s = mapa.porLivro.get(b);
+      let q = 0;
+      if (s) for (const c of s) if (c >= 1 && c <= n) q++;
+      const pct = Math.min(100, Math.round(q * 100 / n));
+      const dica = `${b} · ${n} ${n === 1 ? "capítulo" : "capítulos"}${q ? ` · ${q} lido(s)` : ""}`;
+      return `<button type="button" class="bibLivro${ult?.book === b ? " atual" : ""}" data-livro="${escapeHtml(b)}" title="${escapeHtml(dica)}" style="background:${grupoDoLivro(b)[1]}"><em${q >= n ? ' class="ok"' : ""}>${q >= n ? "✓" : n}</em><b>${escapeHtml(SIGLAS[b] || b)}</b><small>${escapeHtml(b)}</small>${q ? `<i style="--p:${pct}%"></i>` : ""}</button>`;
+    }).join("");
     grade.querySelectorAll(".bibLivro").forEach(el => el.addEventListener("click", () => abrirLivroBiblia(el.dataset.livro)));
   }
   function abrirLivroBiblia(livro, pagina){
@@ -5583,7 +5683,8 @@ function closeReader(){
     const caps = document.getElementById("bibCaps");
     const ini = pagina * POR + 1, fim = Math.min(n, (pagina + 1) * POR);
     let html = "";
-    for (let c = ini; c <= fim; c++) html += `<button type="button" class="bibCap${ult?.book === livro && ult.chapter === c ? " atual" : ""}" data-c="${c}">${c}</button>`;
+    const jaLidos = mapaLeitura(st).porLivro.get(livro) || new Set();
+    for (let c = ini; c <= fim; c++) html += `<button type="button" class="bibCap${jaLidos.has(c) ? " lido" : ""}${ult?.book === livro && ult.chapter === c ? " atual" : ""}" data-c="${c}" title="${jaLidos.has(c) ? "já lido" : ""}">${c}</button>`;
     caps.innerHTML = html;
     caps.querySelectorAll(".bibCap").forEach(b => b.addEventListener("click", () => abrirVersosBiblia(livro, Number(b.dataset.c))));
     document.getElementById("bibLivrosView").hidden = true;
