@@ -1075,6 +1075,7 @@
       .grid > [data-panel="Progresso"]{order:2}
       .grid > [data-panel="Calendario"]{order:3}
       .grid > [data-panel="Devocionais"]{order:4}
+      .grid > [data-panel="Biblia"]{order:3}
       .grid > [data-panel="Temas"]{order:4}
       .grid > [data-panel="Ajustes"]{order:5}
       .grid > .manualCard{display:none}
@@ -1299,7 +1300,7 @@
 
       /* barra de abas */
       .tabBar{
-        display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+        display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
         position:fixed;left:0;right:0;bottom:0;z-index:999;
         background:var(--surface);border-top:1px solid var(--line);
         padding:6px 6px calc(8px + env(safe-area-inset-bottom));
@@ -1407,6 +1408,40 @@
       .extraM{max-width:620px;margin:0 auto}
     }
 
+    /* ── aba Bíblia: leitura livre ── */
+    .grid > [data-panel="Biblia"]{background:transparent;border:0;box-shadow:none;padding:0 2px}
+    .bibM{display:flex;flex-direction:column;gap:8px}
+    .bibM [hidden]{display:none !important}
+    .bibContinuar{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:4px 14px;border-radius:14px;border:0;background:var(--ink);color:var(--paper);font-family:var(--ui);font-size:13px;cursor:pointer;text-align:left}
+    .bibContinuar:hover,.bibContinuar:focus{background:var(--ink);color:var(--paper)}
+    .bibContinuar span{opacity:.75}
+    .bibContinuar b{flex:1;font-family:var(--serif);font-size:16px;font-weight:600}
+    .bibSeg{display:grid;grid-template-columns:1fr 1fr;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px;margin-bottom:8px}
+    .bibSeg button{height:32px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer}
+    .bibSeg button:hover,.bibSeg button:focus{background:transparent;color:var(--ink-2)}
+    .bibSeg button.on,.bibSeg button.on:hover{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+    .bibGrade{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+    .bibLivro{height:32px;padding:0 3px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:12px;letter-spacing:-.1px;font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+    .bibLivro:hover,.bibLivro:focus{background:var(--surface);color:var(--ink);border-color:var(--ink-3)}
+    .bibLivro .longo{display:none}
+    .bibLivro.atual{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+    .bibPag{display:flex;gap:6px;margin-bottom:8px}
+    .bibPag button{flex:1;height:30px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);font-family:var(--ui);font-size:12.5px;font-weight:600;cursor:pointer}
+    .bibPag button:hover,.bibPag button:focus{background:var(--surface);color:var(--ink-2)}
+    .bibPag button.on,.bibPag button.on:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .bibCaps{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+    .bibCap{height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:14px;font-weight:600;cursor:pointer;padding:0;min-width:0}
+    .bibCap:hover,.bibCap:focus{background:var(--surface);color:var(--ink);border-color:var(--ink-3)}
+    .bibCap.atual{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    @media (min-width:521px){
+      .bibM{max-width:760px;margin:0 auto}
+      .bibGrade{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+      .bibLivro{height:40px;font-size:13px;padding:0 2px}
+      .bibCaps{grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}
+      .bibCap{height:44px}
+    }
+    @media (min-width:861px){ .bibLivro .longo{display:inline} .bibLivro .curto{display:none} }
+
     /* ── aba Temas: versículos por tema ── */
     .grid > [data-panel="Temas"]{background:transparent;border:0;box-shadow:none;padding:0 2px}
     .temasM{display:flex;flex-direction:column}
@@ -1506,7 +1541,8 @@
       body[data-aba="Hoje"] .grid > [data-panel="Hoje"],
       body[data-aba="Progresso"] .grid > [data-panel="Progresso"],
       body[data-aba="Ajustes"] .grid > [data-panel="Ajustes"],
-      body[data-aba="Temas"] .grid > [data-panel="Temas"]{display:block}
+      body[data-aba="Temas"] .grid > [data-panel="Temas"],
+      body[data-aba="Biblia"] .grid > [data-panel="Biblia"]{display:block}
       .grid > .manualCard,.grid > [data-panel="Calendario"],.grid > [data-panel="Devocionais"]{display:none !important}
 
       /* abas no topo, entre o nome e a conta */
@@ -1541,6 +1577,13 @@
       /* Ajustes: a lista, centralizada */
       .ajM{max-width:620px;margin:0 auto}
     }
+    /* computador estreito: com 5 abas no topo, o selo da conta usa o texto curto e as abas ficam mais justas */
+    @media (min-width:861px) and (max-width:1199px){
+      #syncChip .longo{display:none}
+      #syncChip .curto{display:inline}
+      .tabBtn{padding:0 12px;gap:6px}
+    }
+    @media (min-width:861px) and (max-width:979px){ .tabBtn svg{display:none} }
     @media (min-width:521px) and (max-width:860px){
       /* tablet: a barra de abas fica embaixo, como no celular */
       .tabBar{position:fixed;top:auto;left:0;right:0;bottom:0;transform:none;border-radius:0;border-width:1px 0 0;justify-content:center;gap:10px;padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
@@ -1747,6 +1790,30 @@
 
 <main>
   <div class="grid">
+    <section class="card" data-panel="Biblia">
+      <div class="bibM" id="bibM">
+        <button type="button" class="bibContinuar" id="bibContinuar" hidden>
+          <span>Continuar lendo</span><b id="bibContinuarRef">—</b>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+        <div id="bibLivrosView">
+          <div class="bibSeg" role="tablist" aria-label="Testamento">
+            <button type="button" role="tab" data-t="at" class="on">Antigo Testamento</button>
+            <button type="button" role="tab" data-t="nt">Novo Testamento</button>
+          </div>
+          <div class="bibGrade" id="bibGrade"></div>
+        </div>
+        <div id="bibCapsView" hidden>
+          <div class="temasTopo">
+            <button type="button" class="temasVoltar" id="bibVoltar" aria-label="Voltar aos livros">‹ Livros</button>
+            <h3 class="temasTit" id="bibLivroNome">—</h3>
+          </div>
+          <div class="bibPag" id="bibPag" hidden></div>
+          <div class="bibCaps" id="bibCaps"></div>
+        </div>
+      </div>
+    </section>
+
     <section class="card" data-panel="Temas">
       <div class="temasM" id="temasM">
         <div class="temasLista" id="temasLista">
@@ -2182,6 +2249,8 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Hoje</button>
   <button type="button" class="tabBtn" data-alvo="Progresso" aria-label="Plano">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Plano</button>
+  <button type="button" class="tabBtn" data-alvo="Biblia" aria-label="Bíblia">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5.5C4.5 4 7.5 4 12 6c4.5-2 7.5-2 10-.5V19c-2.5-1.5-5.5-1.5-10 .5-4.5-2-7.5-2-10-.5z"/><path d="M12 6v13.5"/></svg>Bíblia</button>
   <button type="button" class="tabBtn" data-alvo="Temas" aria-label="Temas">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M9 7h6M9 11h4"/></svg>Temas</button>
   <button type="button" class="tabBtn" data-alvo="Ajustes" aria-label="Ajustes">
@@ -3706,7 +3775,7 @@ function updateLateUI(state){
     const grid = document.querySelector("main .grid");
     const bar = document.getElementById("tabBar");
     if (!grid || !bar) return;
-    const abaDoPainel = { Hoje:"Hoje", Progresso:"Progresso", Calendario:"Progresso", Devocionais:"Devocionais", Temas:"Temas", Ajustes:"Ajustes" };
+    const abaDoPainel = { Hoje:"Hoje", Progresso:"Progresso", Calendario:"Progresso", Devocionais:"Devocionais", Biblia:"Biblia", Temas:"Temas", Ajustes:"Ajustes" };
 
     bar.querySelectorAll(".tabBtn").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -4567,6 +4636,16 @@ b.addEventListener("click", ()=>{
     const refEl = document.getElementById("readerRef");
     const extBtn = document.getElementById("readerExternalBtn");
     const doneBtn = document.getElementById("readerDoneBtn");
+    // leitura livre não é dia do plano: sem "Concluir dia"; e guarda onde parou
+    if (doneBtn) doneBtn.style.display = ctx?.livre ? "none" : "";
+    if (ctx?.livre){
+      try {
+        const stL = ensureStateDefaults(loadState());
+        stL.reader = stL.reader || {};
+        stL.reader.ultimoLivre = { book, chapter };
+        saveState(stL);
+      } catch(e){}
+    }
 
     pararAudio();
     textEl.innerHTML = "";
@@ -4857,6 +4936,11 @@ const keyRef = `${book}|${chapter}|${translationId}`;
 
   function fimDoCapituloHtml(ctx, book, chapter){
     if (!ctx || !Array.isArray(ctx.list) || !ctx.list.length) return "";
+    if (ctx.livre){
+      // leitura livre (aba Bíblia): só segue para o próximo capítulo, sem marcar progresso
+      const prox = ctx.list[Number(ctx.idx || 0) + 1];
+      return prox ? `<div class="fimCap"><button type="button" class="fimCapBtn principal" id="fimCapProx">Próximo: ${escapeHtml(prox.book)} ${prox.chapter} ›</button></div>` : "";
+    }
     const i = Number(ctx.idx || 0);
     const prox = ctx.list[i + 1];
     const st = ensureStateDefaults(loadState());
@@ -4880,6 +4964,7 @@ const keyRef = `${book}|${chapter}|${translationId}`;
     if (!bProx || !ctx) return;
     const i = Number(ctx.idx || 0);
     const item = ctx.list[i] || { book, chapter };
+    if (ctx.livre){ bProx.onclick = () => goPlanDelta(1); return; }
     bProx.onclick = () => {
       marcarCapituloLido(ctx, item);
       if (ctx.list[i + 1]){ goPlanDelta(1); return; }
@@ -4932,6 +5017,14 @@ const keyRef = `${book}|${chapter}|${translationId}`;
 function closeReader(){
     pararAudio();
     // um destaque novo ou removido no leitor já aparece em "Meus destaques"
+    try {
+      renderBiblia();
+      if (!document.getElementById("bibCapsView").hidden){
+        const nome = document.getElementById("bibLivroNome").textContent;
+        const pg = document.querySelector("#bibPag .on");
+        abrirLivroBiblia(nome, pg ? Number(pg.dataset.p) : undefined);
+      }
+    } catch(e){}
     try {
       atualizarResumoDestaques();
       if (document.getElementById("temasNome")?.textContent === "Meus destaques" && !document.getElementById("temasVersos").hidden){
@@ -5337,6 +5430,68 @@ function closeReader(){
       erro.classList.add("on");
     }
   });
+
+  // ── Aba Bíblia: escolher livro e capítulo e ler livremente ──
+  const NOME_CURTO = { "Deuteronômio": "Deuteron.", "1 Tessalonicenses": "1 Tess.", "2 Tessalonicenses": "2 Tess.", "Lamentações": "Lament.", "Eclesiastes": "Eclesiast.", "Colossenses": "Colossens." };
+  const TODOS_CAPS = [...OT_ALL, ...NT_ALL].flatMap(([b, n]) => Array.from({ length: n }, (_, i) => ({ book: b, chapter: i + 1 })));
+  let bibTestamento = "at";
+  function abrirLivre(book, chapter){
+    const idx = TODOS_CAPS.findIndex(it => it.book === book && it.chapter === chapter);
+    if (idx < 0) return;
+    openBibleReader(book, chapter, { livre: true, idx, list: TODOS_CAPS });
+  }
+  function renderBiblia(){
+    const st = ensureStateDefaults(loadState());
+    const ult = st.reader?.ultimoLivre;
+    const cont = document.getElementById("bibContinuar");
+    if (!cont) return;
+    cont.hidden = !ult;
+    if (ult) document.getElementById("bibContinuarRef").textContent = `${ult.book} ${ult.chapter}`;
+    document.querySelectorAll(".bibSeg button").forEach(b => b.classList.toggle("on", b.dataset.t === bibTestamento));
+    const livros = bibTestamento === "at" ? OT_ALL : NT_ALL;
+    const grade = document.getElementById("bibGrade");
+    grade.innerHTML = livros.map(([b]) => `<button type="button" class="bibLivro${ult?.book === b ? " atual" : ""}" data-livro="${escapeHtml(b)}" title="${escapeHtml(b)}"><span class="curto">${escapeHtml(NOME_CURTO[b] || b)}</span><span class="longo">${escapeHtml(b)}</span></button>`).join("");
+    grade.querySelectorAll(".bibLivro").forEach(el => el.addEventListener("click", () => abrirLivroBiblia(el.dataset.livro)));
+  }
+  function abrirLivroBiblia(livro, pagina){
+    const n = ([...OT_ALL, ...NT_ALL].find(b => b[0] === livro) || [livro, 0])[1];
+    const st = ensureStateDefaults(loadState());
+    const ult = st.reader?.ultimoLivre;
+    // até 63 capítulos cabem de uma vez (7 colunas × 9 linhas); acima disso, páginas de 56
+    const POR = n > 63 ? 56 : n;
+    const paginas = Math.ceil(n / POR);
+    if (pagina === undefined) pagina = (ult?.book === livro) ? Math.floor((ult.chapter - 1) / POR) : 0;
+    document.getElementById("bibLivroNome").textContent = livro;
+    const pag = document.getElementById("bibPag");
+    pag.hidden = paginas <= 1;
+    pag.innerHTML = Array.from({ length: paginas }, (_, k) => {
+      const a = k * POR + 1, z = Math.min(n, (k + 1) * POR);
+      return `<button type="button" data-p="${k}" class="${k === pagina ? "on" : ""}">${a}–${z}</button>`;
+    }).join("");
+    pag.querySelectorAll("button").forEach(b => b.addEventListener("click", () => abrirLivroBiblia(livro, Number(b.dataset.p))));
+    const caps = document.getElementById("bibCaps");
+    const ini = pagina * POR + 1, fim = Math.min(n, (pagina + 1) * POR);
+    let html = "";
+    for (let c = ini; c <= fim; c++) html += `<button type="button" class="bibCap${ult?.book === livro && ult.chapter === c ? " atual" : ""}" data-c="${c}">${c}</button>`;
+    caps.innerHTML = html;
+    caps.querySelectorAll(".bibCap").forEach(b => b.addEventListener("click", () => abrirLivre(livro, Number(b.dataset.c))));
+    document.getElementById("bibLivrosView").hidden = true;
+    document.getElementById("bibCapsView").hidden = false;
+    document.getElementById("bibContinuar").hidden = true;
+  }
+  document.querySelectorAll(".bibSeg button").forEach(b => b.addEventListener("click", () => { bibTestamento = b.dataset.t; renderBiblia(); }));
+  document.getElementById("bibVoltar")?.addEventListener("click", () => {
+    document.getElementById("bibCapsView").hidden = true;
+    document.getElementById("bibLivrosView").hidden = false;
+    renderBiblia();
+  });
+  document.getElementById("bibContinuar")?.addEventListener("click", () => {
+    const ult = ensureStateDefaults(loadState()).reader?.ultimoLivre;
+    if (ult) abrirLivre(ult.book, ult.chapter);
+  });
+  // o testamento começa no do último capítulo lido
+  try { const u = ensureStateDefaults(loadState()).reader?.ultimoLivre; if (u && NT_ALL.some(b => b[0] === u.book)) bibTestamento = "nt"; } catch(e){}
+  renderBiblia();
 
   // ── Versículos por tema ──
   // Textos da Bíblia Livre copiados dos arquivos ./biblia (conferidos um a um).
