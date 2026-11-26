@@ -788,6 +788,28 @@
     .readerBtn.danger{color:var(--accent)}
     .readerBtn.danger:hover{background:var(--accent-soft);border-color:var(--accent)}
 
+
+    /* ── modo apresentação: um versículo por vez, em tela cheia ── */
+    .presBtn{position:absolute;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:3;display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 18px 0 14px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+    .presBtn[hidden]{display:none}
+    .presBtn:hover,.presBtn:focus{background:var(--surface);color:var(--ink)}
+    .presModal{position:fixed;inset:0;z-index:3500;display:none;flex-direction:column;background:#0f0d0b;color:#f4efe6;--pres-ref:#E0B04F;--pres-ui:rgba(255,255,255,.12);--pres-ui-ink:#f4efe6;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+    .presModal.open{display:flex}
+    .presModal.claro{background:#fbf8f2;color:#1d1a16;--pres-ref:#B8452F;--pres-ui:rgba(0,0,0,.08);--pres-ui-ink:#1d1a16}
+    .presCorpo{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,28px);padding:clamp(56px,9vh,84px) clamp(20px,6vw,96px) clamp(64px,10vh,92px);text-align:center;cursor:pointer}
+    .presTexto{font-family:var(--serif);font-weight:500;line-height:1.28;overflow:hidden;max-width:1400px;width:100%;text-wrap:balance}
+    .presRef{flex:none;font-family:var(--ui);font-size:clamp(15px,2.6vmin,28px);font-weight:700;letter-spacing:.04em;color:var(--pres-ref)}
+    .presTopo,.presBase{position:absolute;left:0;right:0;display:flex;align-items:center;gap:8px;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));transition:opacity .25s}
+    .presTopo{top:0;justify-content:flex-end;padding-top:calc(12px + env(safe-area-inset-top))}
+    .presBase{bottom:0;justify-content:space-between;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+    .presModal.quieto .presTopo,.presModal.quieto .presBase{opacity:0;pointer-events:none}
+    .presModal button{height:44px;min-width:44px;padding:0 14px;border-radius:999px;border:0;background:var(--pres-ui);color:var(--pres-ui-ink);font-family:var(--ui);font-size:15px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+    .presModal button:hover,.presModal button:focus{background:var(--pres-ui);color:var(--pres-ui-ink)}
+    .presModal button:disabled{opacity:.3}
+    .presPos{font-family:var(--ui);font-size:13px;font-weight:600;opacity:.7}
+    .presCredito{position:absolute;left:0;right:0;bottom:calc(66px + env(safe-area-inset-bottom));text-align:center;font-family:var(--ui);font-size:11px;opacity:.38;pointer-events:none}
+    .presModal.quieto .presCredito{bottom:calc(12px + env(safe-area-inset-bottom))}
+
     /* ouvir o capítulo: botão flutuante no canto do leitor */
     .readerSheet{position:relative}
     .ouvirBtn{position:absolute;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:3;display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 20px 0 16px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font-family:var(--ui);font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.22)}
@@ -1709,6 +1731,25 @@
     </div>
   </div>
 
+  <div class="presModal" id="presModal" aria-hidden="true" role="dialog" aria-label="Modo apresentação">
+    <div class="presTopo">
+      <button type="button" id="presMenos" aria-label="Diminuir a letra">A−</button>
+      <button type="button" id="presMais" aria-label="Aumentar a letra">A+</button>
+      <button type="button" id="presTema" aria-label="Alternar fundo claro e escuro">◐</button>
+      <button type="button" id="presTela" aria-label="Tela cheia">⛶</button>
+      <button type="button" id="presFechar" aria-label="Fechar apresentação">✕</button>
+    </div>
+    <div class="presCorpo" id="presCorpo">
+      <div class="presTexto" id="presTexto"></div>
+      <div class="presRef" id="presRef"></div>
+    </div>
+    <div class="presCredito">Bíblia Livre · CC BY 4.0</div>
+    <div class="presBase">
+      <button type="button" id="presAnt" aria-label="Versículo anterior">‹ Anterior</button>
+      <span class="presPos" id="presPos"></span>
+      <button type="button" id="presProx" aria-label="Próximo versículo">Próximo ›</button>
+    </div>
+  </div>
   <div class="readerModal" id="readerModal" aria-hidden="true">
     <div class="readerSheet" role="dialog" aria-modal="true" aria-label="Leitura bíblica">
       <div class="readerTop">
@@ -1735,6 +1776,10 @@
         <div class="readerError" id="readerError" style="display:none"></div>
         <div class="readerText" id="readerText"></div>
       </div>
+      <button type="button" class="presBtn" id="presBtn" hidden aria-label="Apresentar em tela cheia">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+        <span>Apresentar</span>
+      </button>
       <button type="button" class="ouvirBtn" id="ouvirBtn" hidden aria-label="Ouvir o capítulo">
         <svg class="icPlay" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.7L9.5 4.6A1 1 0 0 0 8 5.5z"/></svg>
         <svg class="icPausa" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
@@ -4674,7 +4719,10 @@ b.addEventListener("click", ()=>{
   let currentReadingCtx = null;
   let readerScrollHandler = null;
 
+  let leitorAtual = null;
   function openBibleReader(book, chapter, ctx){
+    leitorAtual = { book, chapter };
+    try { document.getElementById("presBtn").hidden = true; } catch(e){}
     const modal = document.getElementById("readerModal");
     const textEl = document.getElementById("readerText");
     const loading = document.getElementById("readerLoading");
@@ -4779,6 +4827,7 @@ b.addEventListener("click", ()=>{
             }).join("") + fimDoCapituloHtml(ctx, book, chapter) + `<p class="bibliaCredito">Texto: Bíblia Livre (BLIVRE), © Diego Santos, Mario Sérgio e Marco Teles · Licença Creative Commons Atribuição 4.0 Brasil · <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noopener">site da Bíblia Livre</a></p>`;
 ligarFimDoCapitulo(ctx, book, chapter);
 prepararAudio();
+document.getElementById("presBtn").hidden = false;
 focarVersoAlvo();
 const keyRef = `${book}|${chapter}|${translationId}`;
             const st2 = ensureStateDefaults(loadState());
@@ -5724,6 +5773,139 @@ function closeReader(){
     if (/\d/.test(t) || livroExato(t) || !t.trim()) irParaPassagem(t); else buscarPalavra(t);
   });
   document.getElementById("bibBuscaIn")?.addEventListener("input", () => { document.getElementById("bibBuscaMsg").hidden = true; document.getElementById("bibBuscaIn").classList.remove("erro"); });
+  // ── Modo apresentação ──
+  const PRES_CHAVE = "lerbiblia_pres_v1";
+  const pres = { aberto: false, book: "", cap: 0, versos: [], i: 0, tam: 1, claro: false, timer: null, lock: null, ignorarClique: 0 };
+  try { const o = JSON.parse(localStorage.getItem(PRES_CHAVE) || "{}"); if (o.tam >= 0.6 && o.tam <= 1.6) pres.tam = o.tam; pres.claro = !!o.claro; } catch(e){}
+  function presSalvar(){ try { localStorage.setItem(PRES_CHAVE, JSON.stringify({ tam: pres.tam, claro: pres.claro })); } catch(e){} }
+  function presAjustar(){
+    const corpo = document.getElementById("presCorpo"), el = document.getElementById("presTexto"), ref = document.getElementById("presRef");
+    if (!corpo.clientHeight) return;
+    const cs = getComputedStyle(corpo);
+    const gap = parseFloat(cs.rowGap) || 0;
+    const livre = corpo.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - ref.offsetHeight - gap;
+    el.style.maxHeight = Math.max(60, livre) + "px";
+    let tam = Math.min(120, Math.max(26, Math.min(window.innerWidth, window.innerHeight) * 0.1)) * pres.tam;
+    el.style.fontSize = tam + "px";
+    let guarda = 0;
+    while (el.scrollHeight > el.clientHeight + 1 && tam > 16 && guarda++ < 80){ tam -= 2; el.style.fontSize = tam + "px"; }
+  }
+  function presDesenhar(){
+    const v = pres.versos[pres.i]; if (!v) return;
+    document.getElementById("presTexto").textContent = limparVerso(v[1]);
+    document.getElementById("presRef").textContent = `${pres.book} ${pres.cap}:${v[0]}`;
+    document.getElementById("presPos").textContent = `${pres.i + 1} / ${pres.versos.length}`;
+    const k = TODOS_CAPS.findIndex(it => it.book === pres.book && it.chapter === pres.cap);
+    document.getElementById("presAnt").disabled = pres.i === 0 && k <= 0;
+    document.getElementById("presProx").disabled = pres.i === pres.versos.length - 1 && (k < 0 || k >= TODOS_CAPS.length - 1);
+    presAjustar();
+  }
+  async function presCarregar(book, cap, ultimo){
+    const d = await carregarLivroBiblia(getBookId(book));
+    const vs = d?.capitulos?.[String(cap)] || [];
+    if (!vs.length) throw new Error(`${book} ${cap} não tem texto`);
+    pres.book = book; pres.cap = cap; pres.versos = vs;
+    return ultimo ? vs.length - 1 : 0;
+  }
+  async function presAndar(passo){
+    try {
+      const j = pres.i + passo;
+      if (j >= 0 && j < pres.versos.length){ pres.i = j; return presDesenhar(); }
+      const k = TODOS_CAPS.findIndex(it => it.book === pres.book && it.chapter === pres.cap) + passo;
+      if (k < 0 || k >= TODOS_CAPS.length || pres.ocupado) return;
+      pres.ocupado = true;   // enquanto carrega o outro capítulo, toques extras são ignorados
+      try { pres.i = await presCarregar(TODOS_CAPS[k].book, TODOS_CAPS[k].chapter, passo < 0); } finally { pres.ocupado = false; }
+      presDesenhar();
+    } catch (e){ document.getElementById("presTexto").textContent = "Não consegui carregar: " + (e?.message || e); }
+  }
+  function presVerInicial(){
+    const alvo = document.querySelector("#readerText .verse.alvo");
+    if (alvo) return Number(alvo.dataset.verse);
+    const corpo = document.querySelector("#readerModal .readerBody"), topo = corpo ? corpo.getBoundingClientRect().top + 30 : 0;
+    for (const el of document.querySelectorAll("#readerText .verse")) if (el.getBoundingClientRect().bottom > topo) return Number(el.dataset.verse);
+    return 1;
+  }
+  function presMostrarControles(){
+    const m = document.getElementById("presModal");
+    m.classList.remove("quieto");
+    clearTimeout(pres.timer);
+    pres.timer = setTimeout(() => m.classList.add("quieto"), 3500);
+  }
+  async function presTravarTela(){
+    try { if ("wakeLock" in navigator && pres.aberto) pres.lock = await navigator.wakeLock.request("screen"); } catch(e){}
+  }
+  async function abrirApresentacao(){
+    if (!leitorAtual) return;
+    const m = document.getElementById("presModal");
+    try {
+      const vini = presVerInicial();
+      const i0 = await presCarregar(leitorAtual.book, leitorAtual.chapter, false);
+      pres.i = Math.max(0, pres.versos.findIndex(x => Number(x[0]) === vini));
+      if (pres.i < 0) pres.i = i0;
+    } catch (e){ return alert("Não consegui abrir a apresentação: " + (e?.message || e)); }
+    pres.aberto = true;
+    m.classList.toggle("claro", pres.claro);
+    m.classList.add("open"); m.setAttribute("aria-hidden", "false");
+    presDesenhar(); presMostrarControles(); presTravarTela();
+    pararAudio();
+  }
+  function fecharApresentacao(){
+    if (!pres.aberto) return;
+    pres.aberto = false;
+    const m = document.getElementById("presModal");
+    m.classList.remove("open"); m.setAttribute("aria-hidden", "true");
+    clearTimeout(pres.timer);
+    try { pres.lock?.release(); } catch(e){}
+    pres.lock = null;
+    if (document.fullscreenElement) { try { document.exitFullscreen(); } catch(e){} }
+    // o leitor volta no versículo que estava na tela
+    const n = pres.versos[pres.i]?.[0];
+    if (n && leitorAtual && leitorAtual.book === pres.book && leitorAtual.chapter === pres.cap){
+      document.querySelector(`#readerText .verse[data-verse="${n}"]`)?.scrollIntoView({ block: "center" });
+    }
+  }
+  document.getElementById("presBtn")?.addEventListener("click", abrirApresentacao);
+  document.getElementById("presFechar")?.addEventListener("click", e => { e.stopPropagation(); fecharApresentacao(); });
+  document.getElementById("presAnt")?.addEventListener("click", e => { e.stopPropagation(); presAndar(-1); presMostrarControles(); });
+  document.getElementById("presProx")?.addEventListener("click", e => { e.stopPropagation(); presAndar(1); presMostrarControles(); });
+  document.getElementById("presMais")?.addEventListener("click", e => { e.stopPropagation(); pres.tam = Math.min(1.6, +(pres.tam + 0.1).toFixed(2)); presSalvar(); presAjustar(); presMostrarControles(); });
+  document.getElementById("presMenos")?.addEventListener("click", e => { e.stopPropagation(); pres.tam = Math.max(0.6, +(pres.tam - 0.1).toFixed(2)); presSalvar(); presAjustar(); presMostrarControles(); });
+  document.getElementById("presTema")?.addEventListener("click", e => { e.stopPropagation(); pres.claro = !pres.claro; document.getElementById("presModal").classList.toggle("claro", pres.claro); presSalvar(); presMostrarControles(); });
+  const presTelaBtn = document.getElementById("presTela");
+  if (presTelaBtn && !document.documentElement.requestFullscreen) presTelaBtn.style.display = "none";
+  presTelaBtn?.addEventListener("click", e => {
+    e.stopPropagation();
+    try { if (document.fullscreenElement) document.exitFullscreen(); else document.getElementById("presModal").requestFullscreen(); } catch(err){}
+    presMostrarControles();
+  });
+  // toque: terço esquerdo volta, terço direito avança, meio mostra/esconde os botões; arrastar de lado também troca
+  const presCorpoEl = document.getElementById("presCorpo");
+  presCorpoEl?.addEventListener("click", e => {
+    if (Date.now() < pres.ignorarClique) return;
+    const x = e.clientX / window.innerWidth;
+    if (x < 0.33) presAndar(-1); else if (x > 0.67) presAndar(1);
+    else { const m = document.getElementById("presModal"); if (m.classList.contains("quieto")) presMostrarControles(); else m.classList.add("quieto"); return; }
+    presMostrarControles();
+  });
+  let presToque = null;
+  presCorpoEl?.addEventListener("touchstart", e => { presToque = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }, { passive: true });
+  presCorpoEl?.addEventListener("touchend", e => {
+    if (!presToque) return;
+    const dx = e.changedTouches[0].clientX - presToque.x, dy = e.changedTouches[0].clientY - presToque.y;
+    presToque = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5){ pres.ignorarClique = Date.now() + 400; presAndar(dx < 0 ? 1 : -1); presMostrarControles(); }
+  }, { passive: true });
+  document.addEventListener("keydown", e => {
+    if (!pres.aberto) return;
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " "){ e.preventDefault(); presAndar(1); presMostrarControles(); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp"){ e.preventDefault(); presAndar(-1); presMostrarControles(); }
+    else if (e.key === "Escape" && !document.fullscreenElement){ e.preventDefault(); e.stopPropagation(); fecharApresentacao(); }
+    else if (e.key === "+" || e.key === "="){ document.getElementById("presMais").click(); }
+    else if (e.key === "-"){ document.getElementById("presMenos").click(); }
+  }, true);
+  window.addEventListener("resize", () => { if (pres.aberto) presAjustar(); });
+  document.addEventListener("visibilitychange", () => { if (pres.aberto && document.visibilityState === "visible") presTravarTela(); });
+
   document.getElementById("bibVoltarCaps")?.addEventListener("click", () => {
     document.getElementById("bibVersView").hidden = true;
     abrirLivroBiblia(document.getElementById("bibLivroNome").textContent);
