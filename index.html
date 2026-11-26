@@ -1416,6 +1416,16 @@
     .bibContinuar:hover,.bibContinuar:focus{background:var(--ink);color:var(--paper)}
     .bibContinuar span{opacity:.75}
     .bibContinuar b{flex:1;font-family:var(--serif);font-size:16px;font-weight:600}
+    .bibBusca{position:relative;display:flex;gap:6px;margin-bottom:6px}
+    .bibBusca input{flex:1;min-width:0;height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:16px}
+    .bibBusca input.erro{border-color:#B8452F}
+    .bibBusca button{height:34px;padding:0 16px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer}
+    .bibBusca button:hover,.bibBusca button:focus{background:var(--ink);color:var(--paper)}
+    .bibBusca .bibBuscaLupa{padding:0;width:38px;display:inline-flex;align-items:center;justify-content:center;background:var(--surface);color:var(--ink);border:1px solid var(--line-strong)}
+    .bibBusca .bibBuscaLupa:hover,.bibBusca .bibBuscaLupa:focus{background:var(--surface);color:var(--ink)}
+    .temaVerso mark{background:rgba(217,130,43,.35);color:inherit;border-radius:3px;padding:0 1px}
+    .bibBuscaMsg{position:absolute;left:8px;right:8px;top:38px;z-index:5;padding:6px 10px;border-radius:10px;background:#B8452F;color:#fff;font-family:var(--ui);font-size:12.5px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+    .bibBuscaMsg[hidden]{display:none}
     .bibSeg{display:grid;grid-template-columns:1fr 1fr;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px;margin-bottom:8px}
     .bibSeg button{height:32px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer}
     .bibSeg button:hover,.bibSeg button:focus{background:transparent;color:var(--ink-2)}
@@ -1424,8 +1434,8 @@
     .bibLegenda{display:flex;flex-wrap:wrap;gap:3px 10px;font-family:var(--ui);font-size:11px;color:var(--ink-2);margin:0 2px 7px}
     .bibLegenda span{display:inline-flex;align-items:center;gap:4px}
     .bibLegenda i{width:9px;height:9px;border-radius:3px;display:inline-block}
-    .bibGrade{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
-    .bibLivro{position:relative;height:43px;padding:0 2px;border-radius:9px;border:0;color:#fff;font-family:var(--ui);cursor:pointer;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+    .bibGrade{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}
+    .bibLivro{position:relative;height:38px;padding:0 2px;border-radius:9px;border:0;color:#fff;font-family:var(--ui);cursor:pointer;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
     .bibLivro:hover,.bibLivro:focus{color:#fff;filter:brightness(1.06)}
     .bibLivro b{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1}
     .bibLivro small{font-size:8.5px;font-weight:500;opacity:.92;max-width:96%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1809,12 +1819,26 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
         </button>
         <div id="bibLivrosView">
+          <form class="bibBusca" id="bibBusca" autocomplete="off">
+            <input type="text" id="bibBuscaIn" placeholder="Ir para (jo 3 16) ou buscar palavra" enterkeyhint="go" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Ir para uma passagem">
+            <button type="submit">Ir</button>
+            <button type="button" class="bibBuscaLupa" id="bibBuscaLupa" aria-label="Buscar palavra na Bíblia" title="Buscar palavra na Bíblia"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+            <div class="bibBuscaMsg" id="bibBuscaMsg" role="alert" hidden></div>
+          </form>
           <div class="bibSeg" role="tablist" aria-label="Testamento">
             <button type="button" role="tab" data-t="at" class="on">Antigo Testamento</button>
             <button type="button" role="tab" data-t="nt">Novo Testamento</button>
           </div>
           <div class="bibLegenda" id="bibLegenda"></div>
           <div class="bibGrade" id="bibGrade"></div>
+        </div>
+        <div id="bibBuscaView" hidden>
+          <div class="temasTopo">
+            <button type="button" class="temasVoltar" id="bibBuscaVoltar" aria-label="Voltar aos livros">‹ Livros</button>
+            <h3 class="temasTit" id="bibBuscaTit">—</h3>
+          </div>
+          <div class="temasGrupos" id="bibBuscaPag" hidden></div>
+          <div class="temasItens" id="bibBuscaItens"></div>
         </div>
         <div id="bibCapsView" hidden>
           <div class="temasTopo">
@@ -5482,7 +5506,7 @@ function closeReader(){
     const ult = st.reader?.ultimoLivre;
     const cont = document.getElementById("bibContinuar");
     if (!cont) return;
-    cont.hidden = !ult;
+    cont.hidden = !ult || document.getElementById("bibLivrosView").hidden;
     if (ult) document.getElementById("bibContinuarRef").textContent = `${ult.book} ${ult.chapter}`;
     document.querySelectorAll(".bibSeg button").forEach(b => b.classList.toggle("on", b.dataset.t === bibTestamento));
     const livros = bibTestamento === "at" ? OT_ALL : NT_ALL;
@@ -5545,6 +5569,161 @@ function closeReader(){
     box.innerHTML = html;
     box.querySelectorAll(".bibCap").forEach(b => b.addEventListener("click", () => { versoAlvoLeitor = Number(b.dataset.v); abrirLivre(livro, cap); }));
   }
+  // ── Ir para uma passagem digitada ("jo 3 16", "sl 23", "1co 13") ──
+  const semAcento = t => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  function entenderPassagem(texto){
+    const t = texto.toLowerCase().replace(/[:.,;\-–—]/g, " ").replace(/\s+/g, " ").trim();
+    if (!t) return { erro: "Digite um livro, por exemplo: jo 3 16" };
+    let partes = t.split(" ");
+    let prefixo = "";
+    if (/^[123]$/.test(partes[0]) && partes[1] && /^[^\d]/.test(partes[1])) prefixo = partes.shift();
+    else { const m = partes[0].match(/^([123])([^\d\s]+)$/); if (m){ prefixo = m[1]; partes[0] = m[2]; } }
+    const letras = [], nums = [];
+    for (const p of partes){ if (/^\d+$/.test(p)) nums.push(Number(p)); else if (!nums.length) letras.push(p); }
+    const consulta = prefixo + letras.join("");
+    if (!letras.length) return { erro: "Comece pelo livro, por exemplo: jo 3 16" };
+    const todos = [...OT_ALL, ...NT_ALL];
+    const chaveCru = b => (SIGLAS[b[0]] || "").toLowerCase().replace(/ /g, "");
+    const chave = b => semAcento(SIGLAS[b[0]] || "").replace(/ /g, "");
+    const nome = b => semAcento(b[0]).replace(/ /g, "");
+    const q = semAcento(consulta);
+    let ach = todos.filter(b => chaveCru(b) === consulta.replace(/ /g, ""));
+    if (!ach.length) ach = todos.filter(b => chave(b) === q);
+    if (!ach.length) ach = todos.filter(b => nome(b) === q);
+    if (!ach.length) ach = todos.filter(b => nome(b).startsWith(q));
+    if (!ach.length) return { erro: `Não achei o livro "${texto.trim()}"` };
+    if (ach.length > 1) return { erro: `Qual livro? ${ach.map(b => b[0]).join(", ")}` };
+    return { livro: ach[0][0], total: ach[0][1], cap: nums[0], verso: nums[1] };
+  }
+  async function irParaPassagem(texto){
+    const msg = document.getElementById("bibBuscaMsg"), inp = document.getElementById("bibBuscaIn");
+    const falha = m => { msg.textContent = m; msg.hidden = false; inp.classList.add("erro"); };
+    msg.hidden = true; inp.classList.remove("erro");
+    const r = entenderPassagem(texto);
+    if (r.erro) return falha(r.erro);
+    if (r.cap === undefined){ inp.value = ""; return abrirLivroBiblia(r.livro); }
+    if (r.cap < 1 || r.cap > r.total) return falha(`${r.livro} tem ${r.total} ${r.total === 1 ? "capítulo" : "capítulos"}`);
+    if (r.verso !== undefined){
+      try {
+        const dados = await carregarLivroBiblia(getBookId(r.livro));
+        const n = (dados?.capitulos?.[String(r.cap)] || []).length;
+        if (r.verso < 1 || r.verso > n) return falha(`${r.livro} ${r.cap} tem ${n} versículos`);
+      } catch (e){ return falha("Não consegui carregar: " + (e?.message || e)); }
+      versoAlvoLeitor = r.verso;
+    }
+    inp.value = ""; inp.blur();
+    abrirLivre(r.livro, r.cap);
+  }
+  // ── Buscar uma palavra no texto da Bíblia ──
+  // O texto já está no app (Bíblia Livre), então a busca é local: sem IA, sem limite de uso.
+  const CLASSES_ACENTO = { a:"[aàáâãä]", e:"[eèéêë]", i:"[iìíîï]", o:"[oòóôõö]", u:"[uùúûü]", c:"[cç]" };
+  function padraoPalavra(w){
+    return semAcento(w).replace(/[^a-z0-9]/g, "").split("").map(ch => CLASSES_ACENTO[ch] || ch).join("");
+  }
+  let todosVersos = null;
+  async function carregarTodosVersos(progresso){
+    if (todosVersos) return todosVersos;
+    const livros = [...OT_ALL, ...NT_ALL];
+    let feitos = 0;
+    const partes = await Promise.all(livros.map(async ([nome]) => {
+      const d = await carregarLivroBiblia(getBookId(nome));
+      progresso?.(++feitos, livros.length);
+      return Object.entries(d?.capitulos || {}).flatMap(([cap, vs]) => vs.map(([v, t]) => ({ livro: nome, cap: Number(cap), v, t: limparVerso(t) })));
+    }));
+    todosVersos = partes.flat();
+    return todosVersos;
+  }
+  const MAX_RESULTADOS = 200;
+  let buscaEstado = null;
+  function realcar(texto, reUnico){
+    const re = new RegExp(reUnico.source, "giu");
+    let out = "", ult = 0, m;
+    while ((m = re.exec(texto))){
+      const ini = m.index + m[1].length, fim = m.index + m[0].length;
+      out += escapeHtml(texto.slice(ult, ini)) + "<mark>" + escapeHtml(texto.slice(ini, fim)) + "</mark>";
+      ult = fim;
+      if (re.lastIndex === m.index) re.lastIndex++;
+    }
+    return out + escapeHtml(texto.slice(ult));
+  }
+  async function buscarPalavra(texto){
+    const msg = document.getElementById("bibBuscaMsg"), inp = document.getElementById("bibBuscaIn");
+    const falha = m => { msg.textContent = m; msg.hidden = false; inp.classList.add("erro"); };
+    msg.hidden = true; inp.classList.remove("erro");
+    const palavras = texto.trim().split(/\s+/).map(padraoPalavra).filter(Boolean);
+    if (!palavras.length || semAcento(texto).replace(/[^a-z0-9]/g, "").length < 3) return falha("Digite ao menos 3 letras para buscar");
+    inp.blur();
+    abrirBuscaView(`Buscando “${texto.trim()}”…`);
+    const itens = document.getElementById("bibBuscaItens");
+    itens.innerHTML = `<div class="temasVazio" id="bibBuscaCarga">Carregando a Bíblia… (só na primeira busca)</div>`;
+    document.getElementById("bibBuscaPag").hidden = true;
+    try {
+      const base = await carregarTodosVersos((f, t) => { const el = document.getElementById("bibBuscaCarga"); if (el) el.textContent = `Carregando a Bíblia… ${f} de ${t} livros`; });
+      const testes = palavras.map(w => new RegExp(`(^|[^\\p{L}])${w}`, "iu"));
+      const todos = base.filter(x => testes.every(r => r.test(x.t)));
+      const reUnico = new RegExp(`(^|[^\\p{L}])(?:${palavras.join("|")})[\\p{L}]*`, "iu");
+      buscaEstado = { termo: texto.trim(), re: reUnico, total: todos.length, lista: todos.slice(0, MAX_RESULTADOS), pagina: 0 };
+      inp.value = "";
+      desenharBusca();
+    } catch (e){
+      itens.innerHTML = `<div class="temasVazio">Não consegui carregar a Bíblia: ${escapeHtml(e?.message || String(e))}</div>`;
+    }
+  }
+  // mostra o trecho em volta da primeira palavra achada, para ela não ficar escondida pelo corte de 2 linhas
+  function recorteBusca(t, re){
+    const LIM = 62;
+    if (t.length <= LIM) return t;
+    const m = new RegExp(re.source, "iu").exec(t);
+    if (!m) return t;
+    const pos = m.index + m[1].length;
+    if (pos + 12 <= LIM) return t;
+    let ini = Math.max(0, pos - 24);
+    const esp = t.indexOf(" ", ini);
+    if (esp > 0 && esp < pos) ini = esp + 1;
+    return "… " + t.slice(ini);
+  }
+  function abrirBuscaView(titulo){
+    document.getElementById("bibLivrosView").hidden = true;
+    document.getElementById("bibCapsView").hidden = true;
+    document.getElementById("bibVersView").hidden = true;
+    document.getElementById("bibBuscaView").hidden = false;
+    document.getElementById("bibContinuar").hidden = true;
+    document.getElementById("bibBuscaTit").textContent = titulo;
+  }
+  function desenharBusca(){
+    const b = buscaEstado; if (!b) return;
+    const POR = 6, paginas = Math.max(1, Math.ceil(b.lista.length / POR));
+    b.pagina = Math.max(0, Math.min(b.pagina, paginas - 1));
+    const n = b.total;
+    document.getElementById("bibBuscaTit").textContent = n ? `“${b.termo}” · ${n} ${n === 1 ? "versículo" : "versículos"}` : `“${b.termo}”`;
+    const pag = document.getElementById("bibBuscaPag");
+    pag.hidden = paginas <= 1;
+    pag.innerHTML = `<button type="button" data-p="${b.pagina - 1}" ${b.pagina === 0 ? "disabled" : ""}>‹ Anteriores</button><span class="pag">${b.pagina + 1} de ${paginas}${n > b.lista.length ? "+" : ""}</span><button type="button" data-p="${b.pagina + 1}" ${b.pagina >= paginas - 1 ? "disabled" : ""}>Próximos ›</button>`;
+    pag.querySelectorAll("button").forEach(x => x.addEventListener("click", () => { b.pagina = Number(x.dataset.p); desenharBusca(); }));
+    const itens = document.getElementById("bibBuscaItens");
+    if (!n){ itens.innerHTML = `<div class="temasVazio">Nenhum versículo com essa palavra. Tente outra palavra ou só o começo dela.</div>`; return; }
+    itens.innerHTML = b.lista.slice(b.pagina * POR, (b.pagina + 1) * POR).map(x => `<button type="button" class="temaVerso" data-livro="${escapeHtml(x.livro)}" data-cap="${x.cap}" data-v="${x.v}"><span><b>${escapeHtml(x.livro)} ${x.cap}:${x.v}</b>${realcar(recorteBusca(x.t, b.re), b.re)}</span></button>`).join("")
+      + (n > b.lista.length && b.pagina === paginas - 1 ? `<div class="temasVazio">Mostrando os ${b.lista.length} primeiros de ${n}. Use mais de uma palavra para refinar.</div>` : "");
+    itens.querySelectorAll(".temaVerso").forEach(x => x.addEventListener("click", () => { versoAlvoLeitor = Number(x.dataset.v); abrirLivre(x.dataset.livro, Number(x.dataset.cap)); }));
+  }
+  document.getElementById("bibBuscaVoltar")?.addEventListener("click", () => {
+    document.getElementById("bibBuscaView").hidden = true;
+    document.getElementById("bibLivrosView").hidden = false;
+    renderBiblia();
+  });
+  document.getElementById("bibBuscaLupa")?.addEventListener("click", () => buscarPalavra(document.getElementById("bibBuscaIn").value));
+  // Enter: com número ("jo 3 16") ou livro por extenso/sigla ("sl", "obadias") vai para a passagem; o resto é busca de palavra
+  function livroExato(texto){
+    const q = semAcento(texto).replace(/[^a-z0-9]/g, "");
+    const cru = texto.toLowerCase().replace(/[^\p{L}0-9]/gu, "");
+    return [...OT_ALL, ...NT_ALL].some(b => (SIGLAS[b[0]] || "").toLowerCase().replace(/ /g, "") === cru || semAcento(SIGLAS[b[0]] || "").replace(/ /g, "") === q || semAcento(b[0]).replace(/ /g, "") === q);
+  }
+  document.getElementById("bibBusca")?.addEventListener("submit", e => {
+    e.preventDefault();
+    const t = document.getElementById("bibBuscaIn").value;
+    if (/\d/.test(t) || livroExato(t) || !t.trim()) irParaPassagem(t); else buscarPalavra(t);
+  });
+  document.getElementById("bibBuscaIn")?.addEventListener("input", () => { document.getElementById("bibBuscaMsg").hidden = true; document.getElementById("bibBuscaIn").classList.remove("erro"); });
   document.getElementById("bibVoltarCaps")?.addEventListener("click", () => {
     document.getElementById("bibVersView").hidden = true;
     abrirLivroBiblia(document.getElementById("bibLivroNome").textContent);
