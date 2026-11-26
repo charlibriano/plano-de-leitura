@@ -1420,13 +1420,21 @@
     .bibSeg button{height:32px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font-family:var(--ui);font-size:13px;font-weight:600;cursor:pointer}
     .bibSeg button:hover,.bibSeg button:focus{background:transparent;color:var(--ink-2)}
     .bibSeg button.on,.bibSeg button.on:hover{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
-    .bibGrade{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
-    .bibLivro{height:32px;padding:0 3px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:12px;letter-spacing:-.1px;font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-    .bibLivro:hover,.bibLivro:focus{background:var(--surface);color:var(--ink);border-color:var(--ink-3)}
-    .bibLivro .longo{display:none}
-    .bibLivro.atual{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+    /* livros como "tabela periódica": cor por grupo, sigla grande, nome pequeno e nº de capítulos */
+    .bibLegenda{display:flex;flex-wrap:wrap;gap:3px 10px;font-family:var(--ui);font-size:11px;color:var(--ink-2);margin:0 2px 7px}
+    .bibLegenda span{display:inline-flex;align-items:center;gap:4px}
+    .bibLegenda i{width:9px;height:9px;border-radius:3px;display:inline-block}
+    .bibGrade{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+    .bibLivro{position:relative;height:43px;padding:0 2px;border-radius:9px;border:0;color:#fff;font-family:var(--ui);cursor:pointer;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+    .bibLivro:hover,.bibLivro:focus{color:#fff;filter:brightness(1.06)}
+    .bibLivro b{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1}
+    .bibLivro small{font-size:8.5px;font-weight:500;opacity:.92;max-width:96%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bibLivro em{position:absolute;top:3px;right:5px;font-style:normal;font-size:8.5px;font-weight:600;opacity:.8}
+    .bibLivro.atual{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ink)}
+    .bibInteiro{width:100%;height:40px;margin-bottom:8px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font-family:var(--ui);font-size:14px;font-weight:600;cursor:pointer}
+    .bibInteiro:hover,.bibInteiro:focus{background:var(--ink);color:var(--paper)}
     .bibPag{display:flex;gap:6px;margin-bottom:8px}
-    .bibPag button{flex:1;height:30px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);font-family:var(--ui);font-size:12.5px;font-weight:600;cursor:pointer}
+    .bibPag button{flex:1;min-width:0;height:30px;padding:0 4px;white-space:nowrap;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);font-family:var(--ui);font-size:12px;font-weight:600;cursor:pointer}
     .bibPag button:hover,.bibPag button:focus{background:var(--surface);color:var(--ink-2)}
     .bibPag button.on,.bibPag button.on:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
     .bibCaps{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
@@ -1435,12 +1443,16 @@
     .bibCap.atual{background:var(--ink);color:var(--paper);border-color:var(--ink)}
     @media (min-width:521px){
       .bibM{max-width:760px;margin:0 auto}
-      .bibGrade{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
-      .bibLivro{height:40px;font-size:13px;padding:0 2px}
+      .bibGrade{grid-template-columns:repeat(9,minmax(0,1fr));gap:6px}
+      .bibLivro{height:56px}
+      .bibLivro b{font-size:20px}
+      .bibLivro small{font-size:10px}
+      .bibLivro em{font-size:10px}
+      .bibLegenda{font-size:12.5px;gap:4px 14px;margin-bottom:10px}
       .bibCaps{grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}
       .bibCap{height:44px}
     }
-    @media (min-width:861px){ .bibLivro .longo{display:inline} .bibLivro .curto{display:none} }
+
 
     /* ── aba Temas: versículos por tema ── */
     .grid > [data-panel="Temas"]{background:transparent;border:0;box-shadow:none;padding:0 2px}
@@ -1801,6 +1813,7 @@
             <button type="button" role="tab" data-t="at" class="on">Antigo Testamento</button>
             <button type="button" role="tab" data-t="nt">Novo Testamento</button>
           </div>
+          <div class="bibLegenda" id="bibLegenda"></div>
           <div class="bibGrade" id="bibGrade"></div>
         </div>
         <div id="bibCapsView" hidden>
@@ -1810,6 +1823,15 @@
           </div>
           <div class="bibPag" id="bibPag" hidden></div>
           <div class="bibCaps" id="bibCaps"></div>
+        </div>
+        <div id="bibVersView" hidden>
+          <div class="temasTopo">
+            <button type="button" class="temasVoltar" id="bibVoltarCaps" aria-label="Voltar aos capítulos">‹ Capítulos</button>
+            <h3 class="temasTit" id="bibCapNome">—</h3>
+          </div>
+          <button type="button" class="bibInteiro" id="bibInteiro">Ler o capítulo inteiro</button>
+          <div class="bibPag" id="bibVersPag" hidden></div>
+          <div class="bibCaps" id="bibVers"></div>
         </div>
       </div>
     </section>
@@ -5432,7 +5454,22 @@ function closeReader(){
   });
 
   // ── Aba Bíblia: escolher livro e capítulo e ler livremente ──
-  const NOME_CURTO = { "Deuteronômio": "Deuteron.", "1 Tessalonicenses": "1 Tess.", "2 Tessalonicenses": "2 Tess.", "Lamentações": "Lament.", "Eclesiastes": "Eclesiast.", "Colossenses": "Colossens." };
+  const SIGLAS = { "Gênesis":"Gn","Êxodo":"Êx","Levítico":"Lv","Números":"Nm","Deuteronômio":"Dt","Josué":"Js","Juízes":"Jz","Rute":"Rt","1 Samuel":"1Sm","2 Samuel":"2Sm","1 Reis":"1Rs","2 Reis":"2Rs","1 Crônicas":"1Cr","2 Crônicas":"2Cr","Esdras":"Ed","Neemias":"Ne","Ester":"Et","Jó":"Jó","Salmos":"Sl","Provérbios":"Pv","Eclesiastes":"Ec","Cantares":"Ct","Isaías":"Is","Jeremias":"Jr","Lamentações":"Lm","Ezequiel":"Ez","Daniel":"Dn","Oséias":"Os","Joel":"Jl","Amós":"Am","Obadias":"Ob","Jonas":"Jn","Miquéias":"Mq","Naum":"Na","Habacuque":"Hc","Sofonias":"Sf","Ageu":"Ag","Zacarias":"Zc","Malaquias":"Ml",
+    "Mateus":"Mt","Marcos":"Mc","Lucas":"Lc","João":"Jo","Atos":"At","Romanos":"Rm","1 Coríntios":"1Co","2 Coríntios":"2Co","Gálatas":"Gl","Efésios":"Ef","Filipenses":"Fp","Colossenses":"Cl","1 Tessalonicenses":"1Ts","2 Tessalonicenses":"2Ts","1 Timóteo":"1Tm","2 Timóteo":"2Tm","Tito":"Tt","Filemom":"Fm","Hebreus":"Hb","Tiago":"Tg","1 Pedro":"1Pe","2 Pedro":"2Pe","1 João":"1Jo","2 João":"2Jo","3 João":"3Jo","Judas":"Jd","Apocalipse":"Ap" };
+  // grupos de livros (cor de cada um), na ordem da Bíblia: [nome, cor, último livro do grupo]
+  const GRUPOS = {
+    at: [["Lei","#B8452F","Deuteronômio"],["Históricos","#D9822B","Ester"],["Poéticos","#2F8F6B","Cantares"],["Profetas maiores","#7B4BA3","Daniel"],["Profetas menores","#3D6FB0","Malaquias"]],
+    nt: [["Evangelhos","#2A5C8A","João"],["Histórico","#3D8FA8","Atos"],["Cartas de Paulo","#3E8A4F","Filemom"],["Cartas gerais","#6E9A3A","Judas"],["Profecia","#9A7A1E","Apocalipse"]]
+  };
+  function grupoDoLivro(livro){
+    for (const t of ["at", "nt"]){
+      const lista = t === "at" ? OT_ALL : NT_ALL;
+      const i = lista.findIndex(b => b[0] === livro);
+      if (i < 0) continue;
+      return GRUPOS[t].find(g => lista.findIndex(b => b[0] === g[2]) >= i);
+    }
+    return ["", "#555", ""];
+  }
   const TODOS_CAPS = [...OT_ALL, ...NT_ALL].flatMap(([b, n]) => Array.from({ length: n }, (_, i) => ({ book: b, chapter: i + 1 })));
   let bibTestamento = "at";
   function abrirLivre(book, chapter){
@@ -5449,8 +5486,9 @@ function closeReader(){
     if (ult) document.getElementById("bibContinuarRef").textContent = `${ult.book} ${ult.chapter}`;
     document.querySelectorAll(".bibSeg button").forEach(b => b.classList.toggle("on", b.dataset.t === bibTestamento));
     const livros = bibTestamento === "at" ? OT_ALL : NT_ALL;
+    document.getElementById("bibLegenda").innerHTML = GRUPOS[bibTestamento].map(([nome, cor]) => `<span><i style="background:${cor}"></i>${escapeHtml(nome)}</span>`).join("");
     const grade = document.getElementById("bibGrade");
-    grade.innerHTML = livros.map(([b]) => `<button type="button" class="bibLivro${ult?.book === b ? " atual" : ""}" data-livro="${escapeHtml(b)}" title="${escapeHtml(b)}"><span class="curto">${escapeHtml(NOME_CURTO[b] || b)}</span><span class="longo">${escapeHtml(b)}</span></button>`).join("");
+    grade.innerHTML = livros.map(([b, n]) => `<button type="button" class="bibLivro${ult?.book === b ? " atual" : ""}" data-livro="${escapeHtml(b)}" title="${escapeHtml(b)} · ${n} ${n === 1 ? "capítulo" : "capítulos"}" style="background:${grupoDoLivro(b)[1]}"><em>${n}</em><b>${escapeHtml(SIGLAS[b] || b)}</b><small>${escapeHtml(b)}</small></button>`).join("");
     grade.querySelectorAll(".bibLivro").forEach(el => el.addEventListener("click", () => abrirLivroBiblia(el.dataset.livro)));
   }
   function abrirLivroBiblia(livro, pagina){
@@ -5474,14 +5512,47 @@ function closeReader(){
     let html = "";
     for (let c = ini; c <= fim; c++) html += `<button type="button" class="bibCap${ult?.book === livro && ult.chapter === c ? " atual" : ""}" data-c="${c}">${c}</button>`;
     caps.innerHTML = html;
-    caps.querySelectorAll(".bibCap").forEach(b => b.addEventListener("click", () => abrirLivre(livro, Number(b.dataset.c))));
+    caps.querySelectorAll(".bibCap").forEach(b => b.addEventListener("click", () => abrirVersosBiblia(livro, Number(b.dataset.c))));
     document.getElementById("bibLivrosView").hidden = true;
     document.getElementById("bibCapsView").hidden = false;
     document.getElementById("bibContinuar").hidden = true;
   }
+  // 3º passo: escolher o versículo (ou ler o capítulo inteiro)
+  async function abrirVersosBiblia(livro, cap, pagina = 0){
+    document.getElementById("bibCapNome").textContent = `${livro} ${cap}`;
+    document.getElementById("bibCapsView").hidden = true;
+    document.getElementById("bibVersView").hidden = false;
+    document.getElementById("bibInteiro").onclick = () => abrirLivre(livro, cap);
+    const box = document.getElementById("bibVers");
+    const pag = document.getElementById("bibVersPag");
+    let n = 0;
+    try {
+      const dados = await carregarLivroBiblia(getBookId(livro));
+      n = (dados?.capitulos?.[String(cap)] || []).length;
+    } catch (e){
+      pag.hidden = true;
+      box.innerHTML = `<div class="temasVazio" style="grid-column:1/-1">Não consegui carregar os versículos: ${escapeHtml(e?.message || String(e))}</div>`;
+      return;
+    }
+    // aqui ainda há o botão "Ler o capítulo inteiro": cabem 56 de uma vez; acima disso, páginas de 49
+    const POR = n > 56 ? 49 : n;
+    const paginas = Math.max(1, Math.ceil(n / POR));
+    pag.hidden = paginas <= 1;
+    pag.innerHTML = Array.from({ length: paginas }, (_, k) => `<button type="button" data-p="${k}" class="${k === pagina ? "on" : ""}">${k * POR + 1}–${Math.min(n, (k + 1) * POR)}</button>`).join("");
+    pag.querySelectorAll("button").forEach(b => b.addEventListener("click", () => abrirVersosBiblia(livro, cap, Number(b.dataset.p))));
+    let html = "";
+    for (let v = pagina * POR + 1; v <= Math.min(n, (pagina + 1) * POR); v++) html += `<button type="button" class="bibCap" data-v="${v}">${v}</button>`;
+    box.innerHTML = html;
+    box.querySelectorAll(".bibCap").forEach(b => b.addEventListener("click", () => { versoAlvoLeitor = Number(b.dataset.v); abrirLivre(livro, cap); }));
+  }
+  document.getElementById("bibVoltarCaps")?.addEventListener("click", () => {
+    document.getElementById("bibVersView").hidden = true;
+    abrirLivroBiblia(document.getElementById("bibLivroNome").textContent);
+  });
   document.querySelectorAll(".bibSeg button").forEach(b => b.addEventListener("click", () => { bibTestamento = b.dataset.t; renderBiblia(); }));
   document.getElementById("bibVoltar")?.addEventListener("click", () => {
     document.getElementById("bibCapsView").hidden = true;
+    document.getElementById("bibVersView").hidden = true;
     document.getElementById("bibLivrosView").hidden = false;
     renderBiblia();
   });
