@@ -212,6 +212,11 @@
       font-size:13px;color:var(--ink-2);line-height:1.5;white-space:normal;
     }
     .syncPanel.open{display:flex}
+    /* celular: o selo fica à direita, e o quadro de 300px passava da borda da tela.
+       Aqui ele ocupa a largura da tela, logo abaixo do selo (--syncTopo vem do JS). */
+    @media (max-width:520px){
+      .syncPanel{position:fixed;top:var(--syncTopo,64px);left:12px;right:12px;width:auto}
+    }
     .syncPanel b{color:var(--ink)}
     .syncPanel .syncErr{
       display:none;padding:9px 11px;border-radius:var(--r1);
@@ -1300,6 +1305,9 @@
       .hojeCta:hover,.hojeCta:focus{background:var(--ink);color:var(--paper)}
       .hojeCta.feito:hover,.hojeCta.feito:focus{background:var(--green-soft);color:var(--green)}
       .hojeHeroBtn:hover,.hojeHeroBtn:focus{background:#fff;color:#17130F}
+      .hojeHeroAcoes{display:flex;gap:8px;flex-wrap:wrap}
+      .hojeHero.aberto .hojeHeroAcoes{display:none}
+      .hojeHeroBtn.hojeMomentoBtn,.hojeHeroBtn.hojeMomentoBtn:hover,.hojeHeroBtn.hojeMomentoBtn:focus{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.55)}
       .tabBtn:hover,.tabBtn:focus{background:transparent;color:var(--ink-3)}
       .tabBtn.on:hover,.tabBtn.on:focus{color:var(--ink)}
       .hojeCheck{flex:none;width:26px;height:26px;border-radius:999px;box-sizing:border-box;border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center}
@@ -1310,6 +1318,13 @@
       .hojeTxt{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
       .hojeRef{font-family:var(--serif);font-size:17px;font-weight:600}
       .hojeItem.lido .hojeRef{color:var(--ink-3);text-decoration:line-through}
+      .hojeItem.hojeFeito{background:var(--green-soft);border-radius:12px;padding:8px 12px;margin:4px 0 2px}
+      .hojeItem.hojeFeito .hojeCheck{border:0;background:var(--green)}
+      .hojeItem.hojeFeito .hojeCheck svg{opacity:1}
+      .hojeItem.hojeFeito .hojeRef{color:var(--green);font-family:var(--ui);font-size:15px;font-weight:600}
+      .hojeItem.hojeFeito .hojeTrilha{color:var(--green)}
+      .hojeMarco{display:flex;align-items:center;gap:6px;padding:10px 2px 2px;font-size:12.5px;color:var(--ink-2)}
+      .hojeMarco b{font-weight:600;color:var(--gold)}
       .hojeItem.concluida{cursor:default}
       .hojeItem.concluida .hojeRef{text-decoration:none}
       .hojeTrilha{font-size:12.5px;color:var(--ink-2)}
@@ -1705,6 +1720,50 @@
       transition:opacity .2s ease;
     }
     .openingBtn:hover{opacity:.85}
+    .openingPular{display:block;margin:14px auto 0;appearance:none;border:0;background:transparent;color:var(--ink-3);font-family:var(--ui);font-size:13px;font-weight:500;cursor:pointer;padding:8px 12px}
+    .openingPular:hover,.openingPular:focus{background:transparent;color:var(--ink)}
+
+    /* ── Momento do dia ── */
+    .momento{position:fixed;inset:0;z-index:2650;display:none;align-items:center;justify-content:center;background:#0f0c0a}
+    .momento.show{display:flex;animation:openingIn .35s ease both}
+    .moCartao{position:relative;width:100%;height:100%;overflow:hidden;color:#fff;font-family:var(--ui);display:flex;flex-direction:column}
+    @media (min-width:521px){ .moCartao{width:420px;height:min(760px,92vh);border-radius:24px} }
+    .moFundo{position:absolute;inset:0}
+    .moFundo svg{position:absolute;inset:0;width:100%;height:100%}
+    .moVeu{position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,18,12,.35),rgba(30,18,12,.55) 45%,rgba(30,18,12,.88))}
+    .moBarra{position:relative;display:flex;gap:4px;padding:calc(12px + env(safe-area-inset-top)) 14px 0}
+    .moBarra i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3)}
+    .moBarra i.on{background:#fff}
+    .moTopo{position:relative;display:flex;align-items:center;justify-content:space-between;padding:10px 10px 0 16px;font-size:12.5px;font-weight:600;opacity:.9}
+    .moTopo button{appearance:none;border:0;background:transparent;color:#fff;font-size:18px;width:40px;height:40px;cursor:pointer}
+    .moCorpo{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:12px 26px}
+    .moRef{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#FFE3B0}
+    .moGrande{font-family:var(--serif);font-size:clamp(21px,5.6vw,26px);line-height:1.45;text-wrap:pretty}
+    .moGrande.moMedio{font-size:clamp(18px,4.8vw,22px)}
+    .moTxt{font-size:14.5px;line-height:1.6;opacity:.95}
+    .moPeq{font-size:12.5px;opacity:.75}
+    .moRolar{overflow-y:auto;min-height:0;flex:0 1 auto;-webkit-overflow-scrolling:touch;padding-right:4px}
+    .moTexto p{margin:0 0 12px;font-family:var(--serif);font-size:16.5px;line-height:1.7}
+    .moBtn{align-self:flex-start;appearance:none;border:0;border-radius:999px;background:#fff;color:#17130F;padding:11px 20px;font-family:var(--ui);font-size:14px;font-weight:600;cursor:pointer}
+    .moBtn:hover,.moBtn:focus{background:#fff;color:#17130F;opacity:.9}
+    .moLista{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+    .moLista li{display:flex;align-items:center;gap:12px;font-family:var(--serif);font-size:20px}
+    .moCheck{width:26px;height:26px;flex:none;border-radius:999px;border:2px solid rgba(255,255,255,.55);box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-family:var(--ui);font-size:13px}
+    .moLista li.ok .moCheck{background:#fff;color:#142a35;border-color:#fff}
+    .moCampo{width:100%;box-sizing:border-box;border:0;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;padding:12px;font-family:var(--ui);font-size:15px;line-height:1.5;resize:none}
+    .moCampo::placeholder{color:rgba(255,255,255,.6)}
+    .moOracao{margin:0;padding:0;list-style:none;counter-reset:o;display:flex;flex-direction:column;gap:14px}
+    .moOracao li{counter-increment:o;display:flex;flex-direction:column;gap:3px;padding-left:30px;position:relative}
+    .moOracao li::before{content:counter(o);position:absolute;left:0;top:1px;width:20px;height:20px;border-radius:999px;background:rgba(255,255,255,.18);font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .moOracao b{font-size:15px;font-weight:700}
+    .moConvite{font-size:14px;line-height:1.45}
+    .moVerso{font-family:var(--serif);font-style:italic;font-size:13.5px;line-height:1.5;opacity:.75}
+    .moPe{position:relative;display:flex;gap:10px;padding:10px 18px calc(18px + env(safe-area-inset-bottom))}
+    .moPe button{appearance:none;cursor:pointer;border-radius:999px;font-family:var(--ui);font-weight:600}
+    #moVoltar{width:48px;height:48px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:22px}
+    #moContinuar{flex:1;height:48px;border:0;background:#fff;color:#17130F;font-size:15px}
+    #moVoltar:hover,#moVoltar:focus{background:rgba(255,255,255,.12);color:#fff}
+    #moContinuar:hover,#moContinuar:focus{background:#fff;color:#17130F;opacity:.9}
 
     /* ══════════════════════════════════════════════════════════
        MODO LEITURA — a leitura vira o único elemento na tela.
@@ -1748,7 +1807,22 @@
       <div class="openingMark">Ler Bíblia</div>
       <div class="openingRef" id="openingRef"></div>
       <p class="openingText" id="openingText"></p>
-      <button class="openingBtn" id="openingBtn" type="button">Começar</button>
+      <button class="openingBtn" id="openingBtn" type="button">Começar meu momento</button>
+      <button class="openingPular" id="openingPular" type="button">Ir para o app</button>
+    </div>
+  </div>
+
+  <!-- Momento do dia: cartões em sequência, estilo stories -->
+  <div class="momento" id="momento" aria-hidden="true" role="dialog" aria-label="Momento do dia">
+    <div class="moCartao" id="moCartao">
+      <div class="moFundo" id="moFundo"></div>
+      <div class="moBarra" id="moBarra"></div>
+      <div class="moTopo"><span id="moRotulo"></span><button type="button" id="moFechar" aria-label="Fechar o momento">✕</button></div>
+      <div class="moCorpo" id="moCorpo"></div>
+      <div class="moPe">
+        <button type="button" id="moVoltar" aria-label="Cartão anterior">‹</button>
+        <button type="button" id="moContinuar">Continuar</button>
+      </div>
     </div>
   </div>
 
@@ -2178,7 +2252,10 @@
             <div style="display:flex;flex-direction:column;gap:10px">
               <p class="hojeFrase" id="hojeFrase"></p>
               <p class="hojePergunta" id="hojePergunta"></p>
-              <button type="button" class="hojeHeroBtn" id="hojeHeroBtn">Ler devocional</button>
+              <div class="hojeHeroAcoes">
+                <button type="button" class="hojeHeroBtn" id="hojeHeroBtn">Ler devocional</button>
+                <button type="button" class="hojeHeroBtn hojeMomentoBtn" id="hojeMomentoBtn">Momento do dia</button>
+              </div>
               <div class="hojeDevoNav">
                 <button type="button" id="hojeDevoAnt" aria-label="Devocional anterior">‹ Anterior</button>
                 <button type="button" id="hojeDevoProx" aria-label="Próximo devocional">Próximo ›</button>
@@ -3456,6 +3533,23 @@ function updateLateUI(state){
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--ink-3)"><path d="m9 6 6 6-6 6"/></svg>
       </button>`;
     });
+    // dia concluído: a lista vira uma linha só (sem texto riscado) + o próximo marco como bônus
+    if (done && !temPacote){
+      const refs = (p.blocks || []).filter(b => !b.concluida && b.list?.length).map(b => b.text).join(" · ");
+      const streakHoje = calcStreak(state, today);
+      let marco = "";
+      try {
+        const prox = MARCOS_SEQUENCIA.find(m => m.dias > streakHoje);
+        if (prox && streakHoje > 0){
+          const faltam = prox.dias - streakHoje;
+          marco = `<div class="hojeMarco"><svg class="chama acesa" viewBox="0 0 22 26" aria-hidden="true"><path fill="currentColor" d="M11 1c2 6 9 9 9 16a9 9 0 0 1-18 0c0-4 2-6 4-8 0 3 1 5 3 5-1-5 0-9 2-13z"/></svg><span>Próximo marco: <b>${escapeHtml(prox.nome)}</b> · ${faltam === 1 ? "falta 1 dia" : `faltam ${faltam} dias`}</span></div>`;
+        }
+      } catch(_){}
+      html = `<button type="button" class="hojeItem hojeFeito" data-idx="0">
+        <span class="hojeCheck">${SVG_CHECK}</span>
+        <span class="hojeTxt"><span class="hojeRef">Leitura concluída</span><span class="hojeTrilha">${escapeHtml(refs)}</span></span>
+      </button>${marco}`;
+    }
     lista.innerHTML = html;
     lista.querySelectorAll(".hojeItem").forEach(el => {
       el.addEventListener("click", () => {
@@ -3468,7 +3562,7 @@ function updateLateUI(state){
     // botão único, que muda conforme o momento
     cta.classList.toggle("feito", done);
     if (done){
-      cta.textContent = "Concluída · escrever no diário";
+      cta.textContent = "Escrever no diário";
       hojeAcaoCta = () => document.getElementById("mainDiaryBtn")?.click();
     } else if (temPacote){
       const cur = listaDia[idx];
@@ -4626,8 +4720,246 @@ b.addEventListener("click", ()=>{
         el.setAttribute("aria-hidden","true");
       }, 450);
     }
-    document.getElementById("openingBtn").addEventListener("click", entrar);
+    document.getElementById("openingBtn").addEventListener("click", () => { entrar(); abrirMomento(); });
+    document.getElementById("openingPular")?.addEventListener("click", entrar);
     el.addEventListener("click", (e)=>{ if (e.target === el) entrar(); });
+  })();
+
+  // ══ MOMENTO DO DIA ══
+  // Cartões em sequência (estilo stories): versículo → devocional → leitura →
+  // reflexão (vai para o diário) → oração pelo Pai Nosso → concluído.
+  // Só organiza o que o app já tem; a leitura continua sendo marcada no fim de cada capítulo.
+  const MO_ORACAO = [
+    { v: 9,  titulo: "Adore",    convite: "Agradeça a Deus por quem Ele é." },
+    { v: 10, titulo: "Entregue", convite: "O que você precisa deixar nas mãos dEle hoje?" },
+    { v: 11, titulo: "Peça",     convite: "O seu pão de hoje: o que você precisa." },
+    { v: 12, titulo: "Perdoe",   convite: "Peça perdão e libere quem te feriu." },
+    { v: 13, titulo: "Confie",   convite: "Peça proteção e força contra a tentação." }
+  ];
+  const MO_FUNDOS = {
+    devocional: "linear-gradient(160deg,#5b6b52,#24301f)",
+    leitura:    "linear-gradient(160deg,#2f5d73,#142a35)",
+    reflexao:   "linear-gradient(160deg,#8a5a3c,#3d2216)",
+    oracao:     "linear-gradient(160deg,#4a4470,#1d1a33)",
+    fim:        "linear-gradient(160deg,#2C7A57,#123825)"
+  };
+  let moCartoes = [], moI = 0, moRetomar = false, moReflexaoInicial = null;
+
+  function moDados(){
+    const st = ensureStateDefaults(loadState());
+    const hoje = new Date();
+    const key = todayKeyNow();
+    const p = buildPlanForYear(st)[key];
+    const dentro = inPlan(hoje, st) && !!p?.active;
+    const primeira = p?.guidedList?.[0];
+    const devo = (primeira && typeof DEVOTIONALS !== "undefined") ? DEVOTIONALS[`${primeira.book} ${primeira.chapter}`] : null;
+    return { st, hoje, key, p, dentro, primeira, devo, done: !!st.days?.[key]?.done };
+  }
+
+  function moMontar(){
+    const d = moDados();
+    const c = [];
+    c.push({ id: "versiculo", rotulo: "Versículo do dia" });
+    if (d.devo) c.push({ id: "devocional", rotulo: "Devocional" });
+    if (d.dentro) c.push({ id: "leitura", rotulo: "Leitura" });
+    c.push({ id: "reflexao", rotulo: "Reflexão" });
+    c.push({ id: "oracao", rotulo: "Oração" });
+    c.push({ id: "fim", rotulo: "Concluído" });
+    moCartoes = c;
+    return d;
+  }
+
+  function moParagrafos(t){
+    return String(t || "").split(/\n+/).map(x => x.trim()).filter(Boolean).map(x => `<p>${escapeHtml(x)}</p>`).join("");
+  }
+
+  function moSalvarReflexao(){
+    const ta = document.getElementById("moReflexaoTxt");
+    if (!ta || moReflexaoInicial === null) return;
+    const txt = ta.value.trim();
+    if (txt === moReflexaoInicial) return;
+    const st = ensureStateDefaults(loadState());
+    const key = todayKeyNow();
+    st.reader = st.reader || {};
+    st.reader.diary = st.reader.diary || {};
+    const ant = st.reader.diary[key] || {};
+    st.reader.diary[key] = { ...ant, summary: txt, verseRef: ant.verseRef || "", verseText: ant.verseText || "", updatedAt: new Date().toISOString() };
+    saveState(st);
+    moReflexaoInicial = txt;
+    try { renderAll(); } catch(_){}
+  }
+
+  function moDesenhar(){
+    const d = moDados();
+    const cartao = moCartoes[moI];
+    const fundo = document.getElementById("moFundo");
+    const corpo = document.getElementById("moCorpo");
+    document.getElementById("moRotulo").textContent = cartao.rotulo;
+    document.getElementById("moBarra").innerHTML = moCartoes.map((_, k) => `<i class="${k <= moI ? "on" : ""}"></i>`).join("");
+    document.getElementById("moVoltar").style.visibility = moI === 0 ? "hidden" : "";
+    const ultimo = moI === moCartoes.length - 1;
+    document.getElementById("moContinuar").textContent = ultimo ? "Voltar ao app" : "Continuar";
+    moReflexaoInicial = null;
+    corpo.scrollTop = 0;
+
+    // fundo: o versículo usa a mesma paisagem do dia; os outros, uma cor própria
+    if (cartao.id === "versiculo"){
+      try {
+        const { cena, luz } = cenaDoDiaIdx(d.hoje);
+        const cn = CENAS[cena];
+        fundo.style.background = "#2A1A12";
+        fundo.innerHTML = `<svg viewBox="0 0 358 236" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${cn.d(cn.luz[luz])}</svg><span class="moVeu"></span>`;
+      } catch(_){ fundo.innerHTML = ""; fundo.style.background = MO_FUNDOS.devocional; }
+    } else {
+      fundo.innerHTML = "";
+      fundo.style.background = MO_FUNDOS[cartao.id];
+    }
+
+    if (cartao.id === "versiculo"){
+      corpo.innerHTML = `<div class="moRef" id="moVersRef">&nbsp;</div><div class="moGrande" id="moVersTxt">Preparando o versículo…</div>
+        <button type="button" class="moBtn" id="moVersCompartilhar">Compartilhar imagem</button>`;
+      document.getElementById("moVersCompartilhar").addEventListener("click", () => abrirVersiculo());
+      const alvo = moI;
+      versiculoDoDia(d.p?.guidedList, d.key).then(v => {
+        if (moI !== alvo || !document.getElementById("moVersTxt")) return;
+        document.getElementById("moVersRef").textContent = v.ref;
+        document.getElementById("moVersTxt").textContent = `“${v.texto}”`;
+      }).catch(() => {
+        if (moI !== alvo || !document.getElementById("moVersTxt")) return;
+        document.getElementById("moVersRef").textContent = "Salmos 119:105";
+        document.getElementById("moVersTxt").textContent = "“Lâmpada para os meus pés é a tua palavra, e luz para o meu caminho.”";
+      });
+    }
+    else if (cartao.id === "devocional"){
+      corpo.innerHTML = `<div class="moRef">Devocional · ${escapeHtml(`${d.primeira.book} ${d.primeira.chapter}`)}</div>
+        <div class="moRolar moTexto">${moParagrafos(d.devo.texto)}</div>`;
+    }
+    else if (cartao.id === "leitura"){
+      const lidos = capsLidos(d.st, d.key);
+      const itens = (d.p.blocks || []).filter(b => !b.concluida && b.list?.length).map(b => {
+        const ok = d.done || b.list.every(it => lidos.has(refCap(it)));
+        return `<li class="${ok ? "ok" : ""}"><span class="moCheck">${ok ? "✓" : ""}</span>${escapeHtml(b.text)}</li>`;
+      }).join("");
+      corpo.innerHTML = `<div class="moRef">Leitura de hoje</div><ul class="moLista">${itens}</ul>
+        ${d.done ? `<div class="moTxt">Leitura concluída. Muito bem!</div>` : `<button type="button" class="moBtn" id="moLer">Ler agora</button>
+        <div class="moTxt moPeq">Ao fechar o leitor, o momento continua daqui.</div>`}`;
+      document.getElementById("moLer")?.addEventListener("click", () => {
+        moRetomar = true;
+        moEsconder();
+        document.getElementById("hojeCta")?.click();
+        // se o leitor não abrir (ex.: fora do plano), o momento volta sozinho
+        setTimeout(() => { if (moRetomar && !document.getElementById("readerModal").classList.contains("open")) moRetomarDepois(); }, 1500);
+      });
+    }
+    else if (cartao.id === "reflexao"){
+      const pergunta = d.devo?.pergunta || "O que Deus falou com você na leitura de hoje?";
+      const atual = d.st.reader?.diary?.[d.key]?.summary || "";
+      corpo.innerHTML = `<div class="moRef">Para pensar</div><div class="moGrande moMedio">${escapeHtml(pergunta)}</div>
+        <textarea id="moReflexaoTxt" class="moCampo" rows="4" placeholder="Escreva uma frase… (vai para o seu diário de hoje)"></textarea>
+        <div class="moTxt moPeq">Opcional: se preferir, só continue.</div>`;
+      const ta = document.getElementById("moReflexaoTxt");
+      ta.value = atual;
+      moReflexaoInicial = atual.trim();
+    }
+    else if (cartao.id === "oracao"){
+      corpo.innerHTML = `<div class="moRef">Oração · Mateus 6:9-13</div>
+        <div class="moRolar"><ol class="moOracao">${MO_ORACAO.map(o => `<li><b>${o.titulo}</b><span class="moConvite">${escapeHtml(o.convite)}</span><span class="moVerso" data-v="${o.v}"></span></li>`).join("")}</ol></div>`;
+      const alvo = moI;
+      const id = getBookId("Mateus");
+      carregarLivroBiblia(id).then(livro => {
+        if (moI !== alvo) return;
+        const vs = livro?.capitulos?.["6"] || [];
+        document.querySelectorAll("#moCorpo .moVerso").forEach(el => {
+          const achado = vs.find(([n]) => Number(n) === Number(el.dataset.v));
+          if (achado) el.textContent = `“${limparVerso(achado[1])}” (v. ${el.dataset.v})`;
+        });
+      }).catch(() => {});
+    }
+    else if (cartao.id === "fim"){
+      const streak = calcStreak(d.st, d.hoje);
+      let marco = "";
+      try {
+        const prox = MARCOS_SEQUENCIA.find(m => m.dias > streak);
+        if (prox && streak > 0){
+          const f = prox.dias - streak;
+          marco = `Próximo marco: ${prox.nome} (${f === 1 ? "falta 1 dia" : `faltam ${f} dias`})`;
+        }
+      } catch(_){}
+      const seq = streak > 0 ? `${streak} ${streak === 1 ? "dia seguido" : "dias seguidos"}` : "";
+      corpo.innerHTML = `<div class="moGrande">Momento concluído.</div>
+        ${d.done ? `<div class="moTxt">${escapeHtml([seq, marco].filter(Boolean).join(" · "))}</div>`
+                 : `<div class="moTxt">A leitura de hoje ainda não foi marcada. Leia até o fim de cada capítulo para manter a chama acesa.</div>`}`;
+    }
+  }
+
+  function moIr(i){
+    moSalvarReflexao();
+    moI = Math.max(0, Math.min(moCartoes.length - 1, i));
+    moDesenhar();
+  }
+  function moEsconder(){
+    const el = document.getElementById("momento");
+    el.classList.remove("show");
+    el.setAttribute("aria-hidden", "true");
+  }
+  function moFechar(){
+    moSalvarReflexao();
+    moRetomar = false;
+    moEsconder();
+    try { renderAll(); } catch(_){}
+  }
+  function abrirMomento(inicio){
+    moMontar();
+    moI = 0;
+    if (inicio) moI = Math.max(0, moCartoes.findIndex(c => c.id === inicio));
+    const el = document.getElementById("momento");
+    el.classList.add("show");
+    el.setAttribute("aria-hidden", "false");
+    moDesenhar();
+  }
+  function moRetomarDepois(){
+    moRetomar = false;
+    const d = moMontar();
+    let i = moCartoes.findIndex(c => c.id === "leitura");
+    if (i < 0) i = 0;
+    if (d.done) i = Math.min(i + 1, moCartoes.length - 1);   // leu tudo: segue para a reflexão
+    moI = i;
+    const el = document.getElementById("momento");
+    el.classList.add("show");
+    el.setAttribute("aria-hidden", "false");
+    moDesenhar();
+  }
+
+  (function initMomento(){
+    const el = document.getElementById("momento");
+    if (!el) return;
+    document.getElementById("moFechar").addEventListener("click", moFechar);
+    document.getElementById("moVoltar").addEventListener("click", () => moIr(moI - 1));
+    document.getElementById("moContinuar").addEventListener("click", () => {
+      if (moI >= moCartoes.length - 1) moFechar(); else moIr(moI + 1);
+    });
+    // toque no cartão: terço esquerdo volta, o resto avança (fora de botões, campos e textos que rolam)
+    document.getElementById("moCartao").addEventListener("click", (e) => {
+      if (e.target.closest("button, textarea, a, input, .moRolar, .moPe, .moTopo")) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      if (e.clientX - r.left < r.width / 3){ if (moI > 0) moIr(moI - 1); }
+      else if (moI < moCartoes.length - 1) moIr(moI + 1);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (!el.classList.contains("show") || e.target.closest?.("textarea")) return;
+      if (e.key === "Escape") moFechar();
+      else if (e.key === "ArrowRight" && moI < moCartoes.length - 1) moIr(moI + 1);
+      else if (e.key === "ArrowLeft" && moI > 0) moIr(moI - 1);
+    });
+    // voltando do leitor: o momento reaparece onde parou
+    const leitor = document.getElementById("readerModal");
+    if (leitor){
+      new MutationObserver(() => {
+        if (!moRetomar || leitor.classList.contains("open")) return;
+        setTimeout(() => { if (moRetomar && !leitor.classList.contains("open")) moRetomarDepois(); }, 350);
+      }).observe(leitor, { attributes: true, attributeFilter: ["class"] });
+    }
+    document.getElementById("hojeMomentoBtn")?.addEventListener("click", () => abrirMomento());
   })();
 
   // ── MODO LEITURA: esconde tudo que não é o texto bíblico ──
@@ -6505,9 +6837,14 @@ function closeReader(){
   const info  = document.getElementById("syncInfo");
   const errEl = document.getElementById("syncErr");
 
+  // altura do quadro no celular: logo abaixo do selo, onde quer que ele esteja
+  function posicionarPainel(){
+    try { panel.style.setProperty("--syncTopo", Math.round(chip.getBoundingClientRect().bottom + 8) + "px"); } catch(_){}
+  }
   function mostrarErro(msg){
     errEl.textContent = msg;
     errEl.classList.add("show");
+    posicionarPainel();
     panel.classList.add("open");
   }
   function limparErro(){ errEl.textContent = ""; errEl.classList.remove("show"); }
@@ -6733,6 +7070,7 @@ function closeReader(){
 
   chip.addEventListener("click", () => {
     if (!usuario){ entrar(); return; }
+    posicionarPainel();
     panel.classList.toggle("open");
   });
   document.getElementById("syncAgora").addEventListener("click", () => { panel.classList.remove("open"); baixar(); });
