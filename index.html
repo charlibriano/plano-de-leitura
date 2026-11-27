@@ -1725,6 +1725,21 @@
     .openingPular{display:block;margin:14px auto 0;appearance:none;border:0;background:transparent;color:var(--ink-3);font-family:var(--ui);font-size:13px;font-weight:500;cursor:pointer;padding:8px 12px}
     .openingPular:hover,.openingPular:focus{background:transparent;color:var(--ink)}
 
+    /* ── Desafio de Natal ── */
+    .desafioConvite{background:#1F2A44;color:#fff;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+    .desafioConvite[hidden]{display:none}
+    .dnKicker{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#F3D38A}
+    .dnTitulo{font-family:var(--serif);font-size:19px;line-height:1.3}
+    .dnTxt{font-size:13px;line-height:1.5;opacity:.85}
+    .dnAcoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .dnBtn{appearance:none;border:0;border-radius:999px;background:#fff;color:#1F2A44;padding:8px 16px;font-family:var(--ui);font-size:13px;font-weight:700;cursor:pointer}
+    .dnBtn:hover,.dnBtn:focus{background:#fff;color:#1F2A44;opacity:.9}
+    .dnQuando{font-size:12px;opacity:.75}
+    .dnAgoraNao{appearance:none;border:0;background:transparent;color:rgba(255,255,255,.7);font-family:var(--ui);font-size:12px;cursor:pointer;margin-left:auto;padding:4px}
+    .dnAgoraNao:hover,.dnAgoraNao:focus{background:transparent;color:#fff}
+    .hojePlanos button.natal.on{background:#1F2A44;color:#fff;border-color:#1F2A44}
+    #readerText .verse.foraTrecho{opacity:.38}
+
     /* ── Ler junto ── */
     .ajJuntoNovo{flex-wrap:wrap}
     .ajJuntoNovo .ajBtn{flex:1;padding:0 8px;white-space:nowrap;font-size:12.5px}
@@ -2306,6 +2321,7 @@
         </section>
 
         <section class="hojeCard" aria-label="Leitura de hoje">
+          <div class="desafioConvite" id="desafioConvite" hidden></div>
           <div class="hojeCardTop">
             <h3 id="hojeTitulo">Leitura de hoje</h3>
             <div class="hojePlanos" id="hojePlanos" role="tablist" aria-label="Plano" hidden></div>
@@ -2501,6 +2517,38 @@
 
 <script src="devocionais.js"></script>
 <script>
+  // Desafio de Natal: dados no começo do script (a tela Hoje é desenhada antes do resto carregar)
+  const DESAFIO_NATAL = [
+    ["Gênesis 3:1-15", "A primeira promessa"],
+    ["Gênesis 12:1-3", "Bênção para todas as famílias"],
+    ["2 Samuel 7:8-16", "Um trono para sempre"],
+    ["Isaías 7:10-14", "Emanuel"],
+    ["Isaías 9:1-7", "Um menino nos nasceu"],
+    ["Isaías 11:1-10", "O rebento de Jessé"],
+    ["Miqueias 5:2-5", "Belém"],
+    ["Isaías 40:1-11", "Consolai o meu povo"],
+    ["Isaías 53:1-12", "O servo que leva as nossas dores"],
+    ["Malaquias 3:1-4", "O mensageiro"],
+    ["João 1:1-14", "O Verbo se fez carne"],
+    ["Hebreus 1:1-4", "Deus nos falou pelo Filho"],
+    ["João 3:16-21", "Deus amou o mundo"],
+    ["Gálatas 4:4-7", "Na plenitude dos tempos"],
+    ["Filipenses 2:5-11", "Ele se esvaziou"],
+    ["Mateus 1:1-17", "A genealogia de Jesus"],
+    ["Lucas 1:5-25", "O anúncio a Zacarias"],
+    ["Lucas 1:26-38", "O anúncio a Maria"],
+    ["Lucas 1:39-56", "Maria visita Isabel"],
+    ["Lucas 1:57-80", "O nascimento de João"],
+    ["Mateus 1:18-25", "O sonho de José"],
+    ["Isaías 60:1-6", "Levanta-te, resplandece"],
+    ["Salmos 98", "Cantai um cântico novo"],
+    ["Lucas 2:1-7", "O nascimento em Belém"],
+    ["Lucas 2:8-20", "Glória a Deus nas alturas"]
+  ].map(([ref, tema]) => {
+    const m = ref.match(/^(.+?) (\d+)(?::(\d+)-(\d+))?$/);
+    return { ref, tema, book: m[1], chapter: Number(m[2]), ini: m[3] ? Number(m[3]) : null, fim: m[4] ? Number(m[4]) : null };
+  });
+  const DESAFIO_TOTAL = DESAFIO_NATAL.length;   // 25
   // O plano não é mais preso a 2026: são 365 dias a partir de state.planStart
   // (a data do 1º login da pessoa, gravada na conta). Ver "Janela do plano".
   const DEFAULT_VERSION = "acf";
@@ -3523,14 +3571,22 @@ function updateLateUI(state){
 
     // ── chave de planos (só aparece se a pessoa tem planos extras) ──
     const ativosExtra = planosAtivos(state);
-    const vistoHoje = planoVisto(state);
+    const comNatal = desafioParticipa(state, today);   // Desafio de Natal: aba ao lado do plano anual
+    const vistoHoje = (comNatal && state.ui?.planoVisto === "natal") ? "natal" : planoVisto(state);
     const chave = document.getElementById("hojePlanos");
-    document.getElementById("hojeTitulo").hidden = ativosExtra.length > 0;
-    chave.hidden = ativosExtra.length === 0;
-    if (ativosExtra.length){
+    const temAbas = ativosExtra.length > 0 || comNatal;
+    desafioConviteHtml(state, today);
+    document.getElementById("hojeTitulo").hidden = temAbas;
+    chave.hidden = !temAbas;
+    if (temAbas){
       chave.innerHTML = `<button type="button" role="tab" data-id="anual" class="${vistoHoje === "anual" ? "on" : ""}">Plano anual</button>`
-        + ativosExtra.map(pl => `<button type="button" role="tab" data-id="${escapeHtml(pl.id)}" class="${vistoHoje === pl.id ? "on" : ""}">${escapeHtml(pl.curto || pl.nome)}</button>`).join("");
+        + ativosExtra.map(pl => `<button type="button" role="tab" data-id="${escapeHtml(pl.id)}" class="${vistoHoje === pl.id ? "on" : ""}">${escapeHtml(pl.curto || pl.nome)}</button>`).join("")
+        + (comNatal ? `<button type="button" role="tab" data-id="natal" class="natal${vistoHoje === "natal" ? " on" : ""}">Natal</button>` : "");
       chave.querySelectorAll("button").forEach(b => b.addEventListener("click", () => verPlano(b.dataset.id)));
+    }
+    if (vistoHoje === "natal"){
+      renderHojeDesafio(state, today);
+      return;
     }
     if (vistoHoje !== "anual"){
       renderHojeExtra(ativosExtra.find(pl => pl.id === vistoHoje), today);
@@ -4903,13 +4959,19 @@ b.addEventListener("click", ()=>{
         const ok = d.done || b.list.every(it => lidos.has(refCap(it)));
         return `<li class="${ok ? "ok" : ""}"><span class="moCheck">${ok ? "✓" : ""}</span>${escapeHtml(b.text)}</li>`;
       }).join("");
-      corpo.innerHTML = `<div class="moRef">Leitura de hoje</div><ul class="moLista">${itens}</ul>
-        ${d.done ? `<div class="moTxt">Leitura concluída. Muito bem!</div>` : `<button type="button" class="moBtn" id="moLer">Ler agora</button>
+      // Desafio de Natal: a passagem do dia entra junto
+      const dnIdx = desafioParticipa(d.st, d.hoje) ? desafioIdxHoje(d.hoje) : -1;
+      const dnFeito = dnIdx >= 0 && desafioLidos(d.st, d.hoje).has(dnIdx);
+      const dnItem = dnIdx >= 0 ? `<li class="${dnFeito ? "ok" : ""}"><span class="moCheck">${dnFeito ? "✓" : ""}</span>Natal · ${escapeHtml(DESAFIO_NATAL[dnIdx].ref)}</li>` : "";
+      const tudoFeito = d.done && (dnIdx < 0 || dnFeito);
+      const lerNatal = d.done && dnIdx >= 0 && !dnFeito;
+      corpo.innerHTML = `<div class="moRef">Leitura de hoje</div><ul class="moLista">${itens}${dnItem}</ul>
+        ${tudoFeito ? `<div class="moTxt">Leitura concluída. Muito bem!</div>` : `<button type="button" class="moBtn" id="moLer">${lerNatal ? "Ler a passagem do Natal" : "Ler agora"}</button>
         <div class="moTxt moPeq">Ao fechar o leitor, o momento continua daqui.</div>`}`;
       document.getElementById("moLer")?.addEventListener("click", () => {
         moRetomar = true;
         moEsconder();
-        document.getElementById("hojeCta")?.click();
+        if (lerNatal) abrirDesafio(dnIdx); else document.getElementById("hojeCta")?.click();
         // se o leitor não abrir (ex.: fora do plano), o momento volta sozinho
         setTimeout(() => { if (moRetomar && !document.getElementById("readerModal").classList.contains("open")) moRetomarDepois(); }, 1500);
       });
@@ -4985,7 +5047,9 @@ b.addEventListener("click", ()=>{
     const d = moMontar();
     let i = moCartoes.findIndex(c => c.id === "leitura");
     if (i < 0) i = 0;
-    if (d.done) i = Math.min(i + 1, moCartoes.length - 1);   // leu tudo: segue para a reflexão
+    const dnI = desafioParticipa(d.st, d.hoje) ? desafioIdxHoje(d.hoje) : -1;
+    const natalOk = dnI < 0 || desafioLidos(d.st, d.hoje).has(dnI);
+    if (d.done && natalOk) i = Math.min(i + 1, moCartoes.length - 1);   // leu tudo: segue para a reflexão
     moI = i;
     const el = document.getElementById("momento");
     el.classList.add("show");
@@ -5230,6 +5294,11 @@ b.addEventListener("click", ()=>{
     // Concluir dia: marca o dia selecionado como concluído e fecha o leitor
     if (doneBtn){
       doneBtn.onclick = ()=>{
+        if (ctx?.desafio != null){
+          desafioMarcar(ctx.desafio);
+          closeReader(); try{ renderAll(); }catch(e){}
+          return;
+        }
         if (ctx?.extraId){
           // plano extra: marca todos os capítulos deste dia do plano
           const st3 = ensureStateDefaults(loadState());
@@ -5283,6 +5352,7 @@ ligarFimDoCapitulo(ctx, book, chapter);
 prepararAudio();
 document.getElementById("presBtn").hidden = false;
 focarVersoAlvo();
+marcarTrechoDesafio(ctx);
 const keyRef = `${book}|${chapter}|${translationId}`;
             const st2 = ensureStateDefaults(loadState());
             st2.reader = st2.reader || {};
@@ -5485,6 +5555,13 @@ const keyRef = `${book}|${chapter}|${translationId}`;
 
   function fimDoCapituloHtml(ctx, book, chapter){
     if (!ctx || !Array.isArray(ctx.list) || !ctx.list.length) return "";
+    if (ctx.desafio != null){
+      const ja = desafioLidos(ensureStateDefaults(loadState()), new Date()).has(ctx.desafio);
+      return `<div class="fimCap">
+        ${ja ? `<span class="fimCapInfo">Esta passagem já está marcada como lida.</span>` : ""}
+        <button type="button" class="fimCapBtn principal" id="fimCapProx">✓ Li a passagem do dia ${ctx.desafio + 1}</button>
+      </div>`;
+    }
     if (ctx.livre){
       // leitura livre (aba Bíblia): só segue para o próximo capítulo, sem marcar progresso
       const prox = ctx.list[Number(ctx.idx || 0) + 1];
@@ -5511,6 +5588,7 @@ const keyRef = `${book}|${chapter}|${translationId}`;
     const bProx = document.getElementById("fimCapProx");
     const bFechar = document.getElementById("fimCapFechar");
     if (!bProx || !ctx) return;
+    if (ctx.desafio != null){ bProx.onclick = () => { desafioMarcar(ctx.desafio); closeReader(); renderAll(); }; return; }
     const i = Number(ctx.idx || 0);
     const item = ctx.list[i] || { book, chapter };
     if (ctx.livre){ bProx.onclick = () => goPlanDelta(1); return; }
@@ -5783,6 +5861,140 @@ function closeReader(){
     const lidos = new Set(pl.lidos || []);
     if (!Number.isInteger(idx)) idx = Math.max(0, lista.findIndex(it => !lidos.has(refCap(it))));
     openBibleReader(lista[idx].book, lista[idx].chapter, { extraId: id, extraDia: dia, idx, list: lista });
+  }
+
+  // ══ DESAFIO DE NATAL ══
+  // 25 passagens, de 1º a 25 de dezembro, com data fixa para todos (o grupo lê junto).
+  // Só a Escritura: os temas são títulos curtos tirados do próprio texto.
+  function desafioChave(hoje){ return `natal${hoje.getFullYear()}`; }
+  // convite aparece de 15/11 a 25/12; a aba fica até 31/12 para quem quiser terminar
+  function desafioConviteAberto(hoje){ const m = hoje.getMonth(), d = hoje.getDate(); return (m === 10 && d >= 15) || (m === 11 && d <= 25); }
+  function desafioAbaAberta(hoje){ const m = hoje.getMonth(), d = hoje.getDate(); return (m === 10 && d >= 15) || m === 11; }
+  // índice do dia (0 = 1º/12); -1 antes de começar; depois do dia 25 fica no último
+  function desafioIdxHoje(hoje){ if (hoje.getMonth() !== 11) return -1; return Math.min(hoje.getDate(), DESAFIO_TOTAL) - 1; }
+  function desafioDias(hoje){ return Math.round((new Date(hoje.getFullYear(), 11, 1) - new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())) / 86400000); }
+  function desafioDe(st, hoje){ return st.desafios?.[desafioChave(hoje)] || null; }
+  function desafioParticipa(st, hoje){ return !!desafioDe(st, hoje) && desafioAbaAberta(hoje); }
+  function desafioLidos(st, hoje){ return new Set(desafioDe(st, hoje)?.lidos || []); }
+  function desafioMarcar(i){
+    const hoje = new Date();
+    const st = ensureStateDefaults(loadState());
+    st.desafios = st.desafios || {};
+    const k = desafioChave(hoje);
+    st.desafios[k] = st.desafios[k] || { entrou: new Date().toISOString(), lidos: [] };
+    st.desafios[k].lidos = [...new Set([...(st.desafios[k].lidos || []), i])].sort((a, b) => a - b);
+    saveState(st);
+  }
+  function desafioParticipar(){
+    const hoje = new Date();
+    const st = ensureStateDefaults(loadState());
+    st.desafios = st.desafios || {};
+    const k = desafioChave(hoje);
+    if (!st.desafios[k]) st.desafios[k] = { entrou: new Date().toISOString(), lidos: [] };
+    st.ui = st.ui || {}; st.ui.planoVisto = "natal";
+    saveState(st);
+    redesenharHoje();
+  }
+  function desafioDispensar(){
+    const st = ensureStateDefaults(loadState());
+    st.ui = st.ui || {}; st.ui.desafioDispensado = desafioChave(new Date());
+    saveState(st);
+    redesenharHoje();
+  }
+  // abre o capítulo no leitor, com o trecho do dia em destaque
+  function abrirDesafio(i){
+    const p = DESAFIO_NATAL[i];
+    if (!p) return;
+    openBibleReader(p.book, p.chapter, { desafio: i, list: [{ book: p.book, chapter: p.chapter }], idx: 0 });
+  }
+  // chamado pelo leitor depois de montar o texto
+  function marcarTrechoDesafio(ctx){
+    if (ctx?.desafio == null) return;
+    const p = DESAFIO_NATAL[ctx.desafio];
+    if (!p) return;
+    try { document.getElementById("readerRef").textContent = `${p.ref} · Natal, dia ${ctx.desafio + 1}`; } catch(_){}
+    if (p.ini == null) return;
+    const vs = Array.from(document.querySelectorAll("#readerText .verse"));
+    let ultimo = null, primeiro = null;
+    vs.forEach(el => {
+      const n = Number(el.dataset.verse);
+      if (n >= p.ini && n <= p.fim){ ultimo = el; primeiro = primeiro || el; }
+      else el.classList.add("foraTrecho");
+    });
+    // o botão de concluir fica logo depois do último versículo do trecho
+    const fim = document.querySelector("#readerText .fimCap");
+    if (fim && ultimo) ultimo.after(fim);
+    if (primeiro) setTimeout(() => primeiro.scrollIntoView({ block: "start" }), 80);
+  }
+
+  function desafioConviteHtml(st, hoje){
+    const box = document.getElementById("desafioConvite");
+    if (!box) return;
+    const mostrar = desafioConviteAberto(hoje) && !desafioDe(st, hoje) && st.ui?.desafioDispensado !== desafioChave(hoje);
+    box.hidden = !mostrar;
+    if (!mostrar){ box.innerHTML = ""; return; }
+    const faltam = desafioDias(hoje);
+    const quando = faltam > 1 ? `Começa em ${faltam} dias` : faltam === 1 ? "Começa amanhã" : `Hoje é o dia ${desafioIdxHoje(hoje) + 1}`;
+    box.innerHTML = `<div class="dnKicker">Desafio de Natal</div>
+      <div class="dnTitulo">25 dias até Belém</div>
+      <div class="dnTxt">Da primeira promessa ao nascimento de Jesus. De 1º a 25 de dezembro · 5 a 10 min por dia.</div>
+      <div class="dnAcoes"><button type="button" class="dnBtn" id="dnParticipar">Participar</button><span class="dnQuando">${quando}</span><button type="button" class="dnAgoraNao" id="dnAgoraNao">Agora não</button></div>`;
+    document.getElementById("dnParticipar").addEventListener("click", desafioParticipar);
+    document.getElementById("dnAgoraNao").addEventListener("click", desafioDispensar);
+  }
+
+  function renderHojeDesafio(st, hoje){
+    const lista = document.getElementById("hojeLista");
+    const cta = document.getElementById("hojeCta");
+    const links = document.getElementById("hojeLinks");
+    const rodape = document.getElementById("hojeRodape");
+    links.innerHTML = "";
+    const lidos = desafioLidos(st, hoje);
+    const idx = desafioIdxHoje(hoje);
+    document.getElementById("hojeBarra").style.width = `${Math.round(lidos.size / DESAFIO_TOTAL * 100)}%`;
+    cta.style.display = "";
+    const item = (i, extra) => {
+      const p = DESAFIO_NATAL[i], ok = lidos.has(i);
+      return `<button type="button" class="hojeItem${ok ? " lido" : ""}" data-dn="${i}">
+        <span class="hojeCheck">${SVG_CHECK}</span>
+        <span class="hojeTxt"><span class="hojeRef">${escapeHtml(p.ref)}</span><span class="hojeTrilha">${extra ? escapeHtml(extra) + " · " : ""}${escapeHtml(p.tema)}</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--ink-3)"><path d="m9 6 6 6-6 6"/></svg>
+      </button>`;
+    };
+    if (idx < 0){
+      const faltam = desafioDias(hoje);
+      document.getElementById("hojeDia").textContent = faltam === 1 ? "Começa amanhã" : `Começa em ${faltam} dias`;
+      lista.innerHTML = item(0, "1º de dezembro");
+      cta.style.display = "none";
+      rodape.textContent = "Desafio de Natal · de 1º a 25 de dezembro";
+    } else if (lidos.size >= DESAFIO_TOTAL){
+      document.getElementById("hojeDia").textContent = "Concluído";
+      lista.innerHTML = `<div class="hojeTrilha" style="padding:10px 2px">Você chegou a Belém: leu as 25 passagens do Desafio de Natal. “Glória a Deus nas alturas, e paz na terra.”</div>`;
+      cta.style.display = "none";
+      rodape.textContent = "Desafio de Natal · 25 de 25 dias lidos";
+    } else {
+      document.getElementById("hojeDia").textContent = `Dia ${idx + 1} de ${DESAFIO_TOTAL}`;
+      // a passagem de hoje + até 2 dias anteriores ainda não lidos (para alcançar o grupo)
+      const atrasados = [];
+      for (let i = idx - 1; i >= 0 && atrasados.length < 2; i--) if (!lidos.has(i)) atrasados.unshift(i);
+      lista.innerHTML = item(idx, "Hoje") + atrasados.map(i => item(i, `Dia ${i + 1}`)).join("");
+      const alvo = !lidos.has(idx) ? idx : (atrasados[0] ?? null);
+      if (alvo === null){
+        cta.classList.add("feito");
+        cta.textContent = "Passagem de hoje lida ✓";
+        hojeAcaoCta = null;
+      } else {
+        cta.classList.remove("feito");
+        cta.textContent = alvo === idx ? "Ler a passagem" : `Ler o dia ${alvo + 1}`;
+        hojeAcaoCta = () => abrirDesafio(alvo);
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "hojeLink"; b.textContent = "Marcar como lido";
+        b.addEventListener("click", () => { desafioMarcar(alvo); redesenharHoje(); });
+        links.appendChild(b);
+      }
+      rodape.textContent = `Desafio de Natal · ${lidos.size} de ${DESAFIO_TOTAL} dias lidos`;
+    }
+    lista.querySelectorAll("[data-dn]").forEach(el => el.addEventListener("click", () => abrirDesafio(Number(el.dataset.dn))));
   }
 
   function renderHojeExtra(pl, hoje){
@@ -6999,6 +7211,13 @@ function closeReader(){
       atual.apagado = !!(atual.apagado || pl.apagado);
     }
     out.planosExtras = Object.values(planos);
+
+    // Desafios (ex.: Natal): participar em qualquer lado = participando; dias lidos = soma dos dois
+    out.desafios = { ...(nuvem.desafios || {}) };
+    for (const [k, d] of Object.entries(local.desafios || {})){
+      const r = out.desafios[k];
+      out.desafios[k] = r ? { ...r, ...d, entrou: [r.entrou, d.entrou].filter(Boolean).sort()[0], lidos: [...new Set([...(r.lidos || []), ...(d.lidos || [])])].sort((a, b) => a - b) } : d;
+    }
     return out;
   }
 
@@ -7331,7 +7550,9 @@ function closeReader(){
     const key = todayKeyNow();
     const p = buildPlanForYear(st)[key];
     const leituras = (p?.blocks || []).filter(b => !b.concluida && b.list?.length).map(b => b.text).join(" · ");
-    return { nome: primeiroNome(), dia: key, leu: !!st.days?.[key]?.done, leituras, sequencia: calcStreak(st, hoje) };
+    const dnIdx = desafioParticipa(st, hoje) ? desafioIdxHoje(hoje) : -1;
+    const natal = dnIdx >= 0 ? { dia: dnIdx + 1, leu: desafioLidos(st, hoje).has(dnIdx) } : null;
+    return { nome: primeiroNome(), dia: key, leu: !!st.days?.[key]?.done, leituras, sequencia: calcStreak(st, hoje), natal };
   }
   async function publicarStatus(){
     if (!usuario || !juntoGrupos.length) return;
@@ -7427,7 +7648,8 @@ function closeReader(){
         const leu = s.dia === hoje && s.leu;
         const inicial = escapeHtml((s.nome || "?").charAt(0).toUpperCase());
         const seq = leu && s.sequencia > 1 ? ` · ${s.sequencia} dias` : "";
-        return `<div class="jtPessoa${leu ? " leu" : ""}"><span class="jtAv">${inicial}</span><span class="jtNome">${escapeHtml(s.nome || "Alguém")}${leu && s.leituras ? ` · ${escapeHtml(s.leituras)}` : ""}</span><span class="jtEst">${leu ? `✓ leu${seq}` : "ainda não leu"}</span></div>`;
+        const natal = s.dia === hoje && s.natal?.leu ? ` · Natal dia ${s.natal.dia} ✓` : "";
+        return `<div class="jtPessoa${leu ? " leu" : ""}"><span class="jtAv">${inicial}</span><span class="jtNome">${escapeHtml(s.nome || "Alguém")}${leu && s.leituras ? ` · ${escapeHtml(s.leituras)}` : ""}${escapeHtml(natal)}</span><span class="jtEst">${leu ? `✓ leu${seq}` : "ainda não leu"}</span></div>`;
       }).join("");
       return `<div class="jtGrupo"><div class="jtTit">Lendo junto · ${escapeHtml(g.nome)}</div>${pessoas}${resto > 0 ? `<div class="jtMais">+${resto} ${resto === 1 ? "pessoa" : "pessoas"}</div>` : ""}</div>`;
     }).join("");
