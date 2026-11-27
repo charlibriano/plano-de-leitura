@@ -1725,6 +1725,18 @@
     .openingPular{display:block;margin:14px auto 0;appearance:none;border:0;background:transparent;color:var(--ink-3);font-family:var(--ui);font-size:13px;font-weight:500;cursor:pointer;padding:8px 12px}
     .openingPular:hover,.openingPular:focus{background:transparent;color:var(--ink)}
 
+    /* ── Seu ano na Bíblia ── */
+    .retroConvite{background:#3b2a5c}
+    .rtNum{font-family:var(--serif);font-size:clamp(54px,15vw,72px);line-height:1}
+    .rtTitulo{font-size:clamp(30px,8vw,38px)}
+    #rtCartao{background:#3b2a5c}
+    #rtVoltar{width:48px;height:48px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:22px}
+    #rtContinuar{flex:1;height:48px;border:0;background:#fff;color:#17130F;font-size:15px}
+    #rtVoltar:hover,#rtVoltar:focus{background:rgba(255,255,255,.12);color:#fff}
+    #rtContinuar:hover,#rtContinuar:focus{background:#fff;color:#17130F;opacity:.9}
+    .rtOutro{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.5)}
+    .rtOutro:hover,.rtOutro:focus{background:rgba(255,255,255,.22);color:#fff}
+
     /* ── Desafio de Natal ── */
     .desafioConvite{background:#1F2A44;color:#fff;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
     .desafioConvite[hidden]{display:none}
@@ -1850,6 +1862,19 @@
       <p class="openingText" id="openingText"></p>
       <button class="openingBtn" id="openingBtn" type="button">Começar meu momento</button>
       <button class="openingPular" id="openingPular" type="button">Ir para o app</button>
+    </div>
+  </div>
+
+  <!-- Seu ano na Bíblia (retrospectiva) -->
+  <div class="momento" id="retro" aria-hidden="true" role="dialog" aria-label="Seu ano na Bíblia">
+    <div class="moCartao" id="rtCartao">
+      <div class="moBarra" id="rtBarra"></div>
+      <div class="moTopo"><span>Seu ano na Bíblia</span><button type="button" id="rtFechar" aria-label="Fechar a retrospectiva">✕</button></div>
+      <div class="moCorpo" id="rtCorpo"></div>
+      <div class="moPe">
+        <button type="button" id="rtVoltar" aria-label="Cartão anterior">‹</button>
+        <button type="button" id="rtContinuar">Continuar</button>
+      </div>
     </div>
   </div>
 
@@ -2134,6 +2159,10 @@
               <span class="ajTxt"><b>Tema escuro</b><small>Mais confortável à noite</small></span>
               <input type="checkbox" id="ajTema" class="ajSwitch" role="switch" />
             </label>
+            <div class="ajLinha">
+              <span class="ajTxt"><b id="ajRetroTit">Seu ano na Bíblia</b><small>Retrospectiva do seu ano de leitura</small></span>
+              <button type="button" class="ajBtn" id="ajRetroBtn">Ver</button>
+            </div>
           </div>
         </div>
         <p class="ajRodape">Texto bíblico: Bíblia Livre (BLIVRE), © Diego Santos, Mario Sérgio e Marco Teles · CC BY 4.0</p>
@@ -2321,6 +2350,7 @@
         </section>
 
         <section class="hojeCard" aria-label="Leitura de hoje">
+          <div class="desafioConvite retroConvite" id="retroConvite" hidden></div>
           <div class="desafioConvite" id="desafioConvite" hidden></div>
           <div class="hojeCardTop">
             <h3 id="hojeTitulo">Leitura de hoje</h3>
@@ -3576,6 +3606,7 @@ function updateLateUI(state){
     const chave = document.getElementById("hojePlanos");
     const temAbas = ativosExtra.length > 0 || comNatal;
     desafioConviteHtml(state, today);
+    retroConviteHtml(state, today);
     document.getElementById("hojeTitulo").hidden = temAbas;
     chave.hidden = !temAbas;
     if (temAbas){
@@ -5089,6 +5120,183 @@ b.addEventListener("click", ()=>{
     document.getElementById("hojeMomentoBtn")?.addEventListener("click", () => abrirMomento());
   })();
 
+  // ══ SEU ANO NA BÍBLIA (retrospectiva) ══
+  // Tudo sai do progresso salvo: dias lidos, capítulos, sequência, diário e destaques.
+  function retroAnoDe(hoje){ return hoje.getMonth() === 0 ? hoje.getFullYear() - 1 : hoje.getFullYear(); }
+  function retroConviteAberto(hoje){ const m = hoje.getMonth(), d = hoje.getDate(); return (m === 11 && d >= 26) || (m === 0 && d <= 15); }
+  const MESES_PT = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+
+  function retroCalcular(st, ano){
+    const pre = `${ano}-`;
+    const diasAno = Object.keys(st.days || {}).filter(k => k.startsWith(pre) && st.days[k]?.done).sort();
+    const porMes = Array(12).fill(0);
+    diasAno.forEach(k => porMes[Number(k.slice(5, 7)) - 1]++);
+    const mesTop = porMes.indexOf(Math.max(...porMes));
+
+    // capítulos: os marcados um a um; dia marcado inteiro usa a leitura daquele dia do plano
+    const refs = new Set();
+    let plano = {};
+    try { plano = buildPlanForYear(st); } catch(_){}
+    Object.keys(st.days || {}).filter(k => k.startsWith(pre)).forEach(k => {
+      (st.days[k].lidos || []).forEach(r => refs.add(r));
+      if (st.days[k].done) (plano[k]?.guidedList || []).forEach(it => refs.add(`${it.book} ${it.chapter}`));
+    });
+    (st.planosExtras || []).filter(pl => !pl.apagado && String(pl.inicio || "").startsWith(pre)).forEach(pl => (pl.lidos || []).forEach(r => refs.add(r)));
+    const natal = st.desafios?.[`natal${ano}`];
+    (natal?.lidos || []).forEach(i => { const p = DESAFIO_NATAL[i]; if (p) refs.add(`${p.book} ${p.chapter}`); });
+    const porLivro = {};
+    refs.forEach(r => { const m = r.match(/^(.+) (\d+)$/); if (m) (porLivro[m[1]] = porLivro[m[1]] || new Set()).add(Number(m[2])); });
+    const livrosCompletos = LIVROS_TODOS.filter(([nome, n]) => (porLivro[nome]?.size || 0) >= n).map(([nome]) => nome);
+
+    // sequência do ano (mesma regra do descanso)
+    const soAno = { days: Object.fromEntries(diasAno.map(k => [k, { done: true }])) };
+    const recorde = melhorSequencia(soAno);
+    let marco = null;
+    try { MARCOS_SEQUENCIA.forEach(m => { if (recorde >= m.dias) marco = m; }); } catch(_){}
+
+    const diario = Object.entries(st.reader?.diary || {}).filter(([k, e]) => k.startsWith(pre) && String(e?.summary || "").trim()).length;
+    const hl = st.reader?.highlights || {};
+    const destaques = Object.values(hl).reduce((n, a) => n + (a?.length || 0), 0);
+
+    // versículos destacados, do mais recente para o mais antigo
+    const versos = [];
+    const vistos = new Set();
+    const addVerso = (keyRef, vn) => {
+      const id = `${keyRef}#${vn}`;
+      if (vistos.has(id) || !(hl[keyRef] || []).includes(String(vn))) return;
+      const [book, chapter] = keyRef.split("|");
+      const bruto = st.reader?.hlText?.[keyRef]?.[vn] || "";
+      const texto = bruto.replace(/^\s*\d+\s*/, "").trim();
+      if (!texto) return;
+      vistos.add(id); versos.push({ ref: `${book} ${chapter}:${vn}`, texto });
+    };
+    [...(st.reader?.hlRecentes || [])].reverse().forEach(h => addVerso(h.k, h.v));
+    Object.keys(hl).reverse().forEach(k => [...(hl[k] || [])].reverse().forEach(v => addVerso(k, v)));
+
+    return { ano, dias: diasAno.length, mesTop: diasAno.length ? MESES_PT[mesTop] : "", mesTopN: porMes[mesTop] || 0,
+      capitulos: refs.size, livros: Object.keys(porLivro).length, livrosCompletos, recorde, marco, diario, destaques, versos,
+      natal: natal ? (natal.lidos || []).length : null };
+  }
+
+  let rtCartoes = [], rtI = 0, rtDados = null, rtVerso = 0;
+  const RT_FUNDOS = ["linear-gradient(160deg,#3b2a5c,#141026)","linear-gradient(160deg,#2C7A57,#123825)","linear-gradient(160deg,#2f5d73,#142a35)","linear-gradient(160deg,#8a5a1c,#3a2408)","linear-gradient(160deg,#8a5a3c,#3d2216)","linear-gradient(160deg,#4a4470,#1d1a33)","linear-gradient(160deg,#1F2A44,#0c1222)"];
+  const fmtN = n => Number(n).toLocaleString("pt-BR");
+  function rtListaLivros(arr){ if (arr.length <= 3) return arr.join(", "); return `${arr.slice(0, 3).join(", ")} e mais ${arr.length - 3}`; }
+
+  function rtDesenhar(){
+    const d = rtDados, c = rtCartoes[rtI];
+    const el = document.getElementById("rtCartao");
+    el.style.background = RT_FUNDOS[c.fundo];
+    document.getElementById("rtBarra").innerHTML = rtCartoes.map((_, k) => `<i class="${k <= rtI ? "on" : ""}"></i>`).join("");
+    document.getElementById("rtVoltar").style.visibility = rtI === 0 ? "hidden" : "";
+    document.getElementById("rtContinuar").textContent = rtI === rtCartoes.length - 1 ? "Fechar" : "Continuar";
+    const corpo = document.getElementById("rtCorpo");
+    if (c.id === "abre") corpo.innerHTML = `<div class="moRef">Ler Bíblia · ${d.ano}</div><div class="moGrande rtTitulo">Seu ano<br>na Bíblia</div><div class="moTxt">Uma olhada no caminho que você fez com a Palavra este ano.</div>`;
+    if (c.id === "dias") corpo.innerHTML = `<div class="moRef">Dias com a Palavra</div><div class="rtNum">${fmtN(d.dias)}</div><div class="moTxt">${d.dias === 1 ? "dia" : "dias"} de leitura em ${d.ano}.${d.mesTopN > 1 ? `<br>Seu mês mais forte foi <b>${d.mesTop}</b>, com ${d.mesTopN} dias.` : ""}</div>`;
+    if (c.id === "caps") corpo.innerHTML = `<div class="moRef">O que você leu</div><div class="rtNum">${fmtN(d.capitulos)}</div><div class="moTxt">${d.capitulos === 1 ? "capítulo" : "capítulos"}, passando por <b>${d.livros} ${d.livros === 1 ? "livro" : "livros"}</b> da Bíblia.${d.livrosCompletos.length ? `<br>Lidos do começo ao fim: ${escapeHtml(rtListaLivros(d.livrosCompletos))}.` : ""}</div>`;
+    if (c.id === "seq") corpo.innerHTML = `<div class="moRef">Sua maior sequência</div><div class="rtNum">${d.recorde}</div><div class="moTxt">${d.recorde === 1 ? "dia" : "dias seguidos"}.${d.marco ? ` Marco alcançado: <b>${escapeHtml(d.marco.nome)}</b>.` : ""}</div>`;
+    if (c.id === "diario") corpo.innerHTML = `<div class="moRef">O que ficou em você</div><div class="rtNum">${fmtN(d.diario)}</div><div class="moTxt">${d.diario === 1 ? "reflexão escrita" : "reflexões escritas"} no diário${d.destaques ? ` e <b>${fmtN(d.destaques)} ${d.destaques === 1 ? "versículo destacado" : "versículos destacados"}</b>` : ""}.</div>`;
+    if (c.id === "verso"){
+      const v = d.versos[rtVerso % d.versos.length];
+      corpo.innerHTML = `<div class="moRef">Um versículo que você guardou</div><div class="moGrande moMedio">“${escapeHtml(v.texto)}”</div><div class="moTxt">${escapeHtml(v.ref)}</div>
+        ${d.versos.length > 1 ? `<button type="button" class="moBtn rtOutro" id="rtOutro">Outro</button>` : ""}`;
+      document.getElementById("rtOutro")?.addEventListener("click", () => { rtVerso++; rtDesenhar(); });
+    }
+    if (c.id === "fim"){
+      corpo.innerHTML = `<div class="moRef">${d.ano} na sua Bíblia</div><div class="moGrande">${fmtN(d.dias)} dias · ${fmtN(d.capitulos)} capítulos · ${d.recorde} seguidos</div>
+        ${d.natal !== null ? `<div class="moTxt">Desafio de Natal: ${d.natal} de ${DESAFIO_TOTAL}${d.natal >= DESAFIO_TOTAL ? " ✓" : ""}</div>` : ""}
+        <button type="button" class="moBtn" id="rtCompartilhar">Compartilhar imagem</button><div class="moTxt moPeq" id="rtMsg"></div>`;
+      document.getElementById("rtCompartilhar").addEventListener("click", rtCompartilhar);
+    }
+  }
+  function abrirRetro(ano){
+    const st = ensureStateDefaults(loadState());
+    rtDados = retroCalcular(st, ano || retroAnoDe(new Date()));
+    rtCartoes = [{ id: "abre", fundo: 0 }, { id: "dias", fundo: 1 }, { id: "caps", fundo: 2 }, { id: "seq", fundo: 3 }, { id: "diario", fundo: 4 }];
+    if (rtDados.versos.length) rtCartoes.push({ id: "verso", fundo: 5 });
+    rtCartoes.push({ id: "fim", fundo: 6 });
+    rtI = 0; rtVerso = 0;
+    const el = document.getElementById("retro");
+    el.classList.add("show"); el.setAttribute("aria-hidden", "false");
+    rtDesenhar();
+  }
+  function fecharRetro(){ const el = document.getElementById("retro"); el.classList.remove("show"); el.setAttribute("aria-hidden", "true"); }
+  function rtIr(i){ rtI = Math.max(0, Math.min(rtCartoes.length - 1, i)); rtDesenhar(); }
+
+  // imagem do resumo (mesmo estilo da imagem do versículo)
+  async function rtImagem(d){
+    const S = 1080, cv = document.createElement("canvas"); cv.width = S; cv.height = S;
+    const g = cv.getContext("2d");
+    const fundo = g.createLinearGradient(0, 0, S * .6, S);
+    fundo.addColorStop(0, "#3b2a5c"); fundo.addColorStop(1, "#141026");
+    g.fillStyle = fundo; g.fillRect(0, 0, S, S);
+    g.textAlign = "center";
+    g.fillStyle = "#F3D38A"; g.font = "600 34px Inter, system-ui, sans-serif";
+    g.fillText(`MEU ${d.ano} NA BÍBLIA`, S / 2, 170);
+    const linhas = [[fmtN(d.dias), d.dias === 1 ? "dia de leitura" : "dias de leitura"], [fmtN(d.capitulos), d.capitulos === 1 ? "capítulo" : "capítulos"], [String(d.recorde), "dias seguidos (recorde)"]];
+    let y = 310;
+    linhas.forEach(([n, t]) => {
+      g.fillStyle = "#FFFFFF"; g.font = "500 112px Literata, Georgia, serif"; g.fillText(n, S / 2, y);
+      g.fillStyle = "rgba(255,255,255,.8)"; g.font = "500 36px Inter, system-ui, sans-serif"; g.fillText(t, S / 2, y + 56);
+      y += 205;
+    });
+    if (d.natal !== null && d.natal > 0){ g.fillStyle = "#F3D38A"; g.font = "600 34px Inter, system-ui, sans-serif"; g.fillText(`Desafio de Natal: ${d.natal} de ${DESAFIO_TOTAL}`, S / 2, y - 25); }
+    g.fillStyle = "rgba(255,246,222,.92)"; g.font = "600 28px Inter, system-ui, sans-serif";
+    g.fillText("Ler Bíblia · lerbiblia.vercel.app", S / 2, S - 70);
+    return await new Promise((ok, falha) => cv.toBlob(b => b ? ok(b) : falha(new Error("o navegador não gerou a imagem.")), "image/png"));
+  }
+  async function rtCompartilhar(){
+    const msg = document.getElementById("rtMsg");
+    try {
+      const blob = await rtImagem(rtDados);
+      const arquivo = new File([blob], `meu-${rtDados.ano}-na-biblia.png`, { type: "image/png" });
+      if (ehToque() && navigator.canShare && navigator.canShare({ files: [arquivo] })){
+        try { await navigator.share({ files: [arquivo], text: `Meu ${rtDados.ano} na Bíblia · Ler Bíblia` }); } catch (e){ if (e?.name !== "AbortError") throw e; }
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = arquivo.name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      if (msg) msg.textContent = "Imagem baixada.";
+    } catch (e){ if (msg) msg.textContent = "Não deu para gerar a imagem agora. Tente de novo."; }
+  }
+
+  function retroConviteHtml(st, hoje){
+    const box = document.getElementById("retroConvite");
+    if (!box) return;
+    const ano = retroAnoDe(hoje);
+    const mostrar = retroConviteAberto(hoje) && st.ui?.retroDispensado !== ano;
+    box.hidden = !mostrar;
+    if (!mostrar){ box.innerHTML = ""; return; }
+    box.innerHTML = `<div class="dnKicker">Retrospectiva</div><div class="dnTitulo">Seu ${ano} na Bíblia</div>
+      <div class="dnAcoes"><button type="button" class="dnBtn" id="rtVer">Ver agora</button><button type="button" class="dnAgoraNao" id="rtAgoraNao">Agora não</button></div>`;
+    document.getElementById("rtVer").addEventListener("click", () => abrirRetro(ano));
+    document.getElementById("rtAgoraNao").addEventListener("click", () => {
+      const s2 = ensureStateDefaults(loadState()); s2.ui = s2.ui || {}; s2.ui.retroDispensado = ano; saveState(s2); redesenharHoje();
+    });
+  }
+
+  (function initRetro(){
+    const el = document.getElementById("retro");
+    if (!el) return;
+    document.getElementById("rtFechar").addEventListener("click", fecharRetro);
+    document.getElementById("rtVoltar").addEventListener("click", () => rtIr(rtI - 1));
+    document.getElementById("rtContinuar").addEventListener("click", () => { if (rtI >= rtCartoes.length - 1) fecharRetro(); else rtIr(rtI + 1); });
+    document.getElementById("rtCartao").addEventListener("click", (e) => {
+      if (e.target.closest("button, a, .moPe, .moTopo")) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      if (e.clientX - r.left < r.width / 3) rtIr(rtI - 1); else rtIr(rtI + 1);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (!el.classList.contains("show")) return;
+      if (e.key === "Escape") fecharRetro(); else if (e.key === "ArrowRight") rtIr(rtI + 1); else if (e.key === "ArrowLeft") rtIr(rtI - 1);
+    });
+    document.getElementById("ajRetroBtn")?.addEventListener("click", () => abrirRetro());
+    const t = document.getElementById("ajRetroTit");
+    if (t) t.textContent = `Seu ${retroAnoDe(new Date())} na Bíblia`;
+  })();
+
   // ── MODO LEITURA: esconde tudo que não é o texto bíblico ──
   (function initZenMode(){
     const btn = document.getElementById("readerZenBtn");
@@ -5382,6 +5590,8 @@ const keyRef = `${book}|${chapter}|${translationId}`;
                   set.add(vn);
                   el.classList.add("hl");
                   try{ st3.reader.hlText[keyRef][vn] = (el.textContent || "").trim(); }catch(e){}
+                  // ordem dos destaques (para a retrospectiva mostrar o mais recente); guarda os últimos 200
+                  try{ st3.reader.hlRecentes = [...(st3.reader.hlRecentes || []).filter(h => !(h.k === keyRef && h.v === vn)), { k: keyRef, v: vn }].slice(-200); }catch(e){}
                 }
                 st3.reader.highlights[keyRef] = Array.from(set);
                 saveState(st3);
