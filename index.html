@@ -1989,6 +1989,10 @@
               <span class="ajTxt"><b>Instalar o app</b><small id="ajAppInfo">Ícone na tela inicial, abre em tela cheia</small></span>
               <button type="button" class="ajBtn principal" id="ajAppBtn">Instalar</button>
             </div>
+            <label class="ajLinha" id="ajLembreteLinha" for="ajLembrete" hidden>
+              <span class="ajTxt"><b>Lembrete às 18h</b><small id="ajLembreteInfo">Um aviso por dia, só se a leitura ainda não estiver marcada</small></span>
+              <input type="checkbox" id="ajLembrete" class="ajSwitch" role="switch" />
+            </label>
             <label class="ajLinha" for="ajTema">
               <span class="ajTxt"><b>Tema escuro</b><small>Mais confortável à noite</small></span>
               <input type="checkbox" id="ajTema" class="ajSwitch" role="switch" />
@@ -6736,12 +6740,126 @@ function closeReader(){
     if (document.visibilityState === "visible" && usuario && !lerMeta().pendente) baixar();
   });
 
+
+  // ── Lembrete diário às 18h (Firebase Cloud Messaging) ──
+  // A chave abaixo é pública (fica no app). Firebase → Configurações do projeto →
+  // Cloud Messaging → Configuração da Web → Certificados push da Web → Gerar par de chaves.
+  const VAPID = "COLE_AQUI_A_CHAVE_PUBLICA_DO_FIREBASE";
+
+  const linhaLembrete = document.getElementById("ajLembreteLinha");
+  const chaveLembrete = document.getElementById("ajLembrete");
+  const infoLembrete  = document.getElementById("ajLembreteInfo");
+  const TOKEN_LOCAL   = "lerbiblia_push_token_v1";
+
+  const podeAvisar = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window;
+  const appInstalado = () => window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  const souIphone = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  // o aviso depende do service worker, que só é registrado no endereço do app
+  const enderecoDoApp = location.hostname === "lerbiblia.vercel.app" || location.hostname === "localhost";
+
+  let messaging = null, msgMod = null;
+  async function prepararAvisos(){
+    if (messaging) return messaging;
+    msgMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js");
+    if (!(await msgMod.isSupported())) throw new Error("este navegador não aceita avisos");
+    messaging = msgMod.getMessaging(app);
+    return messaging;
+  }
+
+  function textoLembrete(estado){
+    if (!usuario) return "Entre com o Google para receber o lembrete";
+    if (souIphone() && !appInstalado()) return "No iPhone, instale o app na tela de início para receber";
+    if (Notification.permission === "denied") return "Avisos bloqueados por você neste aparelho — libere nas permissões do navegador";
+    if (estado === "ligando") return "Pedindo permissão…";
+    return chaveLembrete.checked
+      ? "Você recebe um aviso às 18h se a leitura do dia ainda não estiver marcada"
+      : "Um aviso por dia, só se a leitura ainda não estiver marcada";
+  }
+  function pintarLembrete(estado){
+    if (!linhaLembrete) return;
+    linhaLembrete.hidden = !(podeAvisar && enderecoDoApp);
+    const travado = !usuario || Notification.permission === "denied" || (souIphone() && !appInstalado());
+    chaveLembrete.disabled = travado || estado === "ligando";
+    linhaLembrete.style.opacity = travado ? ".55" : "";
+    infoLembrete.textContent = textoLembrete(estado);
+  }
+
+  async function lerLembreteSalvo(){
+    if (!usuario) { chaveLembrete.checked = false; return pintarLembrete(); }
+    try {
+      const snap = await fb.getDoc(fb.doc(db, "lembretes", usuario.uid));
+      const tok = localStorage.getItem(TOKEN_LOCAL);
+      const d = snap.exists() ? snap.data() : null;
+      // ligado = a conta quer receber E este aparelho está na lista
+      chaveLembrete.checked = !!(d?.ativo && tok && (d.tokens || []).includes(tok) && Notification.permission === "granted");
+    } catch (e){ chaveLembrete.checked = false; }
+    pintarLembrete();
+  }
+
+  async function ligarLembrete(){
+    pintarLembrete("ligando");
+    const permissao = await Notification.requestPermission();
+    if (permissao !== "granted"){
+      chaveLembrete.checked = false;
+      pintarLembrete();
+      if (permissao === "denied") mostrarErro("Você bloqueou os avisos neste aparelho. Para receber, libere as notificações do site nas permissões do navegador.");
+      return;
+    }
+    if (!VAPID || VAPID.startsWith("COLE_AQUI")) throw new Error("falta a chave pública (VAPID) do Firebase no index.html");
+    await prepararAvisos();
+    const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", { scope: "/firebase-cloud-messaging-push-scope" });
+    const token = await msgMod.getToken(messaging, { vapidKey: VAPID, serviceWorkerRegistration: reg });
+    if (!token) throw new Error("não consegui o código deste aparelho");
+    localStorage.setItem(TOKEN_LOCAL, token);
+    await fb.setDoc(fb.doc(db, "lembretes", usuario.uid), {
+      ativo: true,
+      hora: 18,
+      fuso: "America/Sao_Paulo",
+      tokens: fb.arrayUnion(token),
+      atualizadoEm: fb.serverTimestamp()
+    }, { merge: true });
+    chaveLembrete.checked = true;
+    pintarLembrete();
+  }
+
+  async function desligarLembrete(){
+    const token = localStorage.getItem(TOKEN_LOCAL);
+    if (usuario){
+      // tira só este aparelho; se não sobrar nenhum, a conta para de receber
+      const ref = fb.doc(db, "lembretes", usuario.uid);
+      const snap = await fb.getDoc(ref);
+      const restantes = ((snap.exists() ? snap.data().tokens : []) || []).filter(t => t !== token);
+      await fb.setDoc(ref, {
+        ativo: restantes.length > 0,
+        tokens: restantes,
+        atualizadoEm: fb.serverTimestamp()
+      }, { merge: true });
+    }
+    try { if (token){ await prepararAvisos(); await msgMod.deleteToken(messaging); } } catch(_){}
+    localStorage.removeItem(TOKEN_LOCAL);
+    chaveLembrete.checked = false;
+    pintarLembrete();
+  }
+
+  chaveLembrete?.addEventListener("change", async () => {
+    const querLigar = chaveLembrete.checked;
+    try {
+      if (querLigar) await ligarLembrete(); else await desligarLembrete();
+    } catch (e){
+      chaveLembrete.checked = false;
+      pintarLembrete();
+      mostrarErro("Não consegui ligar o lembrete: " + (e?.message || e));
+    }
+  });
+  pintarLembrete();
+
   fb.onAuthStateChanged(auth, (u) => {
     usuario = u;
     window.lerBibliaNome = u ? ((u.displayName || "").trim().split(/\s+/)[0] || null) : null;
     window.lerBibliaSyncDisponivel = true;
     window.lerBibliaConta = u ? { logado:true, nome:(u.displayName || "").trim(), email:u.email || "" } : { logado:false };
     try { window.renderAjustesMobile?.(); } catch(_){}
+    lerLembreteSalvo();
     try { atualizarSaudacao(); } catch(_){}   // só o texto do topo; não grava progresso
     if (u){
       info.innerHTML = "";
