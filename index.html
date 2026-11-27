@@ -1723,6 +1723,30 @@
     .openingPular{display:block;margin:14px auto 0;appearance:none;border:0;background:transparent;color:var(--ink-3);font-family:var(--ui);font-size:13px;font-weight:500;cursor:pointer;padding:8px 12px}
     .openingPular:hover,.openingPular:focus{background:transparent;color:var(--ink)}
 
+    /* ── Ler junto ── */
+    .ajJuntoNovo{flex-wrap:wrap}
+    .ajJuntoNovo .ajBtn{flex:1;padding:0 8px;white-space:nowrap;font-size:12.5px}
+    .ajCampo{flex:1;min-width:0;height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:14px}
+    .ajJuntoMsg{font-size:12.5px;color:var(--ink-2);min-height:0;padding:9px 12px}
+    .ajJuntoMsg.erro{color:var(--danger)}
+    .hojeJunto{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+    .hojeJunto[hidden]{display:none}
+    .jtGrupo{display:flex;flex-direction:column;gap:6px}
+    .jtTit{font-size:11.5px;font-weight:600;color:var(--ink-3)}
+    .jtPessoa{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);min-width:0}
+    .jtAv{width:22px;height:22px;flex:none;box-sizing:border-box;border-radius:999px;border:1.5px solid var(--line-strong);color:var(--ink-3);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+    .jtPessoa.leu .jtAv{background:var(--green);border-color:var(--green);color:var(--paper)}
+    .jtNome{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .jtEst{flex:none;color:var(--ink-3)}
+    .jtPessoa.leu .jtEst{color:var(--green)}
+    .jtMais{font-size:12px;color:var(--ink-3);padding-left:30px}
+    .juntoModal{position:fixed;inset:0;z-index:2750;display:none;align-items:center;justify-content:center;background:rgba(23,19,15,.6);backdrop-filter:blur(3px);padding:20px}
+    .juntoModal.open{display:flex}
+    .juntoCaixa{width:min(380px,100%);background:var(--surface);color:var(--ink);border-radius:18px;padding:20px;font-family:var(--ui);box-shadow:var(--shadow)}
+    .juntoCaixa p{margin:0 0 16px;font-size:15px;line-height:1.55}
+    .juntoCaixa small{display:block;margin-top:8px;font-size:12.5px;color:var(--ink-2)}
+    .juntoBtns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+
     /* ── Momento do dia ── */
     .momento{position:fixed;inset:0;z-index:2650;display:none;align-items:center;justify-content:center;background:#0f0c0a}
     .momento.show{display:flex;animation:openingIn .35s ease both}
@@ -1809,6 +1833,14 @@
       <p class="openingText" id="openingText"></p>
       <button class="openingBtn" id="openingBtn" type="button">Começar meu momento</button>
       <button class="openingPular" id="openingPular" type="button">Ir para o app</button>
+    </div>
+  </div>
+
+  <!-- Convite do Ler junto -->
+  <div class="juntoModal" id="juntoModal" role="dialog" aria-modal="true" aria-label="Convite para ler junto">
+    <div class="juntoCaixa">
+      <p id="juntoModalTxt"></p>
+      <div class="juntoBtns" id="juntoModalBtns"></div>
     </div>
   </div>
 
@@ -2036,6 +2068,11 @@
               <button type="button" class="ajBtn" id="ajContaBtn">Entrar</button>
             </div>
           </div>
+        </div>
+
+        <div class="ajGrupo" id="ajJuntoGrupo" hidden>
+          <span class="ajTitulo">Ler junto</span>
+          <div class="ajCard" id="ajJuntoLista"></div>
         </div>
 
         <div class="ajGrupo">
@@ -2276,6 +2313,7 @@
           <div class="hojeLista" id="hojeLista"></div>
           <button type="button" class="hojeCta" id="hojeCta">Começar a leitura</button>
           <div class="hojeLinks" id="hojeLinks"></div>
+          <div class="hojeJunto" id="hojeJunto" hidden></div>
           <div class="hojeRodape" id="hojeRodape"></div>
         </section>
       </div>
@@ -6967,6 +7005,7 @@ function closeReader(){
       await fb.setDoc(fb.doc(db, "progresso", usuario.uid), { dados, atualizadoEm: fb.serverTimestamp() });
       ultimoEnviado = dados;
       gravarMeta({ uid: usuario.uid, pendente: false });
+      agendarStatus();   // Ler junto: avisa o grupo se a leitura de hoje mudou
       limparErro();
       estadoChip("ok", "✓ Sincronizado", usuario.email);
     } catch (e) {
@@ -7228,8 +7267,293 @@ function closeReader(){
   });
   pintarLembrete();
 
+  // ══ LER JUNTO ══
+  // Dupla (até 2) ou grupo (até 30). Cada um segue o próprio plano; o grupo vê só
+  // se cada pessoa leu hoje, o que leu e a sequência. O diário nunca sai do aparelho.
+  // Firestore: grupos/{codigo} { nome, tipo, limite, dono, membros[] }
+  //            grupos/{codigo}/status/{uid} { nome, dia, leu, leituras, sequencia }
+  const juntoGrupoEl = document.getElementById("ajJuntoGrupo");
+  const juntoListaEl = document.getElementById("ajJuntoLista");
+  const hojeJuntoEl  = document.getElementById("hojeJunto");
+  const ALFA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";   // sem 0/O e 1/I, para não confundir
+  let juntoGrupos = [];            // [{ id, nome, tipo, limite, dono, membros }]
+  let juntoStatus = {};            // { codigo: { uid: status } }
+  let juntoOuvintes = [];          // onSnapshot ativos
+  let juntoPublicado = {};         // último status enviado por grupo
+  let juntoTimer = null;
+
+  function juntoMsg(txt, erro){
+    const el = document.getElementById("ajJuntoMsg");
+    if (!el) return;
+    el.textContent = txt || "";
+    el.classList.toggle("erro", !!erro);
+    el.hidden = !txt;
+  }
+  function primeiroNome(){ return ((usuario?.displayName || "").trim().split(/\s+/)[0]) || "Alguém"; }
+  function novoCodigo(){
+    const a = new Uint32Array(6); crypto.getRandomValues(a);
+    return Array.from(a, n => ALFA[n % ALFA.length]).join("");
+  }
+  function meusRef(){ return fb.doc(db, "meusGrupos", usuario.uid); }
+  function anotarGrupo(id){ return fb.setDoc(meusRef(), { ids: fb.arrayUnion(id) }, { merge: true }); }
+  function desanotarGrupo(id){ return fb.setDoc(meusRef(), { ids: fb.arrayRemove(id) }, { merge: true }).catch(() => {}); }
+  function linkConvite(g){ return `${location.origin}/?entrar=${g.id}`; }
+
+  // o que este aparelho publica: leu hoje? o quê? sequência
+  function meuStatus(){
+    const st = ensureStateDefaults(loadState());
+    const hoje = new Date();
+    const key = todayKeyNow();
+    const p = buildPlanForYear(st)[key];
+    const leituras = (p?.blocks || []).filter(b => !b.concluida && b.list?.length).map(b => b.text).join(" · ");
+    return { nome: primeiroNome(), dia: key, leu: !!st.days?.[key]?.done, leituras, sequencia: calcStreak(st, hoje) };
+  }
+  async function publicarStatus(){
+    if (!usuario || !juntoGrupos.length) return;
+    const s = meuStatus();
+    const txt = JSON.stringify(s);
+    for (const g of juntoGrupos){
+      if (juntoPublicado[g.id] === txt) continue;
+      try {
+        await fb.setDoc(fb.doc(db, "grupos", g.id, "status", usuario.uid), { ...s, atualizadoEm: fb.serverTimestamp() });
+        juntoPublicado[g.id] = txt;
+      } catch (e){ console.warn("ler junto: status", g.id, e); }
+    }
+  }
+  function agendarStatus(ms){
+    clearTimeout(juntoTimer);
+    juntoTimer = setTimeout(publicarStatus, ms ?? 1500);
+  }
+
+  function pararOuvintes(){ juntoOuvintes.forEach(f => { try { f(); } catch(_){} }); juntoOuvintes = []; }
+  async function carregarGrupos(){
+    pararOuvintes();
+    juntoGrupos = []; juntoStatus = {};
+    if (!usuario){ desenharJunto(); return; }
+    try {
+      // a lista dos meus grupos fica num documento só meu (meusGrupos/{uid})
+      const meus = await fb.getDoc(meusRef());
+      const ids = (meus.exists() ? meus.data().ids : []) || [];
+      const achados = await Promise.all(ids.map(id => fb.getDoc(fb.doc(db, "grupos", id)).catch(() => null)));
+      const sumiram = [];
+      achados.forEach((d, i) => {
+        if (d && d.exists() && (d.data().membros || []).includes(usuario.uid)) juntoGrupos.push({ id: d.id, ...d.data() });
+        else if (d) sumiram.push(ids[i]);   // grupo apagado (ou saí): tira da minha lista
+      });
+      if (sumiram.length) fb.setDoc(meusRef(), { ids: fb.arrayRemove(...sumiram) }, { merge: true }).catch(() => {});
+      juntoGrupos.sort((a, b) => (a.criadoEm?.seconds || 0) - (b.criadoEm?.seconds || 0));
+    } catch (e){
+      console.warn("ler junto: grupos", e);
+      juntoMsg("Não deu para carregar seus grupos agora. Tente de novo mais tarde.", true);
+    }
+    // status ao vivo: quando alguém marca a leitura, aparece na hora
+    juntoGrupos.forEach(g => {
+      const f = fb.onSnapshot(fb.collection(db, "grupos", g.id, "status"), (s) => {
+        juntoStatus[g.id] = {};
+        s.forEach(d => { juntoStatus[g.id][d.id] = d.data(); });
+        desenharHojeJunto();
+      }, (e) => console.warn("ler junto: ouvir", g.id, e));
+      juntoOuvintes.push(f);
+    });
+    desenharJunto();
+    agendarStatus(800);
+  }
+
+  function desenharJunto(){ desenharAjustesJunto(); desenharHojeJunto(); }
+
+  function desenharAjustesJunto(){
+    if (!juntoGrupoEl) return;
+    juntoGrupoEl.hidden = !usuario;
+    if (!usuario) return;
+    const linhas = juntoGrupos.map(g => {
+      const n = (g.membros || []).length;
+      const souDono = g.dono === usuario.uid;
+      const cheio = n >= (g.limite || 30);
+      return `<div class="ajLinha" data-g="${escapeHtml(g.id)}">
+        <span class="ajTxt"><b>${escapeHtml(g.nome)}</b><small>${g.tipo === "dupla" ? "Dupla" : "Grupo"} · ${n} ${n === 1 ? "pessoa" : "pessoas"}${cheio ? " · completo" : ""}</small></span>
+        ${cheio ? "" : `<button type="button" class="ajBtn" data-acao="convidar">Convidar</button>`}
+        <button type="button" class="ajBtn" data-acao="${souDono ? "apagar" : "sair"}">${souDono ? "Apagar" : "Sair"}</button>
+      </div>`;
+    }).join("");
+    juntoListaEl.innerHTML = linhas + `
+      <div class="ajLinha ajJuntoNovo">
+        <button type="button" class="ajBtn" data-acao="nova-dupla">Convidar uma pessoa</button>
+        <button type="button" class="ajBtn" data-acao="novo-grupo">Criar um grupo</button>
+      </div>
+      <div class="ajLinha" id="ajJuntoNome" hidden>
+        <input type="text" id="ajJuntoNomeTxt" class="ajCampo" maxlength="40" placeholder="Nome do grupo (ex.: Família, Célula)" />
+        <button type="button" class="ajBtn principal" data-acao="criar-grupo">Criar</button>
+      </div>
+      <div class="ajLinha ajJuntoMsg" id="ajJuntoMsg" hidden></div>`;
+  }
+
+  function desenharHojeJunto(){
+    if (!hojeJuntoEl) return;
+    const hoje = todayKeyNow();
+    const blocos = juntoGrupos.slice(0, 3).map(g => {
+      const st = juntoStatus[g.id] || {};
+      // quem entrou depois que o app abriu já aparece: só membros conseguem gravar status
+      const outros = Object.entries(st).filter(([uid]) => uid !== usuario?.uid);
+      if (!outros.length) return "";
+      outros.sort((a, b) => (b[1].dia === hoje && b[1].leu) - (a[1].dia === hoje && a[1].leu));
+      const mostrar = outros.slice(0, 6);
+      const resto = outros.length - mostrar.length;
+      const pessoas = mostrar.map(([, s]) => {
+        const leu = s.dia === hoje && s.leu;
+        const inicial = escapeHtml((s.nome || "?").charAt(0).toUpperCase());
+        const seq = leu && s.sequencia > 1 ? ` · ${s.sequencia} dias` : "";
+        return `<div class="jtPessoa${leu ? " leu" : ""}"><span class="jtAv">${inicial}</span><span class="jtNome">${escapeHtml(s.nome || "Alguém")}${leu && s.leituras ? ` · ${escapeHtml(s.leituras)}` : ""}</span><span class="jtEst">${leu ? `✓ leu${seq}` : "ainda não leu"}</span></div>`;
+      }).join("");
+      return `<div class="jtGrupo"><div class="jtTit">Lendo junto · ${escapeHtml(g.nome)}</div>${pessoas}${resto > 0 ? `<div class="jtMais">+${resto} ${resto === 1 ? "pessoa" : "pessoas"}</div>` : ""}</div>`;
+    }).join("");
+    hojeJuntoEl.innerHTML = blocos;
+    hojeJuntoEl.hidden = !blocos;
+  }
+
+  async function compartilharConvite(g){
+    const url = linkConvite(g);
+    const texto = g.tipo === "dupla"
+      ? `${primeiroNome()} te convidou para ler a Bíblia junto no Ler Bíblia.`
+      : `${primeiroNome()} te convidou para o grupo "${g.nome}" no Ler Bíblia.`;
+    if (navigator.share){
+      try { await navigator.share({ title: "Ler Bíblia", text: texto, url }); return; }
+      catch (e){ if (e?.name === "AbortError") return; }
+    }
+    try { await navigator.clipboard.writeText(`${texto} ${url}`); juntoMsg("Link do convite copiado. Cole no WhatsApp para enviar."); }
+    catch (_){ juntoMsg(`Envie este link: ${url}`); }
+  }
+
+  async function criarGrupo(tipo, nome){
+    const g = {
+      nome: tipo === "dupla" ? `Dupla de ${primeiroNome()}` : nome,
+      tipo, limite: tipo === "dupla" ? 2 : 30,
+      dono: usuario.uid, membros: [usuario.uid], criadoEm: fb.serverTimestamp()
+    };
+    const id = novoCodigo();
+    try {
+      await fb.setDoc(fb.doc(db, "grupos", id), g);
+      await anotarGrupo(id);
+    } catch (e){
+      console.warn("ler junto: criar", e);
+      juntoMsg("Não deu para criar agora. Verifique a internet e tente de novo.", true);
+      return;
+    }
+    await carregarGrupos();
+    const criado = juntoGrupos.find(x => x.id === id);
+    if (criado) compartilharConvite(criado);
+  }
+
+  async function sairDoGrupo(g){
+    if (!confirm(`Sair de "${g.nome}"? Você deixa de ver a leitura das outras pessoas.`)) return;
+    try {
+      await fb.deleteDoc(fb.doc(db, "grupos", g.id, "status", usuario.uid));
+      await fb.updateDoc(fb.doc(db, "grupos", g.id), { membros: fb.arrayRemove(usuario.uid) });
+    } catch (e){ console.warn("ler junto: sair", e); juntoMsg("Não deu para sair agora. Tente de novo.", true); return; }
+    await desanotarGrupo(g.id);
+    delete juntoPublicado[g.id];
+    carregarGrupos();
+  }
+  async function apagarGrupo(g){
+    if (!confirm(`Apagar "${g.nome}" para todos? As outras pessoas deixam de ver o grupo.`)) return;
+    try {
+      await fb.deleteDoc(fb.doc(db, "grupos", g.id, "status", usuario.uid)).catch(() => {});
+      await fb.deleteDoc(fb.doc(db, "grupos", g.id));
+    }
+    catch (e){ console.warn("ler junto: apagar", e); juntoMsg("Não deu para apagar agora. Tente de novo.", true); return; }
+    await desanotarGrupo(g.id);
+    delete juntoPublicado[g.id];
+    carregarGrupos();
+  }
+
+  juntoListaEl?.addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-acao]");
+    if (!b || !usuario) return;
+    const g = juntoGrupos.find(x => x.id === b.closest("[data-g]")?.dataset.g);
+    const acao = b.dataset.acao;
+    juntoMsg("");
+    if (acao === "convidar" && g) compartilharConvite(g);
+    else if (acao === "sair" && g) sairDoGrupo(g);
+    else if (acao === "apagar" && g) apagarGrupo(g);
+    else if (acao === "nova-dupla") criarGrupo("dupla");
+    else if (acao === "novo-grupo"){ const l = document.getElementById("ajJuntoNome"); l.hidden = false; document.getElementById("ajJuntoNomeTxt").focus(); }
+    else if (acao === "criar-grupo"){
+      const nome = (document.getElementById("ajJuntoNomeTxt").value || "").trim();
+      if (!nome){ juntoMsg("Dê um nome ao grupo primeiro.", true); return; }
+      criarGrupo("grupo", nome.slice(0, 40));
+    }
+  });
+
+  // ── Convite: lerbiblia.vercel.app/?entrar=CODIGO ──
+  const conviteCodigo = (new URLSearchParams(location.search).get("entrar") || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+  function limparConviteDaUrl(){
+    try { const u = new URL(location.href); u.searchParams.delete("entrar"); history.replaceState(null, "", u.pathname + u.search + u.hash); } catch(_){}
+  }
+  function mostrarConvite(html, botoes){
+    const m = document.getElementById("juntoModal");
+    document.getElementById("juntoModalTxt").innerHTML = html;
+    const area = document.getElementById("juntoModalBtns");
+    area.innerHTML = "";
+    botoes.forEach(([txt, principal, fn]) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ajBtn" + (principal ? " principal" : ""); b.textContent = txt;
+      b.addEventListener("click", fn);
+      area.appendChild(b);
+    });
+    m.classList.add("open");
+  }
+  function fecharConvite(){ document.getElementById("juntoModal").classList.remove("open"); }
+  let conviteTratado = false;
+  async function tratarConvite(){
+    if (!conviteCodigo || conviteTratado) return;
+    if (!usuario){
+      mostrarConvite("Você recebeu um convite para <b>ler a Bíblia junto</b>. Entre com sua conta Google para aceitar.",
+        [["Agora não", false, () => { fecharConvite(); limparConviteDaUrl(); conviteTratado = true; }],
+         ["Entrar com o Google", true, () => { fecharConvite(); entrar(); }]]);
+      return;
+    }
+    conviteTratado = true;
+    let g;
+    try {
+      const snap = await fb.getDoc(fb.doc(db, "grupos", conviteCodigo));
+      if (!snap.exists()){
+        mostrarConvite("Este convite não vale mais: o grupo foi apagado ou o link está incompleto.", [["Ok", true, () => { fecharConvite(); limparConviteDaUrl(); }]]);
+        return;
+      }
+      g = { id: snap.id, ...snap.data() };
+    } catch (e){
+      console.warn("ler junto: convite", e);
+      mostrarConvite("Não deu para abrir o convite agora. Verifique a internet e abra o link de novo.", [["Ok", true, () => { fecharConvite(); }]]);
+      return;
+    }
+    if ((g.membros || []).includes(usuario.uid)){ limparConviteDaUrl(); anotarGrupo(g.id).then(carregarGrupos).catch(() => {}); return; }
+    if ((g.membros || []).length >= (g.limite || 30)){
+      mostrarConvite(`${g.tipo === "dupla" ? "Esta dupla" : `O grupo <b>${escapeHtml(g.nome)}</b>`} já está completo.`, [["Ok", true, () => { fecharConvite(); limparConviteDaUrl(); }]]);
+      return;
+    }
+    const titulo = g.tipo === "dupla" ? `ler a Bíblia junto em <b>${escapeHtml(g.nome)}</b>` : `entrar no grupo <b>${escapeHtml(g.nome)}</b>`;
+    mostrarConvite(`Você foi convidado para ${titulo}.<br><small>Cada um segue o próprio plano. O grupo vê só se você leu hoje, o que leu e sua sequência. Seu diário continua só seu.</small>`,
+      [["Agora não", false, () => { fecharConvite(); limparConviteDaUrl(); }],
+       ["Entrar", true, async () => {
+          fecharConvite(); limparConviteDaUrl();
+          try {
+            await fb.updateDoc(fb.doc(db, "grupos", g.id), { membros: fb.arrayUnion(usuario.uid) });
+            await anotarGrupo(g.id);
+          }
+          catch (e){
+            console.warn("ler junto: entrar", e);
+            mostrarConvite("Não deu para entrar agora. Abra o link do convite de novo em alguns instantes.", [["Ok", true, fecharConvite]]);
+            return;
+          }
+          await carregarGrupos();
+        }]]);
+  }
+  // ao voltar para o app: atualiza a lista (alguém pode ter entrado ou saído) e publica o meu status
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && usuario) carregarGrupos(); });
+
   fb.onAuthStateChanged(auth, (u) => {
     usuario = u;
+    carregarGrupos();
+    tratarConvite();
     window.lerBibliaNome = u ? ((u.displayName || "").trim().split(/\s+/)[0] || null) : null;
     window.lerBibliaSyncDisponivel = true;
     window.lerBibliaConta = u ? { logado:true, nome:(u.displayName || "").trim(), email:u.email || "" } : { logado:false };
@@ -7241,7 +7565,7 @@ function closeReader(){
       info.append("Conectado como ");
       const b = document.createElement("b"); b.textContent = u.email || u.displayName || "conta Google";
       info.append(b, ". Seu progresso fica salvo na conta e aparece igual no celular e no computador.");
-      baixar();
+      baixar().finally(() => agendarStatus(500));   // Ler junto: publica já com o progresso da nuvem
     } else {
       ultimoEnviado = null;
       panel.classList.remove("open");
