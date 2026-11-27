@@ -1561,6 +1561,7 @@
       .ajTxt{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
       .ajTxt b{font-size:14.5px;font-weight:600;color:var(--ink)}
       .ajTxt small{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .ajTxt small.erro{color:var(--danger);white-space:normal}
       #ajContaInfo{white-space:normal}
       .ajAvatar{flex:none;width:36px;height:36px;border-radius:999px;background:var(--surface-3);color:var(--ink-2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
       .ajAvatar.on{background:var(--green);color:#fff}
@@ -6766,7 +6767,25 @@ function closeReader(){
     return messaging;
   }
 
+  // O register() devolve o service worker ainda instalando; o navegador só aceita
+  // a inscrição de aviso quando ele está ATIVO. (navigator.serviceWorker.ready não
+  // serve aqui: ele espera o sw.js da página, não este, que tem outro escopo.)
+  function esperarAtivo(reg){
+    if (reg.active) return Promise.resolve(reg);
+    return new Promise((ok, falhou) => {
+      const sw = reg.installing || reg.waiting;
+      if (!sw) return falhou(new Error("service worker dos avisos não instalou"));
+      const limite = setTimeout(() => falhou(new Error("service worker dos avisos demorou para ativar")), 15000);
+      sw.addEventListener("statechange", () => {
+        if (sw.state === "activated"){ clearTimeout(limite); ok(reg); }
+        else if (sw.state === "redundant"){ clearTimeout(limite); falhou(new Error("service worker dos avisos foi descartado")); }
+      });
+    });
+  }
+
+  let erroLembrete = "";   // mensagem amigável mostrada embaixo da chave
   function textoLembrete(estado){
+    if (erroLembrete) return erroLembrete;
     if (!usuario) return "Entre com o Google para receber o lembrete";
     if (souIphone() && !appInstalado()) return "No iPhone, instale o app na tela de início para receber";
     if (Notification.permission === "denied") return "Avisos bloqueados por você neste aparelho — libere nas permissões do navegador";
@@ -6782,6 +6801,8 @@ function closeReader(){
     chaveLembrete.disabled = travado || estado === "ligando";
     linhaLembrete.style.opacity = travado ? ".55" : "";
     infoLembrete.textContent = textoLembrete(estado);
+    infoLembrete.classList.toggle("erro", !!erroLembrete);
+    if (!erroLembrete) infoLembrete.removeAttribute("title");
   }
 
   async function lerLembreteSalvo(){
@@ -6808,6 +6829,7 @@ function closeReader(){
     if (!VAPID || VAPID.startsWith("COLE_AQUI")) throw new Error("falta a chave pública (VAPID) do Firebase no index.html");
     await prepararAvisos();
     const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", { scope: "/firebase-cloud-messaging-push-scope" });
+    await esperarAtivo(reg);
     const token = await msgMod.getToken(messaging, { vapidKey: VAPID, serviceWorkerRegistration: reg });
     if (!token) throw new Error("não consegui o código deste aparelho");
     localStorage.setItem(TOKEN_LOCAL, token);
@@ -6843,12 +6865,17 @@ function closeReader(){
 
   chaveLembrete?.addEventListener("change", async () => {
     const querLigar = chaveLembrete.checked;
+    erroLembrete = "";
     try {
       if (querLigar) await ligarLembrete(); else await desligarLembrete();
     } catch (e){
-      chaveLembrete.checked = false;
+      console.warn("lembrete:", e);
+      infoLembrete.title = "Detalhe técnico: " + (e?.message || e);   // aparece ao passar o mouse no PC
+      chaveLembrete.checked = !querLigar;   // volta para o estado real: falhou ao ligar = desligado; falhou ao desligar = continua ligado
+      erroLembrete = !navigator.onLine
+        ? "Sem internet agora. Conecte e toque na chave de novo."
+        : (querLigar ? "Não deu para ativar o lembrete agora. Toque na chave de novo." : "Não deu para desligar o lembrete agora. Toque na chave de novo.");
       pintarLembrete();
-      mostrarErro("Não consegui ligar o lembrete: " + (e?.message || e));
     }
   });
   pintarLembrete();
